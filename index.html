@@ -174,6 +174,12 @@
   /* 文字還沒跑完:框先在,選項晚點出現(保留位置,框不會跳) */
   .console.waiting .choices { visibility: hidden; }
   .console:not(.waiting) .choices { animation: story-in .4s ease-out both; }
+  /* 文字跑完:只有一個選項時它亮一下;文字跑完後點空白處,選項閃一下提醒要親手點 */
+  button.choice.ready { animation: choice-ready 1.2s .3s ease-out 2; }
+  .console.nudge button.choice:not(:disabled) { animation: choice-ready .7s ease-out; }
+  @keyframes choice-ready {
+    35% { border-color: #f0d08a; box-shadow: inset 0 0 14px rgba(240,208,138,.35), 0 0 12px rgba(240,208,138,.55), 0 3px 0 #0a0705; }
+  }
   .console-orn {
     position: absolute;
     top: 0;
@@ -369,6 +375,53 @@
     margin-bottom: 4px;
   }
   .status-head h1 { margin-bottom: 6px; }
+  /* 查看自身:滿版的角色面板,頂端一條標題列(右上角 ✕),下面整片可以捲 */
+  .status-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(ellipse at 50% 0%, #2a2018, var(--bg) 70%);
+  }
+  .status-sheet.slide-in { animation: status-up .28s ease-out both; }
+  @keyframes status-up { from { transform: translateY(100%); } }
+  .status-bar {
+    width: 100%;
+    max-width: 672px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .status-bar h2 { margin: 0; font-size: 17px; letter-spacing: .3em; color: var(--gold); }
+  .status-close {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    font: inherit;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--gold);
+    background: rgba(10,7,5,.6);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .status-close:hover, .status-close:focus-visible { border-color: var(--gold); color: #f2d896; }
+  .status-body {
+    width: 100%;
+    max-width: 672px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
   .status-head .meta { margin-bottom: 0; }
   /* 頭像:身份圖片還沒到,先用剪影代替 */
   .portrait {
@@ -2150,6 +2203,7 @@ const state = {
   qingli: 50,   // 情理值:越小越牽掛紅塵,越大越無情合道(不顯示在畫面上)
   morality: 50, // 善惡值:越小越善良,越大越邪惡(來源尚未定義)
   statusOpen: false,
+  statusSlide: false,
   introStyle: "4", // 測試用:序章首戰的進場演出 1~4,選定後拿掉
   attackStyle: null, // 測試用:普通攻擊改用斬擊 slash／拳擊 punch 預覽,null = 照 content.js
   testsOpen: false,  // 測試切換列是否展開
@@ -2540,7 +2594,12 @@ function storyText(text, after, actions) {
     stopTimers();
     hint.remove();
     tail.hidden = false;
-    if (actions) actions.classList.remove("waiting");
+    if (actions) {
+      actions.classList.remove("waiting");
+      // 只有一個選項時(例如「墜落」)亮一下,讓玩家知道要點它
+      const only = actions.querySelectorAll("button.choice:not(:disabled)");
+      if (only.length === 1) only[0].classList.add("ready");
+    }
     box.classList.add("done");
     story.finished = true;
     if (box.isConnected && tail.firstChild) tail.scrollIntoView({ block: "nearest", behavior: "smooth" });
@@ -2608,26 +2667,32 @@ function storyText(text, after, actions) {
 
 // 播劇情時往下走一步:字還沒跑完就跑下一句;跑完了而且只有一個選項(例如「繼續」)就直接進下一段。
 // 有兩個以上的選項時要玩家自己選,不動
+// 點畫面推進劇情只推進文字(跑字中 → 下一句);文字跑完後選項一定要親手點,
+// 這時點空白處只會讓選項閃一下提示,不會替玩家按(避免連點跳過字時多點一下就換了畫面)
 function storyStep() {
-  if (!storyScreen) return false;
-  if (!storyScreen.story.finished) {
-    storyScreen.story.advance();
-    return true;
-  }
-  const choices = storyScreen.actions ? storyScreen.actions.querySelectorAll("button.choice:not(:disabled)") : [];
-  if (choices.length !== 1) return false;
-  choices[0].click();
+  if (!storyScreen || storyScreen.story.finished) return false;
+  storyScreen.story.advance();
   return true;
+}
+function nudgeChoices() {
+  const a = storyScreen && storyScreen.story.finished && storyScreen.actions;
+  if (!a) return;
+  a.classList.remove("nudge");
+  void a.offsetWidth; // 重新觸發閃一下的動畫
+  a.classList.add("nudge");
 }
 
 // 點畫面任何地方(按鈕除外)都能推進劇情;掛在 #app 上而不是 document,iPhone 的 Safari 才會送出點擊
 document.getElementById("app").addEventListener("click", e => {
-  if (!e.target.closest("button, a, input, select, textarea")) storyStep();
+  if (e.target.closest("button, a, input, select, textarea")) return;
+  if (!storyStep()) nudgeChoices();
 });
 document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && state.statusOpen) { closeStatus(); return; }
   if (e.key !== " " && e.key !== "Enter") return;
   if (e.target.closest && e.target.closest("button")) return; // 焦點在按鈕上時讓按鈕自己處理
-  if (storyStep()) e.preventDefault();
+  e.preventDefault();
+  if (!storyStep()) nudgeChoices();
 });
 
 // 畫面 = 上面的內容框 + 貼在底部的選項框(跟戰鬥的四格按鈕同一個位置)
@@ -3563,6 +3628,12 @@ function renderPrologueEnd() {
 
 function openStatus() {
   state.statusOpen = true;
+  state.statusSlide = true; // 打開那一次從底部滑上來;之後重畫不再滑
+  render();
+}
+
+function closeStatus() {
+  state.statusOpen = false;
   render();
 }
 
@@ -3597,7 +3668,15 @@ function renderStatus() {
     el("b", null, [blur ? unknown : String(state.attributes[k])]),
     el("span", null, [ATTR_EFFECTS[k]])
   ]));
-  return screen([panel([
+  // 滿版的角色面板:蓋滿整個畫面,右上角 ✕ 關閉(電腦上 Esc 也能關),不用底部的選項
+  const slide = state.statusSlide;
+  state.statusSlide = false;
+  return el("div", { class: slide ? "status-sheet slide-in" : "status-sheet", role: "dialog", "aria-label": "查看自身" }, [
+    el("div", { class: "status-bar" }, [
+      el("h2", null, ["查看自身"]),
+      el("button", { class: "status-close", onclick: closeStatus, "aria-label": "關閉" }, ["✕"])
+    ]),
+    el("div", { class: "status-body" }, [panel([
     el("div", { class: "status-head" }, [
       el("div", { class: blur ? "portrait blur" : "portrait" }),
       el("div", null, [
@@ -3613,7 +3692,7 @@ function renderStatus() {
     el("div", { class: "text" }, [demonText]),
     el("h2", null, ["善惡"]),
     leanBar("善良", "邪惡", blur ? null : state.morality)
-  ]), dock([choiceButton("返回", () => { state.statusOpen = false; render(); })])]);
+  ])])]);
 }
 
 function renderSelect() {
