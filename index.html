@@ -664,15 +664,90 @@
   /* 援手(自動援戰):梅花色的標籤和字 */
   :is(.b-log, .b-backlog) p.ally .b-who b { background: #f0c9d6; color: #4a1426; }
   :is(.b-log, .b-backlog) p.ally .b-text { color: #f3d3de; }
-  .b-assist-flash {
+  .b-val.up { color: #86d68f; }
+  /* 夥伴卡:圖區左下角;頭像外圈的集氣環(--p = 集了多少),集滿的那回合亮起 */
+  .b-ally {
+    position: absolute;
+    left: 10px;
+    bottom: 6px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 12px 3px 3px;
+    background: linear-gradient(90deg, rgba(40,14,24,.85), rgba(20,10,14,.6));
+    border: 1px solid rgba(240,180,200,.45);
+    border-radius: 30px;
+    pointer-events: none;
+  }
+  .b-ally-ring {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    padding: 3px;
+    border-radius: 50%;
+    background: conic-gradient(#f4a9c2 var(--p), rgba(255,255,255,.12) 0);
+  }
+  .b-ally-face {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #2a1a20 center / cover no-repeat;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.6);
+  }
+  .b-ally-info { display: flex; flex-direction: column; line-height: 1.25; }
+  .b-ally-info b { font-size: 14px; letter-spacing: .1em; color: #f8d9e4; }
+  .b-ally-info span { font-size: 11px; color: #c9a7b3; }
+  .b-ally.ready { border-color: #f4a9c2; animation: ally-ready 1.6s ease-in-out infinite; }
+  .b-ally.ready .b-ally-info span { color: #ffd3e1; }
+  @keyframes ally-ready { 50% { box-shadow: 0 0 14px rgba(244,169,194,.65); } }
+  /* 夥伴出手的特寫:斜橫幅從左劃進來,停一下,往右淡出 */
+  .ally-cut {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 50% 62%, rgba(255,192,214,.42), transparent 66%);
-    opacity: 0;
+    z-index: 3;
+    overflow: hidden;
     pointer-events: none;
-    animation: assist-flash 1.4s .7s ease-out;
   }
-  @keyframes assist-flash { 20% { opacity: 1; } }
+  .ally-cut-band {
+    position: absolute;
+    left: -6%;
+    right: -6%;
+    top: 46%;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-left: 12%;
+    background: linear-gradient(90deg, transparent, rgba(70,18,36,.92) 14%, rgba(70,18,36,.92) 86%, transparent);
+    border-top: 1px solid rgba(244,169,194,.7);
+    border-bottom: 1px solid rgba(244,169,194,.7);
+    transform: translateY(-50%) skewY(-5deg);
+    opacity: 0;
+    animation: ally-cut 1.7s .8s ease-out both;
+  }
+  @keyframes ally-cut {
+    0% { opacity: 0; transform: translate(-60%, -50%) skewY(-5deg); }
+    14% { opacity: 1; transform: translate(0, -50%) skewY(-5deg); }
+    78% { opacity: 1; transform: translate(4%, -50%) skewY(-5deg); }
+    100% { opacity: 0; transform: translate(30%, -50%) skewY(-5deg); }
+  }
+  .ally-cut-face {
+    width: 58px;
+    height: 58px;
+    flex: none;
+    border-radius: 50%;
+    background: #2a1a20 center / cover no-repeat;
+    box-shadow: 0 0 0 2px #f4a9c2, 0 0 16px rgba(244,169,194,.6);
+  }
+  .ally-cut-text { display: flex; flex-direction: column; }
+  .ally-cut-text small { font-size: 12px; letter-spacing: .2em; color: #e8b9c8; }
+  .ally-cut-text b { font-size: 26px; letter-spacing: .25em; color: #fff0f5; text-shadow: 0 0 12px rgba(244,169,194,.8); }
+  .b-float.heal { color: #a6f0ad; text-shadow: 0 2px 0 #0b2410, 0 0 12px rgba(120,220,130,.7); }
+  .b-float.heal::before { background: linear-gradient(90deg, transparent, rgba(40,110,52,.88) 18%, rgba(70,150,84,.82) 70%, transparent); }
+  .b-float.mana { color: #b8d4ff; text-shadow: 0 2px 0 #0b1426, 0 0 12px rgba(120,160,240,.7); }
+  .b-float.mana::before { background: linear-gradient(90deg, transparent, rgba(40,70,130,.88) 18%, rgba(70,100,170,.82) 70%, transparent); }
   /* 幼年篇的取名:選項框裡一個輸入框加「就叫這個」 */
   .choices.name-entry { gap: 4px; }
   .name-row { display: flex; gap: 8px; }
@@ -2353,6 +2428,7 @@ const LOG_LINES = 5; // 戰鬥紀錄只保留最近幾行
 const DUSK_MS = 4100; // 分出勝負後,黑暗籠罩多久才切到下一個畫面(CSS b-dusk 延遲 1.4s + 2.6s)
 const REVEAL_MS = 1300; // 最後一劍的演出播完,金身才裂開
 const KILL_MS = 2800; // 真身露出來之後,多久出手
+const ALLY_CUT_MS = 2600; // 夥伴出手特寫的長度(CSS ally-cut 延遲 .8s + 1.7s,再留一點)
 
 // 目前這場戰鬥的設定:序章首戰(content.js 的 prologueBattle)或幼年篇的教學戰(childBattle)
 function battleDef() {
@@ -2375,11 +2451,12 @@ function startPrologue(def = CONTENT.prologueBattle) {
     // usable = 上一刻能用的術法和道具、fresh = 這一刻才變成能用的(外框亮起)
     picked: null, last: null, usable: [], fresh: [],
     // 前世殘念:wrongTurns = 這一輪選錯的回合,echo = 前幾輪記下的(這些回合魂火會指路),echoTurn = 這回合播過了
-    wrongTurns: [], echo: P.soulEcho === false ? [] : loadEcho(), echoTurn: -1
+    wrongTurns: [], echo: P.soulEcho === false ? [] : loadEcho(), echoTurn: -1,
+    // 夥伴(自動援戰):charge = 已經集了幾回合,集滿 ally.every 就在回合結束時出手
+    ally: { charge: 0 }
   };
   state.battle.usable = usableTools(state.battle);
   battleLog(P.opening, "enemy");
-  if (P.tip) battleLog(P.tip, "system");
   battleLog(P.turns[0].telegraph, "enemy");
   state.phase = "prologue";
   render();
@@ -2440,6 +2517,12 @@ function battleAct(id) {
     if (turn.onWrong === "reveal") b.revealed = true;
     // 打贏了:有真身的(序章)接著金身裂開、真身出手(revealTrueForm),沒有的直接打贏
     if (lastTurn) { if (P.reveal) b.ending = true; else b.result = "win"; }
+  } else if (turn.onWrong === "hp" && b.statuses.some(s => s.name === "花蔭")) {
+    // 夥伴種下的花蔭:替你擋掉這一下,用掉就沒了
+    b.statuses = b.statuses.filter(s => s.name !== "花蔭");
+    b.fx.block = true;
+    battleLog(turn.fail);
+    battleLog("花瓣替你擋下了這一擊", "system");
   } else if (turn.onWrong === "hp") {
     b.hp = Math.max(P.cannotLose ? 1 : 0, b.hp - P.wrongDamage); // 打不輸的戰鬥(教學戰)氣血最少剩 1
     b.fx.hurt = P.wrongDamage;
@@ -2461,16 +2544,18 @@ function battleAct(id) {
     const hit = id === turn.answer && !(turn.failUnrevealed && !b.revealed);
     b.fx.attack = { style: (id === "attack" && state.attackStyle) || tool.fx || "slash", hit };
   }
+  if (P.ally && !b.result && !b.ending && !lastTurn) allyTurnEnd(P, b);
   const usable = usableTools(b);
   b.fresh = usable.filter(t => !b.usable.includes(t));
   b.usable = usable;
-  // 自動援戰:援手在這回合結束時自己出手
-  if (turn.assist && b.result !== "lose") {
-    battleLog(turn.assist, "ally");
-    b.fx.assist = true;
-  }
 
   if (!b.result && !b.ending && lastTurn) b.result = P.cannotLose ? "win" : "lose";
+  // 打贏時夥伴收尾:一樣有出手特寫,黑幕晚一點落下,讓特寫和這句話看得完
+  if (b.result === "win" && P.ally && P.ally.finale) {
+    battleLog(P.ally.finale.text, "ally");
+    b.fx.allyCut = P.ally.finale.name;
+    b.duskDelay = ALLY_CUT_MS;
+  }
   if (!b.result && !b.ending) {
     b.turn += 1;
     battleLog(P.turns[b.turn].telegraph, "enemy");
@@ -2479,7 +2564,37 @@ function battleAct(id) {
   if (b.ending) {
     b.lockUntil = Infinity;
     setTimeout(revealTrueForm, REVEAL_MS);
-  } else if (b.result) setTimeout(finishPrologue, DUSK_MS);
+  } else if (b.result) setTimeout(finishPrologue, DUSK_MS + (b.duskDelay || 0));
+}
+
+// 夥伴(自動援戰):每回合結束集一格,集滿 every 格就出手一次,依情況挑招
+// (受了傷先補血、靈力不滿就補靈力,都滿就種花蔭替你擋一次傷害),出手時有一段橫幅特寫
+function allyTurnEnd(P, b) {
+  const A = P.ally;
+  b.ally.charge += 1;
+  if (b.ally.charge < A.every) return;
+  b.ally.charge = 0;
+  const sk = A.skills.find(k => k.when === "hurt" ? b.hp < P.hp : k.when === "tired" ? b.mp <= P.mpMax / 2 : true);
+  battleLog(sk.text, "ally");
+  if (sk.hp) {
+    const v = Math.min(sk.hp, P.hp - b.hp);
+    b.hp += v;
+    b.fx.allyHeal = v;
+    battleLog("你的氣血", "system", `+${v}`);
+  }
+  if (sk.mp) {
+    const v = Math.min(sk.mp, P.mpMax - b.mp);
+    b.mp += v;
+    b.fx.allyMp = v;
+    battleLog("你的靈力", "system", `+${v}`);
+  }
+  if (sk.status) {
+    b.statuses = b.statuses.filter(s => s.name !== sk.status).concat({ name: sk.status, left: 3 });
+    b.fx.gained = sk.status;
+    battleLog(`你得到了${sk.status}，持續 3 回合`, "system");
+  }
+  b.fx.allyCut = sk.name;
+  b.lockUntil = Date.now() + ALLY_CUT_MS; // 特寫播完才接受下一個動作
 }
 
 // 打贏之後:金身沿劍痕裂開,露出第二階段(真身),它隨即出手,這一下必死(劇情殺)
@@ -3339,6 +3454,31 @@ function renderChild() {
   ], "fade-in");
 }
 
+// 夥伴卡:圖區左下角,頭像外圈是集氣環,寫著再幾回合出手;集滿的那回合整張卡亮起
+function allyCard(b, A) {
+  const left = A.every - b.ally.charge; // 包含這回合在內,再幾個回合結束時出手
+  const pct = Math.round((b.ally.charge / A.every) * 100);
+  return el("div", { class: left <= 1 ? "b-ally ready" : "b-ally", "aria-label": `夥伴 ${A.name}，${left <= 1 ? "這回合結束時出手" : `再 ${left} 回合出手`}` }, [
+    el("div", { class: "b-ally-ring", style: `--p:${left <= 1 ? 100 : pct}%` }, [el("i", { class: "b-ally-face", style: `background-image:url("${A.portrait}")` })]),
+    el("div", { class: "b-ally-info" }, [
+      el("b", null, [A.name]),
+      el("span", null, [left <= 1 ? "本回合出手" : `再 ${left} 回合出手`])
+    ])
+  ]);
+}
+
+// 夥伴出手的特寫:一條斜斜的橫幅帶著頭像和招式名劃過舞台;播完就拿掉
+function allyCutIn(A, skillName) {
+  const node = el("div", { class: "ally-cut" }, [
+    el("div", { class: "ally-cut-band" }, [
+      el("i", { class: "ally-cut-face", style: `background-image:url("${A.portrait}")` }),
+      el("div", { class: "ally-cut-text" }, [el("small", null, [`夥伴・${A.name}`]), el("b", null, [skillName])])
+    ])
+  ]);
+  setTimeout(() => node.remove(), ALLY_CUT_MS);
+  return node;
+}
+
 // ---- 前世殘念:魂群(測試切換「前世殘念」)----
 // 序章打輸時記下這一輪選錯的回合(一輪輪累積,打贏才清掉);下一輪到了那些回合,一群魂火像魚群一樣游過來,
 // 繞著正確的選項打轉幾秒再散去,像前世的你還記得。少用:只在前世選錯的回合出現,每回合一次。
@@ -3624,6 +3764,10 @@ function renderPrologue() {
   let meFloat = null;
   if (fx && fx.hurt) meFloat = el("span", { class: "b-float" }, [el("small", null, ["氣血"]), `−${fx.hurt}`]);
   else if (fx && fx.block) meFloat = el("span", { class: "b-float silver" }, ["格擋"]);
+  // 夥伴補的血、靈力:在自己的狀態欄跳綠色/藍色的字,排在出手特寫之後
+  const allyFloat = fx && (fx.allyHeal || fx.allyMp)
+    ? el("span", { class: fx.allyHeal ? "b-float heal" : "b-float mana", style: "animation-delay:2s" }, [el("small", null, [fx.allyHeal ? "氣血" : "靈力"]), `+${fx.allyHeal || fx.allyMp}`])
+    : null;
   // 狀態發作的跳字排在受擊之後,用狀態自己的顏色
   const dotColor = fx && fx.dot && CONTENT.statusEffectCatalog[fx.dot.name].color;
   const dotFloat = fx && fx.dot
@@ -3695,6 +3839,7 @@ function renderPrologue() {
     // 回看紀錄;分出勝負後(含打贏後的劇情殺)藏起來,但保留位置
     el("button", { class: b.result || b.ending ? "b-backlog-btn off" : "b-backlog-btn", onclick: openBacklog }, ["回看紀錄"]),
     meFloat,
+    allyFloat,
     dotFloat,
     tip
   ]);
@@ -3715,12 +3860,13 @@ function renderPrologue() {
       ...layers.overlays,
       dust,
       edge,
-      fx && fx.assist ? el("i", { class: "b-assist-flash" }) : null, // 援手出手:舞台泛一下梅花色的光
       el("div", { class: "b-view" }, [
         fxNode,
         rune,
+        P.ally ? allyCard(b, P.ally) : null,
         atk ? (atk.hit ? el("span", { class: "b-float gold" }, ["？？？"]) : el("span", { class: "b-float miss" }, ["落空"])) : null
       ]),
+      fx && fx.allyCut ? allyCutIn(P.ally, fx.allyCut) : null,
       el("div", { class: "b-log" }, lines),
       el("div", { class: "b-stage-top" }, [
         el("div", { class: "b-stage-meta" }, [el("span", null, [P.location]), el("i", { class: "b-emblem-top" }), el("span", null, [`第 ${b.turn + 1} 回合`])]),
@@ -3733,7 +3879,7 @@ function renderPrologue() {
     ]),
     renderBattleActions(animate, mePanel),
     ...(b.backlog && !b.result && !b.ending ? backlogSheet() : []),
-    b.result ? el("div", { class: "b-dusk" }) : null,
+    b.result ? el("div", b.duskDelay ? { class: "b-dusk", style: `animation-delay:${1.4 + b.duskDelay / 1000}s` } : { class: "b-dusk" }) : null,
     introNode
   ]);
 }
@@ -3741,12 +3887,12 @@ function renderPrologue() {
 // 戰鬥紀錄的一行:前面掛說話的人(你=金底、它=紅底、提示=藍框),行動的結果不掛
 function logLine(line, attrs) {
   const P = battleDef();
-  const whoLabel = { you: "你", enemy: P.enemyName, ally: P.allyName || "援手", system: "提示" };
+  const whoLabel = { you: "你", enemy: P.enemyName, ally: P.ally ? P.ally.name : "援手", system: "提示" };
   return el("p", attrs, [
     el("span", { class: "b-who" }, line.who ? [el("b", null, [whoLabel[line.who]])] : []),
     el("span", { class: "b-text" }, [
       ...richText(line.text),
-      line.value ? el("span", { class: "b-val" }, [line.value]) : null
+      line.value ? el("span", { class: line.value.startsWith("+") ? "b-val up" : "b-val" }, [line.value]) : null
     ])
   ]);
 }
