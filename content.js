@@ -150,7 +150,7 @@ const CONTENT = {
     next: "afterwolf",
     ally: {
       name: "雪梅花",
-      portrait: "assets/placeholder/xuemeihua.svg", // 暫代頭像
+      portrait: "assets/ally/xuemeihua-face.webp", // 從 assets/src/xuemeihua.webp 裁出來的頭像
       every: 2,
       skills: [
         { when: "hurt", name: "梅香回春", hp: 10, text: "雪梅花把一片梅花瓣按在你的傷口上，暖暖的，一點都不痛了。" },
