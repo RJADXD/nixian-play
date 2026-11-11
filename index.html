@@ -661,6 +661,48 @@
   :is(.b-log, .b-backlog) p.system .b-who b { border: 1px solid #6f93ad; color: #9fc1d6; padding: 0 5px; }
   :is(.b-log, .b-backlog) p.enemy .b-text { color: var(--b-warn); }
   :is(.b-log, .b-backlog) p.system .b-text { color: #9fc1d6; font-size: 14px; }
+  /* 援手(自動援戰):梅花色的標籤和字 */
+  :is(.b-log, .b-backlog) p.ally .b-who b { background: #f0c9d6; color: #4a1426; }
+  :is(.b-log, .b-backlog) p.ally .b-text { color: #f3d3de; }
+  .b-assist-flash {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 62%, rgba(255,192,214,.42), transparent 66%);
+    opacity: 0;
+    pointer-events: none;
+    animation: assist-flash 1.4s .7s ease-out;
+  }
+  @keyframes assist-flash { 20% { opacity: 1; } }
+  /* 幼年篇的取名:選項框裡一個輸入框加「就叫這個」 */
+  .choices.name-entry { gap: 4px; }
+  .name-row { display: flex; gap: 8px; }
+  .name-input {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 12px;
+    font: inherit;
+    font-size: 17px; /* 16 以上,iPhone 點下去才不會自動放大 */
+    letter-spacing: .1em;
+    color: #f2e4c4;
+    background: #0d0907;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.8);
+  }
+  .name-input:focus { outline: none; border-color: var(--gold); }
+  .name-ok { flex: none; }
+  .name-hint { min-height: 1em; font-size: 12px; color: #e8907f; }
+  .test-link {
+    margin-top: 10px;
+    padding: 0;
+    font: inherit;
+    font-size: 12px;
+    color: var(--dim);
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--dim);
+    cursor: pointer;
+  }
   .b-val {
     margin-left: 6px;
     color: var(--b-dmg);
@@ -826,6 +868,7 @@
   }
   .ui-new :is(.b-log, .b-backlog) p.you .b-who b { background: linear-gradient(180deg, #e3c27a, #a9803a); color: #1a1209; }
   .ui-new :is(.b-log, .b-backlog) p.system .b-who b { padding: 0 5px; clip-path: none; }
+  .ui-new :is(.b-log, .b-backlog) p.ally .b-who b { background: linear-gradient(180deg, #f6d6e1, #c98aa0); color: #3a0d1a; box-shadow: inset 0 1px 0 rgba(255,255,255,.4); }
   /* 前世殘念的魂群:蓋在整個畫面上的一層畫布,點不到它 */
   .soul-echo {
     position: fixed;
@@ -2311,11 +2354,17 @@ const DUSK_MS = 4100; // 分出勝負後,黑暗籠罩多久才切到下一個畫
 const REVEAL_MS = 1300; // 最後一劍的演出播完,金身才裂開
 const KILL_MS = 2800; // 真身露出來之後,多久出手
 
-function startPrologue() {
-  const P = CONTENT.prologueBattle;
+// 目前這場戰鬥的設定:序章首戰(content.js 的 prologueBattle)或幼年篇的教學戰(childBattle)
+function battleDef() {
+  return (state.battle && state.battle.def) || CONTENT.prologueBattle;
+}
+
+function startPrologue(def = CONTENT.prologueBattle) {
+  const P = def;
   const items = {};
   P.items.forEach(it => { items[it.id] = it.count; });
   state.battle = {
+    def: P,
     turn: 0, hp: P.hp, mp: P.mpMax, items,
     revealed: false, log: [], freshFrom: 0, menu: null, result: null,
     // 身上的狀態 [{ name, left }],left = 還會發作幾次;chipOpen = 正在看哪個狀態的說明
@@ -2326,35 +2375,36 @@ function startPrologue() {
     // usable = 上一刻能用的術法和道具、fresh = 這一刻才變成能用的(外框亮起)
     picked: null, last: null, usable: [], fresh: [],
     // 前世殘念:wrongTurns = 這一輪選錯的回合,echo = 前幾輪記下的(這些回合魂火會指路),echoTurn = 這回合播過了
-    wrongTurns: [], echo: loadEcho(), echoTurn: -1
+    wrongTurns: [], echo: P.soulEcho === false ? [] : loadEcho(), echoTurn: -1
   };
   state.battle.usable = usableTools(state.battle);
   battleLog(P.opening, "enemy");
+  if (P.tip) battleLog(P.tip, "system");
   battleLog(P.turns[0].telegraph, "enemy");
   state.phase = "prologue";
   render();
 }
 
-// who:"you" 你的行動、"enemy" 它的行動/預兆、"system" 提示(數值變化等)、不填 = 上一句行動的結果
-// value:提示行後面的數字,例如「−100」
+// who:"you" 你的行動、"enemy" 它的行動/預兆、"ally" 援手的行動、"system" 提示(數值變化等)、不填 = 上一句行動的結果
+// value:提示行後面的數字,例如「−100」;文字裡的 {name} 換成玩家取的名字
 function battleLog(text, who, value) {
-  state.battle.log.push({ text, who, value, turn: state.battle.turn }); // turn:回看紀錄依回合分段
+  state.battle.log.push({ text: fillName(text), who, value, turn: state.battle.turn }); // turn:回看紀錄依回合分段
 }
 
 function findTool(id) {
-  const P = CONTENT.prologueBattle;
+  const P = battleDef();
   if (id === "attack") return P.attack;
   return P.spells.find(s => s.id === id) || P.items.find(i => i.id === id);
 }
 
 // 現在能用的術法(靈力夠)和道具(還有剩)
 function usableTools(b) {
-  const P = CONTENT.prologueBattle;
+  const P = battleDef();
   return [...P.spells.filter(s => b.mp >= s.cost), ...P.items.filter(i => b.items[i.id] > 0)].map(t => t.id);
 }
 
 function battleAct(id) {
-  const P = CONTENT.prologueBattle;
+  const P = battleDef();
   const b = state.battle;
   if (Date.now() < b.lockUntil) return; // 上一下的演出還沒播完
   const turn = P.turns[b.turn];
@@ -2388,9 +2438,10 @@ function battleAct(id) {
       battleLog("你擋下了這一擊", "system");
     }
     if (turn.onWrong === "reveal") b.revealed = true;
-    if (lastTurn) b.ending = true; // 打贏了:接著金身裂開、真身出手(revealTrueForm)
+    // 打贏了:有真身的(序章)接著金身裂開、真身出手(revealTrueForm),沒有的直接打贏
+    if (lastTurn) { if (P.reveal) b.ending = true; else b.result = "win"; }
   } else if (turn.onWrong === "hp") {
-    b.hp = Math.max(0, b.hp - P.wrongDamage);
+    b.hp = Math.max(P.cannotLose ? 1 : 0, b.hp - P.wrongDamage); // 打不輸的戰鬥(教學戰)氣血最少剩 1
     b.fx.hurt = P.wrongDamage;
     battleLog(turn.fail);
     battleLog("你的氣血", "system", `−${P.wrongDamage}`);
@@ -2413,8 +2464,13 @@ function battleAct(id) {
   const usable = usableTools(b);
   b.fresh = usable.filter(t => !b.usable.includes(t));
   b.usable = usable;
+  // 自動援戰:援手在這回合結束時自己出手
+  if (turn.assist && b.result !== "lose") {
+    battleLog(turn.assist, "ally");
+    b.fx.assist = true;
+  }
 
-  if (!b.result && !b.ending && lastTurn) b.result = "lose";
+  if (!b.result && !b.ending && lastTurn) b.result = P.cannotLose ? "win" : "lose";
   if (!b.result && !b.ending) {
     b.turn += 1;
     battleLog(P.turns[b.turn].telegraph, "enemy");
@@ -2428,7 +2484,7 @@ function battleAct(id) {
 
 // 打贏之後:金身沿劍痕裂開,露出第二階段(真身),它隨即出手,這一下必死(劇情殺)
 function revealTrueForm() {
-  const P = CONTENT.prologueBattle;
+  const P = battleDef();
   const b = state.battle;
   if (state.phase !== "prologue") return;
   b.trueForm = true;
@@ -2440,7 +2496,7 @@ function revealTrueForm() {
 }
 
 function trueFormStrike() {
-  const P = CONTENT.prologueBattle;
+  const P = battleDef();
   const b = state.battle;
   if (state.phase !== "prologue") return;
   b.freshFrom = b.log.length;
@@ -2476,7 +2532,8 @@ function battleFlee() {
   b.menu = null;
   b.fx = {};
   b.picked = b.last = "flee";
-  battleLog(CONTENT.prologueBattle.fleeText, "you");
+  battleLog(battleDef().fleeText, "you");
+  if (battleDef().noFlee) { render(); return; } // 這場不能逃:只說一句話
   b.result = "lose";
   render();
   setTimeout(finishPrologue, DUSK_MS);
@@ -2484,9 +2541,18 @@ function battleFlee() {
 
 function finishPrologue() {
   if (state.phase !== "prologue") return;
-  // 前世殘念:打輸就把這一輪選錯的回合加進紀錄,打贏就清掉
   const b = state.battle;
-  if (b.result === "win") saveEcho([]);
+  const P = battleDef();
+  // 幼年篇的教學戰:打完接回幼年篇
+  if (P.next) {
+    state.phase = "child";
+    state.childNode = P.next;
+    render();
+    return;
+  }
+  // 前世殘念:打輸就把這一輪選錯的回合加進紀錄,打贏就清掉
+  if (P.soulEcho === false) { /* 這場不記 */ }
+  else if (b.result === "win") saveEcho([]);
   else if (b.wrongTurns.length) saveEcho([...new Set([...loadEcho(), ...b.wrongTurns])]);
   state.phase = "prologueEnd";
   render();
@@ -2690,6 +2756,7 @@ document.getElementById("app").addEventListener("click", e => {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && state.statusOpen) { closeStatus(); return; }
   if (e.key !== " " && e.key !== "Enter") return;
+  if (e.target.closest && e.target.closest("input, textarea")) return; // 在輸入框裡打字(例如取名)
   if (e.target.closest && e.target.closest("button")) return; // 焦點在按鈕上時讓按鈕自己處理
   e.preventDefault();
   if (!storyStep()) nudgeChoices();
@@ -2878,9 +2945,13 @@ function screen(children, cls) {
 
 function renderTitle() {
   return screen([
-    panel([el("h1", null, ["逆仙之境 ‧ beta"])]),
+    panel([
+      el("h1", null, ["逆仙之境 ‧ beta"]),
+      player && player.name ? el("div", { class: "meta" }, [`歡迎回來，${player.name}`]) : null,
+      player ? el("button", { class: "test-link", onclick: resetPlayer }, ["（測試）清除名字，重玩幼年篇"]) : null
+    ]),
     dock([
-      choiceButton("新的輪迴", startPrologue),
+      choiceButton("新的輪迴", newCycle),
       disabledButton("三生石碑（尚未開放）"),
       disabledButton("天機閣（尚未開放）"),
       disabledButton("道經（尚未開放）")
@@ -2921,7 +2992,7 @@ function actButton(icon, label, onclick, count, cls) {
 
 // 底部選項框:左邊四個指令,右邊是自己的狀態(mePanel)
 function renderBattleActions(animate, mePanel) {
-  const P = CONTENT.prologueBattle;
+  const P = battleDef();
   const b = state.battle;
   const wait = animate ? " b-wait" : "";
   const itemsLeft = P.items.reduce((n, it) => n + b.items[it.id], 0);
@@ -3024,7 +3095,7 @@ function shatterOverlay() {
     }
   }
 
-  const name = CONTENT.prologueBattle.enemyName;
+  const name = battleDef().enemyName;
   const half = Math.hypot(W, H) / 2;
   const rnd = (min, max) => min + Math.random() * (max - min);
   const pts = poly => poly.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
@@ -3106,7 +3177,7 @@ function introOverlay(style) {
   if (style === "2") return el("div", { class: "b-intro v2" }, [el("div", { class: "b-seal" }, ["戰"])]);
   if (style === "4") return shatterOverlay();
   return el("div", { class: "b-intro v3" }, [
-    el("div", { class: "b-title" }, [el("b", null, [CONTENT.prologueBattle.enemyName]), el("i")])
+    el("div", { class: "b-title" }, [el("b", null, [battleDef().enemyName]), el("i")])
   ]);
 }
 
@@ -3135,7 +3206,7 @@ function renderIntroVariants() {
     el("div", { class: "b-variant" }, [
       "普通攻擊（測試用）：",
       ...[["slash", "斬擊（劍修）"], ["punch", "拳擊（體修）"]].map(([k, name]) => el("button", {
-        class: (state.attackStyle || CONTENT.prologueBattle.attack.fx) === k ? "on" : "",
+        class: (state.attackStyle || battleDef().attack.fx) === k ? "on" : "",
         onclick: () => { state.attackStyle = k; render(); }
       }, [name]))
     ]),
@@ -3179,6 +3250,95 @@ const EMBLEMS = {
   })()
 };
 
+// ---- 玩家:名字 + 一組隱藏的 ID,存在本機(這台裝置的這個瀏覽器)----
+// 名字只是顯示用,兩個玩家可以取一樣的名字;id 才是真正的玩家編號,之後做雲端存檔時拿它綁帳號。
+// childhoodDone = 幼年篇玩過了(只有第一次進遊戲會玩)
+const PLAYER_KEY = "nixian.player";
+let player = (() => {
+  try { return JSON.parse(localStorage.getItem(PLAYER_KEY)); } catch (e) { return null; }
+})();
+function savePlayer() {
+  try { localStorage.setItem(PLAYER_KEY, JSON.stringify(player)); } catch (e) { /* 無痕模式之類存不了,這次遊戲裡還是記得 */ }
+}
+function resetPlayer() {
+  try { localStorage.removeItem(PLAYER_KEY); } catch (e) { /* 同上 */ }
+  player = null;
+  render();
+}
+function newPlayerId() {
+  try { return crypto.randomUUID(); } catch (e) { return "p-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); }
+}
+function playerName() {
+  return (player && player.name) || "你";
+}
+// 台詞裡的 {name};還沒取名(例如測試時跳過幼年篇)就叫「孩子」
+function fillName(text) {
+  return text ? text.replace(/\{name\}/g, (player && player.name) || "孩子") : text;
+}
+
+// 新的輪迴:第一次進遊戲先玩幼年篇,之後直接從序章戰鬥開始(測試用:網址加 ?skipchild 或 #skipchild 也直接開打)
+const SKIP_CHILD = /skipchild/.test(location.search + location.hash);
+function newCycle() {
+  if (!SKIP_CHILD && !(player && player.childhoodDone)) startChildhood();
+  else startPrologue();
+}
+
+// ---- 幼年篇(資料在 content.js 的 childhood)----
+function startChildhood() {
+  const C = CONTENT.childhood;
+  // 已經取過名字(例如上次玩到一半)就不再問
+  state.childNode = player && player.name ? C.nodes[C.start].next : C.start;
+  state.phase = "child";
+  render();
+}
+
+// 選項的 to:節點名稱、"battle:childBattle" 開打教學戰、"prologue" 進序章戰鬥(幼年篇算玩過了)
+function goChild(to) {
+  if (to.startsWith("battle:")) { startPrologue(CONTENT[to.slice(7)]); return; }
+  if (to === "prologue") {
+    if (player) { player.childhoodDone = true; savePlayer(); }
+    startPrologue();
+    return;
+  }
+  state.childNode = to;
+  render();
+}
+
+function submitName(input, hint, next) {
+  const name = input.value.trim();
+  if (!name) {
+    hint.textContent = "先取個名字吧。";
+    input.focus();
+    return;
+  }
+  player = { id: (player && player.id) || newPlayerId(), name, childhoodDone: false, createdAt: (player && player.createdAt) || Date.now() };
+  savePlayer();
+  goChild(next);
+}
+
+function renderChild() {
+  const node = CONTENT.childhood.nodes[state.childNode];
+  let actions;
+  if (node.input === "name") {
+    // 取名:選項框裡放一個輸入框和「就叫這個」;按 Enter 也可以
+    const input = el("input", { class: "name-input", type: "text", maxlength: "8", placeholder: "例如：阿青", autocomplete: "off", enterkeyhint: "done", "aria-label": "你的名字" });
+    if (player && player.name) input.value = player.name;
+    const hint = el("span", { class: "name-hint" });
+    const ok = el("button", { class: "choice name-ok" }, [el("span", { class: "cl" }, ["就叫這個"])]);
+    ok.addEventListener("click", () => submitName(input, hint, node.next));
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); submitName(input, hint, node.next); }
+    });
+    actions = consoleFrame([el("div", { class: "choices name-entry" }, [el("div", { class: "name-row" }, [input, ok]), hint])]);
+  } else {
+    actions = dock(node.choices.map(c => choiceButton(fillName(c.label), () => goChild(c.to))));
+  }
+  return screen([
+    panel([node.title ? el("h1", null, [node.title]) : null, storyText(fillName(node.text), [], actions)]),
+    actions
+  ], "fade-in");
+}
+
 // ---- 前世殘念:魂群(測試切換「前世殘念」)----
 // 序章打輸時記下這一輪選錯的回合(一輪輪累積,打贏才清掉);下一輪到了那些回合,一群魂火像魚群一樣游過來,
 // 繞著正確的選項打轉幾秒再散去,像前世的你還記得。少用:只在前世選錯的回合出現,每回合一次。
@@ -3193,7 +3353,7 @@ function saveEcho(turns) {
 
 // 這回合的正解在哪個按鈕:抽屜開著就指抽屜裡那一項,不然指攻擊、術法或道具
 function echoTarget() {
-  const P = CONTENT.prologueBattle;
+  const P = battleDef();
   const b = state.battle;
   const ans = P.turns[b.turn].answer;
   const opt = document.querySelector(`.b-sheet .b-opt[data-id="${ans}"]`);
@@ -3204,7 +3364,7 @@ function echoTarget() {
 // 正解在哪個指令底下:攻擊、術法或道具
 function answerCommand(ans) {
   if (ans === "attack") return "attack";
-  return CONTENT.prologueBattle.spells.some(s => s.id === ans) ? "spell" : "item";
+  return battleDef().spells.some(s => s.id === ans) ? "spell" : "item";
 }
 
 // 每次畫完戰鬥畫面後檢查:這回合該不該出現、是不是已經出現過
@@ -3416,7 +3576,7 @@ function drainStyle(from, to, max) {
 }
 
 function renderPrologue() {
-  const P = CONTENT.prologueBattle;
+  const P = battleDef();
   const b = state.battle;
   // 效果只在出手後那一次畫面播放;打開選單、查看自身再回來都不重播
   const fx = b.fx;
@@ -3482,7 +3642,7 @@ function renderPrologue() {
     : [artDiv(P.trueArt, "fill"), artDiv(P.trueArt, "main")];
   else enemy = [artDiv(P.art, "fill"), artDiv(P.art, "main")];
   // 舞台特效(測試切換可以一項一項關掉);沒有敵人圖時都不播
-  const sfx = P.art ? state.stageFx : {};
+  const sfx = P.art ? { ...state.stageFx, ...(P.stageFx || {}) } : {}; // 這場關掉的特效(content.js 的 stageFx)
   const scene = sfx.scene && !b.trueForm ? P.turns[b.turn].scene : null;
   const sceneFresh = scene && b.sceneTurn !== b.turn; // 這回合的預告剛出現:光影從無到有
   b.sceneTurn = b.turn;
@@ -3527,7 +3687,7 @@ function renderPrologue() {
   const meCls = ["b-me", fx && fx.hurt ? "b-hit" : "", fx && fx.dot ? "b-dot" : ""].join(" ").trim();
   const mePanel = el("div", dotColor ? { class: meCls, style: `--c:${dotColor}` } : { class: meCls }, [
     el("div", { class: "b-me-head" }, [myFace, el("div", { class: "b-me-id" }, [
-      el("div", { class: "b-name" }, ["你", el("span", { class: "b-realm" }, ["？？？"])]),
+      el("div", { class: "b-name" }, [playerName(), el("span", { class: "b-realm" }, [P.playerRealm || "？？？"])]),
       el("div", { class: "b-chips" }, chips)
     ])]),
     statBlock("hp", hpTrack, b.hp, P.hp),
@@ -3555,6 +3715,7 @@ function renderPrologue() {
       ...layers.overlays,
       dust,
       edge,
+      fx && fx.assist ? el("i", { class: "b-assist-flash" }) : null, // 援手出手:舞台泛一下梅花色的光
       el("div", { class: "b-view" }, [
         fxNode,
         rune,
@@ -3579,7 +3740,8 @@ function renderPrologue() {
 
 // 戰鬥紀錄的一行:前面掛說話的人(你=金底、它=紅底、提示=藍框),行動的結果不掛
 function logLine(line, attrs) {
-  const whoLabel = { you: "你", enemy: CONTENT.prologueBattle.enemyName, system: "提示" };
+  const P = battleDef();
+  const whoLabel = { you: "你", enemy: P.enemyName, ally: P.allyName || "援手", system: "提示" };
   return el("p", attrs, [
     el("span", { class: "b-who" }, line.who ? [el("b", null, [whoLabel[line.who]])] : []),
     el("span", { class: "b-text" }, [
@@ -3680,7 +3842,7 @@ function renderStatus() {
     el("div", { class: "status-head" }, [
       el("div", { class: blur ? "portrait blur" : "portrait" }),
       el("div", null, [
-        el("h1", null, [blur ? "你" : idt.name]),
+        el("h1", null, [blur ? playerName() : idt.name]),
         el("div", { class: "meta" }, [blur ? unknown : `${idt.category}類 ‧ ${state.realm} ‧ 修為 ${state.cultivation}`])
       ])
     ]),
@@ -3821,6 +3983,7 @@ function render() {
     title: renderTitle,
     prologue: renderPrologue,
     prologueEnd: renderPrologueEnd,
+    child: renderChild,
     select: renderSelect,
     opening: renderOpening,
     collision: renderCollision,

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0f0c"/><stop offset=".6" stop-color="#15201a"/><stop offset="1" stop-color="#0b100d"/></linearGradient>
+<radialGradient id="moon" cx=".25" cy=".12" r=".55"><stop offset="0" stop-color="#9fb7a6" stop-opacity=".35"/><stop offset="1" stop-color="#9fb7a6" stop-opacity="0"/></radialGradient>
+<linearGradient id="fog" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a3a30" stop-opacity="0"/><stop offset="1" stop-color="#2a3a30" stop-opacity=".55"/></linearGradient>
+<filter id="glow" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="6"/></filter>
+</defs>
+<rect width="600" height="800" fill="url(#bg)"/><rect width="600" height="800" fill="url(#moon)"/>
+<path d="M30 0 C24 260 38 520 26 800 L74 800 C80 520 66 260 74 0Z" fill="#070b09" opacity="1"/><path d="M128 0 C122 260 136 520 124 800 L144 800 C150 520 136 260 144 0Z" fill="#070b09" opacity="0.7"/><path d="M468 0 C462 260 476 520 464 800 L490 800 C496 520 482 260 490 0Z" fill="#070b09" opacity="0.8"/><path d="M540 0 C534 260 548 520 536 800 L588 800 C594 520 580 260 588 0Z" fill="#070b09" opacity="1"/>
+<polygon points="300,206 270,204 238,148 221,232 204,270 196,312 182,348 150,402 122,470 104,560 96,680 90,800 510,800 504,680 496,560 478,470 450,402 418,348 404,312 396,270 379,232 362,148 330,204 300,206" fill="#030504" stroke="#41574a" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="300,268 278,286 270,322 284,350 300,358 316,350 330,322 322,286" fill="#0c120f"/>
+<g fill="#ffb347"><ellipse cx="262" cy="258" rx="13" ry="7" filter="url(#glow)"/><ellipse cx="338" cy="258" rx="13" ry="7" filter="url(#glow)"/></g>
+<g fill="#ffe2a8"><path d="M250 258 Q262 250 274 258 Q262 264 250 258Z"/><path d="M326 258 Q338 250 350 258 Q338 264 326 258Z"/></g>
+<rect y="560" width="600" height="240" fill="url(#fog)"/>
+</svg>
