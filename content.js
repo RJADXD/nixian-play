@@ -42,7 +42,7 @@ const CONTENT = {
      ============================================================ */
   prologueBattle: {
     location: "三界交會地",
-    enemyName: "醉花仙", // 被微芒浮夢聖君佔據、長大的雪梅花;女聖主只是假的外表,第二、三階段逐步顯露真身
+    enemyName: "醉花仙", // 雪梅花吞下大量囈花後的樣子,名字是腦中的聖君賜的(2026-11-12);下面的台詞還是試玩版舊寫法,要照桃花村版本改
     emblem: "plum", // 名號牌和說話標籤上的徽記(新版介面),每個 Boss 一個;plum = 梅花
     art: "assets/boss/prologue-1-gold.webp",
     trueArt: "assets/boss/prologue-2-blood.webp",
