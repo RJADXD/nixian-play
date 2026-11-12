@@ -2125,6 +2125,135 @@
   @keyframes fade-in {
     from { opacity: 0; }
   }
+
+  /* ---- 第一次進遊戲的開場(全螢幕,見 awakenIntro):眨三次眼,總長 9 秒(要跟 AWAKEN_MS 對得上)----
+     第一次睜眼:白煙裡浮出一句問話;第二次:字消失,只剩白煙;第三次:金光微微亮起,最後淡出成第一段的圖。
+     上下眼皮是兩塊黑幕,睜眼 = 往上下退開。百分比 = 9 秒裡的時間點(例如 14.4% ≈ 1.3 秒) */
+  .awaken {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    overflow: hidden;
+    background: #000;
+  }
+  .awaken > i { position: absolute; pointer-events: none; }
+  .awaken-lid {
+    left: -10%;
+    right: -10%;
+    height: 52%;
+    background: #000;
+    animation: 9s both;
+  }
+  .awaken-lid.top { top: 0; border-radius: 0 0 50% 50% / 0 0 30% 30%; box-shadow: 0 18px 40px 18px #000; animation-name: lid-top; }
+  .awaken-lid.bottom { bottom: 0; border-radius: 50% 50% 0 0 / 30% 30% 0 0; box-shadow: 0 -18px 40px 18px #000; animation-name: lid-bottom; }
+  @keyframes lid-top {
+    0%, 7.8% { transform: translateY(0); animation-timing-function: ease-in-out; }
+    14.4%, 44.4% { transform: translateY(-125%); animation-timing-function: ease-in; }
+    47.2%, 51.1% { transform: translateY(0); animation-timing-function: ease-out; }
+    55.6%, 65.6% { transform: translateY(-125%); animation-timing-function: ease-in; }
+    68.3%, 72.2% { transform: translateY(0); animation-timing-function: ease-in-out; }
+    77.8%, 100% { transform: translateY(-125%); }
+  }
+  @keyframes lid-bottom {
+    0%, 7.8% { transform: translateY(0); animation-timing-function: ease-in-out; }
+    14.4%, 44.4% { transform: translateY(125%); animation-timing-function: ease-in; }
+    47.2%, 51.1% { transform: translateY(0); animation-timing-function: ease-out; }
+    55.6%, 65.6% { transform: translateY(125%); animation-timing-function: ease-in; }
+    68.3%, 72.2% { transform: translateY(0); animation-timing-function: ease-in-out; }
+    77.8%, 100% { transform: translateY(125%); }
+  }
+  /* 淡淡的白煙:兩層慢慢飄,方向相反 */
+  .awaken-smoke {
+    left: -25%;
+    top: -25%;
+    width: 150%;
+    height: 150%;
+    background:
+      radial-gradient(ellipse 30% 16% at 36% 46%, rgba(236,236,242,.2), transparent 70%),
+      radial-gradient(ellipse 24% 14% at 63% 54%, rgba(236,236,242,.16), transparent 70%),
+      radial-gradient(ellipse 42% 20% at 50% 63%, rgba(236,236,242,.11), transparent 70%);
+    animation: smoke-in 9s linear both, smoke-drift 7s ease-in-out infinite alternate;
+  }
+  .awaken-smoke.b {
+    background:
+      radial-gradient(ellipse 28% 15% at 58% 40%, rgba(236,236,242,.14), transparent 70%),
+      radial-gradient(ellipse 34% 18% at 40% 58%, rgba(236,236,242,.12), transparent 70%);
+    animation-direction: normal, alternate-reverse;
+  }
+  @keyframes smoke-in { 0%, 8% { opacity: 0; } 20%, 74% { opacity: 1; } 100% { opacity: .4; } }
+  @keyframes smoke-drift {
+    from { transform: translate(-3%, 1%) rotate(-2deg); }
+    to { transform: translate(3%, -2%) rotate(2deg); }
+  }
+  /* 白煙裡的問話:第一次睜眼時從模糊裡浮出來,閉眼時消失 */
+  .awaken-q {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 42%;
+    padding: 0 16px 0 calc(16px + .28em);
+    text-align: center;
+    font-size: clamp(22px, 6.4vw, 38px);
+    letter-spacing: .28em;
+    color: rgba(246,242,234,.92);
+    text-shadow: 0 0 16px rgba(255,255,255,.45), 0 0 2px rgba(0,0,0,.6);
+    pointer-events: none;
+    animation: awaken-q 9s ease-out both;
+  }
+  @keyframes awaken-q {
+    0%, 15% { opacity: 0; filter: blur(6px); transform: translateY(6px); }
+    24%, 44% { opacity: 1; filter: blur(0); transform: none; }
+    47.2%, 100% { opacity: 0; }
+  }
+  /* 最後一次睜眼:金光從中間微微亮起 */
+  .awaken-gold {
+    inset: 0;
+    background: radial-gradient(circle at 50% 42%, rgba(255,232,170,.95) 0, rgba(240,196,100,.45) 28%, rgba(240,196,100,0) 62%);
+    animation: awaken-gold 9s ease-in both;
+  }
+  @keyframes awaken-gold { 0%, 74% { opacity: 0; } 92% { opacity: .55; } 100% { opacity: 1; } }
+  .awaken-skip {
+    position: absolute;
+    right: max(16px, env(safe-area-inset-right, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 1;
+    padding: 2px 14px;
+    font: inherit;
+    font-size: 12px;
+    letter-spacing: .2em;
+    color: rgba(240,236,228,.55);
+    background: transparent;
+    border: 1px solid rgba(240,236,228,.25);
+    border-radius: 999px;
+    cursor: pointer;
+    animation: fade-in .6s 1s both;
+  }
+  /* 開場播完:黑底和金光一起淡掉,底下露出第一段的圖 */
+  .awaken.out { pointer-events: none; animation: awaken-out 1.6s ease-out forwards; }
+  .awaken.out .awaken-gold { animation: none; }
+  @keyframes awaken-out { to { opacity: 0; } }
+  /* 有圖的劇情段落:圖鋪滿上方,文字壓在圖的下緣(跟戰鬥畫面一樣) */
+  .child-scene {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #0a0705 center 20% / cover no-repeat;
+    box-shadow: inset 0 0 40px rgba(0,0,0,.6);
+  }
+  .child-scene .scene-text {
+    max-height: 62%;
+    overflow-y: auto;
+    padding: 40px 20px 4px;
+    background: linear-gradient(180deg, transparent, rgba(12,9,6,.82) 38%, rgba(12,9,6,.94));
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
   @media (prefers-reduced-motion: reduce) {
     .battle, .battle *, .fade-in { animation: none !important; transition: none !important; }
     .b-float, .b-fx, .b-intro, .pick-fx, .pick-ghost { display: none; }
@@ -2332,7 +2461,8 @@ const state = {
   uiStyle: "new",   // 測試用:new 照設計圖的名號牌、紅綢標籤、刻字選項 / old 舊版
   barStyle: "hex",  // 測試用(新版介面):氣血、靈力條的樣子 hex 六角刀形 / plain 純細框
   soulEcho: "record", // 測試用:前世殘念 record 照紀錄(上一輪選錯的回合才出現) / force 每回合都出現 / off 關
-  hint: "on"        // 測試用:亮光提示 on = 每回合正解的指令和抽屜裡那一項外框亮起 / off 關
+  hint: "on",       // 測試用:亮光提示 on = 每回合正解的指令和抽屜裡那一項外框亮起 / off 關
+  awaken: null      // 第一次進遊戲的開場:"intro" 播放中、"out" 播完正在淡出、null 沒有
 };
 
 function pickWeighted(list) {
@@ -2669,6 +2799,8 @@ function finishPrologue() {
   if (P.soulEcho === false) { /* 這場不記 */ }
   else if (b.result === "win") saveEcho([]);
   else if (b.wrongTurns.length) saveEcho([...new Set([...loadEcho(), ...b.wrongTurns])]);
+  // 序章戰鬥只打一次:打完(不管輸贏)之後的輪迴從選身份開始
+  if (player) { player.prologueDone = true; savePlayer(); }
   state.phase = "prologueEnd";
   render();
 }
@@ -3367,7 +3499,7 @@ const EMBLEMS = {
 
 // ---- 玩家:名字 + 一組隱藏的 ID,存在本機(這台裝置的這個瀏覽器)----
 // 名字只是顯示用,兩個玩家可以取一樣的名字;id 才是真正的玩家編號,之後做雲端存檔時拿它綁帳號。
-// childhoodDone = 幼年篇玩過了(只有第一次進遊戲會玩)
+// childhoodDone = 幼年篇玩過了(只有第一次進遊戲會玩);prologueDone = 序章戰鬥打過了(也只打一次)
 const PLAYER_KEY = "nixian.player";
 let player = (() => {
   try { return JSON.parse(localStorage.getItem(PLAYER_KEY)); } catch (e) { return null; }
@@ -3391,20 +3523,51 @@ function fillName(text) {
   return text ? text.replace(/\{name\}/g, (player && player.name) || "孩子") : text;
 }
 
-// 新的輪迴:第一次進遊戲先玩幼年篇,之後直接從序章戰鬥開始(測試用:網址加 ?skipchild 或 #skipchild 也直接開打)
+// 新的輪迴:第一次進遊戲先玩幼年篇,接著打序章戰鬥(只打一次);之後的輪迴直接從選身份開始
+// (測試用:網址加 ?skipchild 或 #skipchild,每次都直接開打序章)
 const SKIP_CHILD = /skipchild/.test(location.search + location.hash);
 function newCycle() {
-  if (!SKIP_CHILD && !(player && player.childhoodDone)) startChildhood();
-  else startPrologue();
+  if (SKIP_CHILD) startPrologue();
+  else if (!(player && player.childhoodDone)) startChildhood();
+  else if (!player.prologueDone) startPrologue();
+  else { state.phase = "select"; render(); }
 }
 
 // ---- 幼年篇(資料在 content.js 的 childhood)----
+const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function startChildhood() {
   const C = CONTENT.childhood;
   // 已經取過名字(例如上次玩到一半)就不再問
   state.childNode = player && player.name ? C.nodes[C.start].next : C.start;
+  // 從頭開始(還沒取名)才播開場;系統開了「減少動態效果」就不播
+  state.awaken = state.childNode === C.start && C.opening && !REDUCE_MOTION ? "intro" : null;
   state.phase = "child";
   render();
+}
+
+// 第一次進遊戲的開場(全螢幕,content.js 的 childhood.opening):眨三次眼。
+// 第一次睜眼:白煙裡浮出一句問話;第二次:字消失;第三次:金光微微亮起,播完淡出成第一段的圖。可以略過
+const AWAKEN_MS = 9000;     // 跟 CSS 的 .awaken 動畫長度一樣
+const AWAKEN_OUT_MS = 1600; // 播完後黑底和金光淡掉要多久
+function awakenIntro() {
+  const finish = () => {
+    if (state.phase !== "child" || state.awaken !== "intro") return; // 已經略過了
+    state.awaken = "out";
+    render();
+  };
+  setTimeout(finish, AWAKEN_MS);
+  const skip = el("button", { class: "awaken-skip" }, ["略過"]);
+  skip.addEventListener("click", finish);
+  const question = CONTENT.childhood.opening.question;
+  return el("div", { class: "awaken" }, [
+    el("i", { class: "awaken-smoke" }),
+    el("i", { class: "awaken-smoke b" }),
+    el("div", { class: "awaken-q" }, [question]),
+    el("i", { class: "awaken-gold" }),
+    el("i", { class: "awaken-lid top" }),
+    el("i", { class: "awaken-lid bottom" }),
+    skip
+  ]);
 }
 
 // 選項的 to:節點名稱、"battle:childBattle" 開打教學戰、"prologue" 進序章戰鬥(幼年篇算玩過了)
@@ -3432,6 +3595,7 @@ function submitName(input, hint, next) {
 }
 
 function renderChild() {
+  if (state.awaken === "intro") return awakenIntro();
   const node = CONTENT.childhood.nodes[state.childNode];
   let actions;
   if (node.input === "name") {
@@ -3448,10 +3612,19 @@ function renderChild() {
   } else {
     actions = dock(node.choices.map(c => choiceButton(fillName(c.label), () => goChild(c.to))));
   }
-  return screen([
-    panel([node.title ? el("h1", null, [node.title]) : null, storyText(fillName(node.text), [], actions)]),
-    actions
-  ], "fade-in");
+  const body = [node.title ? el("h1", null, [node.title]) : null, storyText(fillName(node.text), [], actions)];
+  // 有圖的段落:圖鋪滿上方,文字壓在圖的下緣(跟戰鬥畫面一樣)
+  const top = node.art
+    ? el("div", { class: "child-scene", style: `background-image:url("${node.art}")` }, [el("div", { class: "scene-text" }, body)])
+    : panel(body);
+  // 開場剛播完:黑底和金光蓋在上面慢慢淡掉,淡完就拿掉
+  let unveil = null;
+  if (state.awaken === "out") {
+    state.awaken = null;
+    unveil = el("div", { class: "awaken out" }, [el("i", { class: "awaken-gold" })]);
+    setTimeout(() => unveil.remove(), AWAKEN_OUT_MS);
+  }
+  return screen([top, actions, unveil], unveil ? null : "fade-in");
 }
 
 // 夥伴卡:圖區左下角,頭像外圈是集氣環,寫著再幾回合出手;集滿的那回合整張卡亮起

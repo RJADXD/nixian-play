@@ -202,14 +202,19 @@ const CONTENT = {
      一段一個節點:title 標題、text 劇情(一句一句打出來)、choices 選項。
      選項的 to = 接哪個節點;"battle:childBattle" = 開打;"prologue" = 進序章戰鬥。
      input: "name" = 這一段要玩家取名字(存在本機,另外產生一組隱藏的 ID)
+     art = 這一段的圖:圖鋪滿上方,文字壓在圖的下緣
      文字裡的 {name} 會換成玩家取的名字
+     opening = 第一次進遊戲的開場(全螢幕):眨三次眼。第一次:白煙裡浮出 question;第二次:字消失;
+               第三次:金光微微亮起,接著淡出成 start 那一段的圖。只在從頭開始(還沒取名)時播放,可以略過
      ============================================================ */
   childhood: {
     start: "name",
+    opening: { question: "是夢醒，還是入夢？" },
     nodes: {
       name: {
         title: "",
-        text: "一片黑暗。\n有人輕輕拍了拍你的臉，聲音很小，像怕吵醒什麼：\n「喂……你叫什麼名字？」",
+        art: "assets/scene/awaken.webp", // 雪梅花把你叫醒的畫面;正式圖還沒畫,先用雪梅花的原圖暫代
+        text: "你醒來……\n她輕輕拍著你的臉，聲音很小，像怕吵醒什麼：\n「喂……你叫什麼名字？」",
         input: "name", next: "wake"
       },
       wake: {
