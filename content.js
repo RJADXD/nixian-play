@@ -213,8 +213,8 @@ const CONTENT = {
     nodes: {
       name: {
         title: "",
-        art: "assets/scene/awaken.webp", // 雪梅花把你叫醒的畫面;正式圖還沒畫,先用雪梅花的原圖暫代
-        text: "「你醒啦。」\n她輕輕拍著你的臉，聲音很小：\n「……你叫什麼名字？」",
+        art: "assets/scene/awaken.webp", // 雪梅花把做惡夢的你叫醒的畫面(開場那段就是惡夢);正式圖還沒畫,先用雪梅花的原圖暫代
+        text: "「你醒啦。」\n她伸手在你眼前晃了晃：「又做惡夢了？……睡糊塗了吧，還記得自己叫什麼嗎？」",
         input: "name", next: "wake"
       },
       wake: {
