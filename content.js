@@ -214,7 +214,7 @@ const CONTENT = {
       name: {
         title: "",
         art: "assets/scene/awaken.webp", // 雪梅花把你叫醒的畫面;正式圖還沒畫,先用雪梅花的原圖暫代
-        text: "你醒來……\n她輕輕拍著你的臉，聲音很小，像怕吵醒什麼：\n「喂……你叫什麼名字？」",
+        text: "「你醒啦。」\n她輕輕拍著你的臉，聲音很小：\n「……你叫什麼名字？」",
         input: "name", next: "wake"
       },
       wake: {
