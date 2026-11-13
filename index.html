@@ -748,7 +748,7 @@
   .b-float.heal::before { background: linear-gradient(90deg, transparent, rgba(40,110,52,.88) 18%, rgba(70,150,84,.82) 70%, transparent); }
   .b-float.mana { color: #b8d4ff; text-shadow: 0 2px 0 #0b1426, 0 0 12px rgba(120,160,240,.7); }
   .b-float.mana::before { background: linear-gradient(90deg, transparent, rgba(40,70,130,.88) 18%, rgba(70,100,170,.82) 70%, transparent); }
-  /* 幼年篇的取名:選項框裡一個輸入框加「就叫這個」 */
+  /* 桃花村開頭的取名:選項框裡一個輸入框加「就叫這個」 */
   .choices.name-entry { gap: 4px; }
   .name-row { display: flex; gap: 8px; }
   .name-input {
@@ -2126,9 +2126,13 @@
     from { opacity: 0; }
   }
 
-  /* ---- 第一次進遊戲的開場(全螢幕,見 awakenIntro):眨三次眼,總長 9 秒(要跟 AWAKEN_MS 對得上)----
-     第一次睜眼:白煙裡浮出一句問話;第二次:字消失,只剩白煙;第三次:金光微微亮起,最後淡出成第一段的圖。
-     上下眼皮是兩塊黑幕,睜眼 = 往上下退開。百分比 = 9 秒裡的時間點(例如 14.4% ≈ 1.3 秒) */
+  /* ---- 第一次進遊戲的開場(全螢幕,見 awakenIntro),總長 12 秒(要跟 AWAKEN_MS 對得上)----
+     主角在做惡夢(參考蔚藍檔案開頭的模糊視角、眨眼、字幕框):
+     第一次睜眼(先半睜成一條縫):白煙、模糊的金色人影、飄落的金色花瓣,浮出一句問話;
+     第二次睜眼:字消失,火光從下面燒上來,字幕「……閉上眼睛。」;
+     第三次睜眼:金光亮起、越來越亮,夢散了;閉眼,黑暗裡有人叫你「……喂，醒醒。」;
+     最後一次睜眼(一樣先半睜):眼前是雪梅花,從模糊慢慢對焦。
+     上下眼皮是兩片羽化的黑幕,睜眼 = 往上下退開。百分比 = 12 秒裡的時間點(例如 37% ≈ 4.45 秒) */
   .awaken {
     position: fixed;
     inset: 0;
@@ -2137,86 +2141,197 @@
     background: #000;
   }
   .awaken > i { position: absolute; pointer-events: none; }
-  .awaken-lid {
-    left: -10%;
-    right: -10%;
-    height: 52%;
-    background: #000;
-    animation: 9s both;
+  /* 夢:模糊的金色人影(醉花仙的圖),慢慢推近 */
+  .aw-dream {
+    inset: -8%;
+    background: center 30% / cover no-repeat;
+    filter: blur(12px) brightness(.5) saturate(1.2);
+    animation: aw-dream 12s linear both;
   }
-  .awaken-lid.top { top: 0; border-radius: 0 0 50% 50% / 0 0 30% 30%; box-shadow: 0 18px 40px 18px #000; animation-name: lid-top; }
-  .awaken-lid.bottom { bottom: 0; border-radius: 50% 50% 0 0 / 30% 30% 0 0; box-shadow: 0 -18px 40px 18px #000; animation-name: lid-bottom; }
-  @keyframes lid-top {
-    0%, 7.8% { transform: translateY(0); animation-timing-function: ease-in-out; }
-    14.4%, 44.4% { transform: translateY(-125%); animation-timing-function: ease-in; }
-    47.2%, 51.1% { transform: translateY(0); animation-timing-function: ease-out; }
-    55.6%, 65.6% { transform: translateY(-125%); animation-timing-function: ease-in; }
-    68.3%, 72.2% { transform: translateY(0); animation-timing-function: ease-in-out; }
-    77.8%, 100% { transform: translateY(-125%); }
+  @keyframes aw-dream {
+    0%, 6.7% { opacity: 0; transform: scale(1.12); }
+    14% { opacity: .9; }
+    74% { opacity: .9; }
+    80%, 100% { opacity: 0; transform: scale(1.02); }
   }
-  @keyframes lid-bottom {
-    0%, 7.8% { transform: translateY(0); animation-timing-function: ease-in-out; }
-    14.4%, 44.4% { transform: translateY(125%); animation-timing-function: ease-in; }
-    47.2%, 51.1% { transform: translateY(0); animation-timing-function: ease-out; }
-    55.6%, 65.6% { transform: translateY(125%); animation-timing-function: ease-in; }
-    68.3%, 72.2% { transform: translateY(0); animation-timing-function: ease-in-out; }
-    77.8%, 100% { transform: translateY(125%); }
-  }
-  /* 淡淡的白煙:兩層慢慢飄,方向相反 */
+  /* 淡淡的白煙,慢慢飄 */
   .awaken-smoke {
     left: -25%;
     top: -25%;
     width: 150%;
     height: 150%;
     background:
-      radial-gradient(ellipse 30% 16% at 36% 46%, rgba(236,236,242,.2), transparent 70%),
-      radial-gradient(ellipse 24% 14% at 63% 54%, rgba(236,236,242,.16), transparent 70%),
-      radial-gradient(ellipse 42% 20% at 50% 63%, rgba(236,236,242,.11), transparent 70%);
-    animation: smoke-in 9s linear both, smoke-drift 7s ease-in-out infinite alternate;
+      radial-gradient(ellipse 30% 16% at 36% 46%, rgba(236,236,242,.22), transparent 70%),
+      radial-gradient(ellipse 24% 14% at 63% 54%, rgba(236,236,242,.18), transparent 70%),
+      radial-gradient(ellipse 42% 20% at 50% 63%, rgba(236,236,242,.12), transparent 70%),
+      radial-gradient(ellipse 28% 15% at 58% 38%, rgba(236,236,242,.14), transparent 70%);
+    animation: smoke-in 12s linear both, smoke-drift 7s ease-in-out infinite alternate;
   }
-  .awaken-smoke.b {
-    background:
-      radial-gradient(ellipse 28% 15% at 58% 40%, rgba(236,236,242,.14), transparent 70%),
-      radial-gradient(ellipse 34% 18% at 40% 58%, rgba(236,236,242,.12), transparent 70%);
-    animation-direction: normal, alternate-reverse;
-  }
-  @keyframes smoke-in { 0%, 8% { opacity: 0; } 20%, 74% { opacity: 1; } 100% { opacity: .4; } }
+  @keyframes smoke-in { 0%, 6.7% { opacity: 0; } 15%, 74% { opacity: 1; } 80%, 100% { opacity: 0; } }
   @keyframes smoke-drift {
     from { transform: translate(-3%, 1%) rotate(-2deg); }
     to { transform: translate(3%, -2%) rotate(2deg); }
   }
-  /* 白煙裡的問話:第一次睜眼時從模糊裡浮出來,閉眼時消失 */
+  /* 第二次睜眼:火光從下面燒上來,忽明忽暗 */
+  .aw-fire {
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    height: 80%;
+    background: radial-gradient(ellipse 60% 70% at 50% 100%, rgba(255,120,40,.75), rgba(200,40,20,.4) 45%, transparent 75%);
+    transform-origin: 50% 100%;
+    animation: aw-fire 12s linear both, aw-flicker .35s steps(2) infinite;
+  }
+  @keyframes aw-fire { 0%, 40.8% { opacity: 0; } 46%, 57% { opacity: 1; } 61%, 100% { opacity: 0; } }
+  @keyframes aw-flicker { 50% { transform: scaleY(.93) scaleX(1.03); } }
+  /* 飄落的金色花瓣(囈花) */
+  .aw-petals { inset: 0; overflow: hidden; animation: smoke-in 12s linear both; }
+  .aw-petals b {
+    position: absolute;
+    top: -5%;
+    left: var(--x);
+    width: var(--s);
+    height: calc(var(--s) * .6);
+    border-radius: 60% 0 60% 0;
+    background: #ffd98a;
+    box-shadow: 0 0 8px 1px rgba(255,200,90,.8);
+    animation: aw-petal var(--d) linear var(--delay) infinite;
+  }
+  @keyframes aw-petal {
+    from { transform: translate(0, 0) rotate(0); }
+    to { transform: translate(var(--dx), 110vh) rotate(540deg); }
+  }
+  /* 第三次睜眼:金光從中間亮起,越來越亮,夢就散了 */
+  .awaken-gold {
+    inset: 0;
+    background: radial-gradient(circle at 50% 42%, rgba(255,240,200,1) 0, rgba(255,214,130,.7) 25%, rgba(240,190,90,.25) 50%, rgba(240,190,90,0) 72%);
+    animation: awaken-gold 12s ease-in both;
+  }
+  @keyframes awaken-gold { 0%, 63.3% { opacity: 0; } 72% { opacity: .55; } 78% { opacity: 1; } 81%, 100% { opacity: 0; } }
+  /* 醒來:眼前是雪梅花,從模糊慢慢對焦 */
+  .aw-wake {
+    inset: 0;
+    background: #0a0705 center 20% / cover no-repeat;
+    animation: aw-wake 12s ease-out both;
+  }
+  @keyframes aw-wake {
+    0%, 80% { opacity: 0; filter: blur(18px) brightness(.8); transform: scale(1.08); }
+    82.5% { opacity: 1; filter: blur(18px) brightness(.8); transform: scale(1.08); }
+    89% { filter: blur(9px) brightness(.9); }
+    97%, 100% { opacity: 1; filter: blur(0) brightness(1); transform: scale(1); }
+  }
+  /* 眼皮:上下兩片羽化得很柔的黑幕,看不出形狀(不做有邊的弧形);睜眼 = 往上下退開。四周再壓一圈暗角 */
+  .aw-vignette { inset: 0; box-shadow: inset 0 0 140px 50px rgba(0,0,0,.85); }
+  .awaken-lid {
+    left: 0;
+    right: 0;
+    height: 75%;
+    animation: 12s both;
+  }
+  .awaken-lid.top {
+    top: 0;
+    background: linear-gradient(180deg, #000 0%, #000 66%, rgba(0,0,0,.9) 74%, rgba(0,0,0,.5) 86%, rgba(0,0,0,0) 100%);
+    animation-name: lid-top;
+  }
+  .awaken-lid.bottom {
+    bottom: 0;
+    background: linear-gradient(0deg, #000 0%, #000 66%, rgba(0,0,0,.9) 74%, rgba(0,0,0,.5) 86%, rgba(0,0,0,0) 100%);
+    animation-name: lid-bottom;
+  }
+  /* 睜眼的位置:0 = 閉著、-40% = 半睜(中間一條模糊的縫)、-105% = 完全睜開。
+     閉眼很快(約 0.15 秒),睜眼慢;最後醒來時,半睜的時候會再眨一下 */
+  @keyframes lid-top {
+    0%, 6.7% { transform: translateY(0); animation-timing-function: ease-out; }
+    10.8%, 12.5% { transform: translateY(-40%); animation-timing-function: ease-in-out; }
+    15.8%, 35.8% { transform: translateY(-105%); animation-timing-function: ease-in; }
+    37%, 40% { transform: translateY(0); animation-timing-function: ease-out; }
+    43.3%, 58.3% { transform: translateY(-105%); animation-timing-function: ease-in; }
+    59.6%, 62.5% { transform: translateY(0); animation-timing-function: ease-out; }
+    66.7%, 77.5% { transform: translateY(-105%); animation-timing-function: ease-in-out; }
+    79.6%, 82.5% { transform: translateY(0); animation-timing-function: ease-out; }
+    86.7% { transform: translateY(-40%); animation-timing-function: ease-in; }
+    88% { transform: translateY(0); animation-timing-function: ease-out; }
+    89.2% { transform: translateY(-40%); animation-timing-function: ease-in-out; }
+    94.2%, 100% { transform: translateY(-105%); }
+  }
+  @keyframes lid-bottom {
+    0%, 6.7% { transform: translateY(0); animation-timing-function: ease-out; }
+    10.8%, 12.5% { transform: translateY(40%); animation-timing-function: ease-in-out; }
+    15.8%, 35.8% { transform: translateY(105%); animation-timing-function: ease-in; }
+    37%, 40% { transform: translateY(0); animation-timing-function: ease-out; }
+    43.3%, 58.3% { transform: translateY(105%); animation-timing-function: ease-in; }
+    59.6%, 62.5% { transform: translateY(0); animation-timing-function: ease-out; }
+    66.7%, 77.5% { transform: translateY(105%); animation-timing-function: ease-in-out; }
+    79.6%, 82.5% { transform: translateY(0); animation-timing-function: ease-out; }
+    86.7% { transform: translateY(40%); animation-timing-function: ease-in; }
+    88% { transform: translateY(0); animation-timing-function: ease-out; }
+    89.2% { transform: translateY(40%); animation-timing-function: ease-in-out; }
+    94.2%, 100% { transform: translateY(105%); }
+  }
+  /* 白煙裡的問話:一個字一個字從模糊裡浮出來,上下各一道細金線;閉眼時消失 */
   .awaken-q {
     position: absolute;
     left: 0;
     right: 0;
-    top: 42%;
-    padding: 0 16px 0 calc(16px + .28em);
+    top: 40%;
+    padding: 0 16px;
     text-align: center;
+    pointer-events: none;
+    animation: awaken-q 12s linear both;
+  }
+  @keyframes awaken-q { 0%, 35.8% { opacity: 1; } 37%, 100% { opacity: 0; } }
+  .awaken-q::before, .awaken-q::after {
+    content: "";
+    display: block;
+    width: min(320px, 70%);
+    height: 1px;
+    margin: 0 auto;
+    background: linear-gradient(90deg, transparent, rgba(240,210,140,.85), transparent);
+    animation: aw-rule 1s 1.6s ease-out both;
+  }
+  .awaken-q::before { margin-bottom: 14px; }
+  .awaken-q::after { margin-top: 14px; }
+  @keyframes aw-rule { from { transform: scaleX(0); opacity: 0; } }
+  .awaken-q span {
+    display: inline-block;
     font-size: clamp(22px, 6.4vw, 38px);
     letter-spacing: .28em;
-    color: rgba(246,242,234,.92);
-    text-shadow: 0 0 16px rgba(255,255,255,.45), 0 0 2px rgba(0,0,0,.6);
+    margin-right: -.28em;
+    color: rgba(250,246,238,.95);
+    text-shadow: 0 0 18px rgba(255,236,190,.55), 0 0 2px rgba(0,0,0,.7);
+    animation: aw-char .7s ease-out both;
+    animation-delay: calc(1.8s + var(--i) * .13s);
+  }
+  @keyframes aw-char { from { opacity: 0; filter: blur(8px); transform: translateY(8px); } }
+  /* 字幕框(參考蔚藍檔案):說話的人不知道是誰,標「？？？」;閉著眼也聽得到,所以疊在眼皮上面 */
+  .aw-sub {
+    position: absolute;
+    left: 50%;
+    bottom: calc(12% + env(safe-area-inset-bottom, 0px));
+    z-index: 1;
+    width: min(560px, calc(100% - 32px));
+    padding: 10px 18px 14px;
+    transform: translateX(-50%);
+    background: linear-gradient(180deg, rgba(14,10,8,.5), rgba(14,10,8,.82));
+    border-top: 1px solid rgba(233,199,123,.55);
+    border-bottom: 1px solid rgba(233,199,123,.25);
+    color: #f3ead8;
+    font-size: 17px;
+    letter-spacing: .1em;
     pointer-events: none;
-    animation: awaken-q 9s ease-out both;
+    opacity: 0;
+    animation: 12s linear both;
   }
-  @keyframes awaken-q {
-    0%, 15% { opacity: 0; filter: blur(6px); transform: translateY(6px); }
-    24%, 44% { opacity: 1; filter: blur(0); transform: none; }
-    47.2%, 100% { opacity: 0; }
-  }
-  /* 最後一次睜眼:金光從中間微微亮起 */
-  .awaken-gold {
-    inset: 0;
-    background: radial-gradient(circle at 50% 42%, rgba(255,232,170,.95) 0, rgba(240,196,100,.45) 28%, rgba(240,196,100,0) 62%);
-    animation: awaken-gold 9s ease-in both;
-  }
-  @keyframes awaken-gold { 0%, 74% { opacity: 0; } 92% { opacity: .55; } 100% { opacity: 1; } }
+  .aw-sub b { display: block; margin-bottom: 4px; font-size: 12px; letter-spacing: .25em; color: #e9c77b; }
+  .aw-sub.s1 { animation-name: aw-sub1; }
+  .aw-sub.s2 { animation-name: aw-sub2; }
+  @keyframes aw-sub1 { 0%, 44% { opacity: 0; } 46%, 56% { opacity: 1; } 58.3%, 100% { opacity: 0; } }
+  @keyframes aw-sub2 { 0%, 76% { opacity: 0; } 78%, 89% { opacity: 1; } 91%, 100% { opacity: 0; } }
   .awaken-skip {
     position: absolute;
     right: max(16px, env(safe-area-inset-right, 0px));
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    z-index: 1;
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    z-index: 2;
     padding: 2px 14px;
     font: inherit;
     font-size: 12px;
@@ -2228,9 +2343,9 @@
     cursor: pointer;
     animation: fade-in .6s 1s both;
   }
-  /* 開場播完:黑底和金光一起淡掉,底下露出第一段的圖 */
-  .awaken.out { pointer-events: none; animation: awaken-out 1.6s ease-out forwards; }
-  .awaken.out .awaken-gold { animation: none; }
+  /* 開場播完:全螢幕的雪梅花慢慢淡掉,底下露出同一張圖的劇情畫面 */
+  .awaken.out { pointer-events: none; background: transparent; animation: awaken-out 1.2s ease-out forwards; }
+  .awaken.out .aw-wake { animation: none; }
   @keyframes awaken-out { to { opacity: 0; } }
   /* 有圖的劇情段落:圖鋪滿上方,文字壓在圖的下緣(跟戰鬥畫面一樣) */
   .child-scene {
@@ -2560,7 +2675,7 @@ const REVEAL_MS = 1300; // 最後一劍的演出播完,金身才裂開
 const KILL_MS = 2800; // 真身露出來之後,多久出手
 const ALLY_CUT_MS = 2600; // 夥伴出手特寫的長度(CSS ally-cut 延遲 .8s + 1.7s,再留一點)
 
-// 目前這場戰鬥的設定:序章首戰(content.js 的 prologueBattle)或幼年篇的教學戰(childBattle)
+// 目前這場戰鬥的設定:序章首戰(content.js 的 prologueBattle)或桃花村的教學戰(childBattle)
 function battleDef() {
   return (state.battle && state.battle.def) || CONTENT.prologueBattle;
 }
@@ -2788,7 +2903,7 @@ function finishPrologue() {
   if (state.phase !== "prologue") return;
   const b = state.battle;
   const P = battleDef();
-  // 幼年篇的教學戰:打完接回幼年篇
+  // 桃花村的教學戰:打完接回桃花村
   if (P.next) {
     state.phase = "child";
     state.childNode = P.next;
@@ -3195,7 +3310,7 @@ function renderTitle() {
     panel([
       el("h1", null, ["逆仙之境 ‧ beta"]),
       player && player.name ? el("div", { class: "meta" }, [`歡迎回來，${player.name}`]) : null,
-      player ? el("button", { class: "test-link", onclick: resetPlayer }, ["（測試）清除名字，重玩幼年篇"]) : null
+      player ? el("button", { class: "test-link", onclick: resetPlayer }, ["（測試）清除名字，從頭重玩序章"]) : null
     ]),
     dock([
       choiceButton("新的輪迴", newCycle),
@@ -3499,7 +3614,7 @@ const EMBLEMS = {
 
 // ---- 玩家:名字 + 一組隱藏的 ID,存在本機(這台裝置的這個瀏覽器)----
 // 名字只是顯示用,兩個玩家可以取一樣的名字;id 才是真正的玩家編號,之後做雲端存檔時拿它綁帳號。
-// childhoodDone = 幼年篇玩過了(只有第一次進遊戲會玩);prologueDone = 序章戰鬥打過了(也只打一次)
+// childhoodDone = 桃花村玩過了(只有第一次進遊戲會玩);prologueDone = 序章戰鬥打過了(也只打一次)
 const PLAYER_KEY = "nixian.player";
 let player = (() => {
   try { return JSON.parse(localStorage.getItem(PLAYER_KEY)); } catch (e) { return null; }
@@ -3518,12 +3633,12 @@ function newPlayerId() {
 function playerName() {
   return (player && player.name) || "你";
 }
-// 台詞裡的 {name};還沒取名(例如測試時跳過幼年篇)就叫「孩子」
+// 台詞裡的 {name};還沒取名(例如測試時用 ?skipchild 直接開打)就叫「喂」
 function fillName(text) {
-  return text ? text.replace(/\{name\}/g, (player && player.name) || "孩子") : text;
+  return text ? text.replace(/\{name\}/g, (player && player.name) || "喂") : text;
 }
 
-// 新的輪迴:第一次進遊戲先玩幼年篇,接著打序章戰鬥(只打一次);之後的輪迴直接從選身份開始
+// 新的輪迴:第一次進遊戲先玩桃花村,接著打序章戰鬥(只打一次);之後的輪迴直接從選身份開始
 // (測試用:網址加 ?skipchild 或 #skipchild,每次都直接開打序章)
 const SKIP_CHILD = /skipchild/.test(location.search + location.hash);
 function newCycle() {
@@ -3533,7 +3648,7 @@ function newCycle() {
   else { state.phase = "select"; render(); }
 }
 
-// ---- 幼年篇(資料在 content.js 的 childhood)----
+// ---- 序章前段:桃花村(資料在 content.js 的 childhood)----
 const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function startChildhood() {
   const C = CONTENT.childhood;
@@ -3545,10 +3660,17 @@ function startChildhood() {
   render();
 }
 
-// 第一次進遊戲的開場(全螢幕,content.js 的 childhood.opening):眨三次眼。
-// 第一次睜眼:白煙裡浮出一句問話;第二次:字消失;第三次:金光微微亮起,播完淡出成第一段的圖。可以略過
-const AWAKEN_MS = 9000;     // 跟 CSS 的 .awaken 動畫長度一樣
-const AWAKEN_OUT_MS = 1600; // 播完後黑底和金光淡掉要多久
+// 第一次進遊戲的開場(全螢幕,content.js 的 childhood.opening):主角在做惡夢,眨了幾次眼才醒過來。
+// 夢裡:白煙、模糊的金色人影(醉花仙的圖)、飄落的金色花瓣、一句問話;火光和字幕「……閉上眼睛。」;
+// 金光亮起、夢散了;黑暗裡有人叫你醒醒;最後睜眼看到的是第一段的圖(雪梅花),從模糊對焦。可以略過
+const AWAKEN_MS = 12000;    // 跟 CSS 的 .awaken 動畫長度一樣
+const AWAKEN_OUT_MS = 1200; // 播完後全螢幕的圖淡掉要多久
+// 花瓣的位置每次都一樣(固定亂數種子)
+const AW_PETALS = (() => {
+  let s = 11;
+  const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  return Array.from({ length: 12 }, () => ({ x: rnd() * 100, size: 6 + rnd() * 7, dur: 5 + rnd() * 4, delay: rnd() * 6, dx: (rnd() - 0.5) * 120 }));
+})();
 function awakenIntro() {
   const finish = () => {
     if (state.phase !== "child" || state.awaken !== "intro") return; // 已經略過了
@@ -3558,19 +3680,29 @@ function awakenIntro() {
   setTimeout(finish, AWAKEN_MS);
   const skip = el("button", { class: "awaken-skip" }, ["略過"]);
   skip.addEventListener("click", finish);
-  const question = CONTENT.childhood.opening.question;
+  const C = CONTENT.childhood;
+  const O = C.opening;
+  const sub = (cls, line) => el("div", { class: `aw-sub ${cls}` }, [el("b", null, [O.speaker]), line]);
   return el("div", { class: "awaken" }, [
+    el("i", { class: "aw-dream", style: `background-image:url("${O.dreamArt}")` }),
     el("i", { class: "awaken-smoke" }),
-    el("i", { class: "awaken-smoke b" }),
-    el("div", { class: "awaken-q" }, [question]),
+    el("i", { class: "aw-fire" }),
+    el("i", { class: "aw-petals" }, AW_PETALS.map(p => el("b", {
+      style: `--x:${p.x.toFixed(1)}%;--s:${p.size.toFixed(1)}px;--d:${p.dur.toFixed(1)}s;--delay:${p.delay.toFixed(1)}s;--dx:${p.dx.toFixed(0)}px`
+    }))),
+    el("div", { class: "awaken-q" }, [...O.question].map((ch, i) => el("span", { style: `--i:${i}` }, [ch]))),
     el("i", { class: "awaken-gold" }),
+    el("i", { class: "aw-wake", style: `background-image:url("${C.nodes[C.start].art}")` }),
+    el("i", { class: "aw-vignette" }),
     el("i", { class: "awaken-lid top" }),
     el("i", { class: "awaken-lid bottom" }),
+    sub("s1", O.dreamLine),
+    sub("s2", O.wakeLine),
     skip
   ]);
 }
 
-// 選項的 to:節點名稱、"battle:childBattle" 開打教學戰、"prologue" 進序章戰鬥(幼年篇算玩過了)
+// 選項的 to:節點名稱、"battle:childBattle" 開打教學戰、"prologue" 進序章戰鬥(桃花村算玩過了)
 function goChild(to) {
   if (to.startsWith("battle:")) { startPrologue(CONTENT[to.slice(7)]); return; }
   if (to === "prologue") {
@@ -3617,11 +3749,11 @@ function renderChild() {
   const top = node.art
     ? el("div", { class: "child-scene", style: `background-image:url("${node.art}")` }, [el("div", { class: "scene-text" }, body)])
     : panel(body);
-  // 開場剛播完:黑底和金光蓋在上面慢慢淡掉,淡完就拿掉
+  // 開場剛播完:全螢幕的雪梅花蓋在上面慢慢淡掉,淡完就拿掉
   let unveil = null;
   if (state.awaken === "out") {
     state.awaken = null;
-    unveil = el("div", { class: "awaken out" }, [el("i", { class: "awaken-gold" })]);
+    unveil = el("div", { class: "awaken out" }, [el("i", { class: "aw-wake", style: `background-image:url("${node.art}")` })]);
     setTimeout(() => unveil.remove(), AWAKEN_OUT_MS);
   }
   return screen([top, actions, unveil], unveil ? null : "fade-in");
