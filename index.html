@@ -2208,10 +2208,12 @@
     animation: awaken-gold 12s ease-in both;
   }
   @keyframes awaken-gold { 0%, 63.3% { opacity: 0; } 72% { opacity: .55; } 78% { opacity: 1; } 81%, 100% { opacity: 0; } }
-  /* 醒來:眼前是雪梅花,從模糊慢慢對焦 */
+  /* 醒來:眼前是雪梅花,從模糊慢慢對焦(圖用 sceneStage 鋪,手會動) */
   .aw-wake {
     inset: 0;
-    background: #0a0705 center 20% / cover no-repeat;
+    overflow: hidden;
+    container-type: size;
+    background: #0a0705;
     animation: aw-wake 12s ease-out both;
   }
   @keyframes aw-wake {
@@ -2356,12 +2358,15 @@
     flex-direction: column;
     justify-content: flex-end;
     overflow: hidden;
+    container-type: size;
     border: 1px solid var(--border);
     border-radius: 6px;
-    background: #0a0705 center 20% / cover no-repeat;
-    box-shadow: inset 0 0 40px rgba(0,0,0,.6);
+    background: #0a0705;
   }
+  .child-scene::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 40px rgba(0,0,0,.6); pointer-events: none; }
   .child-scene .scene-text {
+    position: relative;
+    z-index: 1;
     max-height: 62%;
     overflow-y: auto;
     padding: 40px 20px 4px;
@@ -2369,7 +2374,47 @@
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
   }
+  /* 段落的圖(見 sceneStage):跟 background-size: cover 一樣鋪滿,對齊點是 content.js 的 artPos(--px、--py)。
+     這樣才能在圖上的固定位置疊東西:會動的手(wave)以手腕為軸左右擺,像在你眼前晃 */
+  .scene-stage {
+    position: absolute;
+    width: max(100cqw, calc(100cqh * var(--ar)));
+    aspect-ratio: var(--ar);
+    left: calc((100cqw - max(100cqw, calc(100cqh * var(--ar)))) * var(--px) / 100);
+    top: calc((100cqh - max(100cqh, calc(100cqw * var(--ari)))) * var(--py) / 100);
+  }
+  .scene-stage img { position: absolute; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+  .scene-base { inset: 0; width: 100%; height: 100%; }
+  .scene-wave { height: auto; animation: scene-wave 4s ease-in-out .6s infinite; }
+  @keyframes scene-wave {
+    0%, 40%, 100% { transform: rotate(0); }
+    8% { transform: rotate(-6deg); }
+    16% { transform: rotate(5deg); }
+    24% { transform: rotate(-4deg); }
+    32% { transform: rotate(2deg); }
+  }
+  /* 劇情畫面裡的圖慢慢呼吸(微微推近再退回) */
+  .child-scene .scene-stage { transform-origin: 60% 35%; animation: scene-breathe 9s ease-in-out infinite alternate; }
+  @keyframes scene-breathe { to { transform: scale(1.025); } }
+  /* 窗外飄進來的花瓣 */
+  .scene-petals { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .scene-petals b {
+    position: absolute;
+    top: -6%;
+    left: var(--x);
+    width: var(--s);
+    height: calc(var(--s) * .6);
+    border-radius: 60% 0 60% 0;
+    background: #f7c1cf;
+    opacity: .85;
+    animation: scene-petal var(--d) linear var(--delay) infinite;
+  }
+  @keyframes scene-petal {
+    from { transform: translate(0, 0) rotate(0); }
+    to { transform: translate(var(--dx), 110cqh) rotate(400deg); }
+  }
   @media (prefers-reduced-motion: reduce) {
+    .scene-stage, .scene-wave, .scene-petals b { animation: none !important; }
     .battle, .battle *, .fade-in { animation: none !important; transition: none !important; }
     .b-float, .b-fx, .b-intro, .pick-fx, .pick-ghost { display: none; }
   }
@@ -3692,7 +3737,7 @@ function awakenIntro() {
     }))),
     el("div", { class: "awaken-q" }, [...O.question].map((ch, i) => el("span", { style: `--i:${i}` }, [ch]))),
     el("i", { class: "awaken-gold" }),
-    el("i", { class: "aw-wake", style: `background-image:url("${C.nodes[C.start].art}")` }),
+    el("i", { class: "aw-wake" }, [sceneStage(C.nodes[C.start])]),
     el("i", { class: "aw-vignette" }),
     el("i", { class: "awaken-lid top" }),
     el("i", { class: "awaken-lid bottom" }),
@@ -3712,6 +3757,30 @@ function goChild(to) {
   }
   state.childNode = to;
   render();
+}
+
+// 段落的圖(content.js 的 art、artSize、artPos):用一個跟圖同比例的舞台鋪滿畫面(跟 background-size: cover 一樣),
+// 有 wave 的話再疊一層會動的手,位置和手腕(擺動的軸)都用圖上的百分比
+function sceneStage(node) {
+  const [w, h] = node.artSize;
+  const [px, py] = node.artPos || [50, 50];
+  const wv = node.wave;
+  return el("div", { class: "scene-stage", style: `--ar:${(w / h).toFixed(4)};--ari:${(h / w).toFixed(4)};--px:${px};--py:${py}` }, [
+    el("img", { class: "scene-base", src: node.art, alt: "" }),
+    wv ? el("img", { class: "scene-wave", src: wv.src, alt: "", style: `left:${wv.box[0]}%;top:${wv.box[1]}%;width:${wv.box[2]}%;transform-origin:${wv.pivot[0]}% ${wv.pivot[1]}%` }) : null
+  ]);
+}
+
+// 窗外飄進來的花瓣(content.js 的 petals: true);位置每次都一樣(固定亂數種子),一開始就在半空中
+const SCENE_PETALS = (() => {
+  let s = 5;
+  const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  return Array.from({ length: 8 }, () => ({ x: 30 + rnd() * 75, size: 7 + rnd() * 6, dur: 6 + rnd() * 5, delay: rnd() * 10, dx: -(60 + rnd() * 140) }));
+})();
+function scenePetals() {
+  return el("i", { class: "scene-petals" }, SCENE_PETALS.map(p => el("b", {
+    style: `--x:${p.x.toFixed(1)}%;--s:${p.size.toFixed(1)}px;--d:${p.dur.toFixed(1)}s;--delay:-${p.delay.toFixed(1)}s;--dx:${p.dx.toFixed(0)}px`
+  })));
 }
 
 function submitName(input, hint, next) {
@@ -3747,13 +3816,13 @@ function renderChild() {
   const body = [node.title ? el("h1", null, [node.title]) : null, storyText(fillName(node.text), [], actions)];
   // 有圖的段落:圖鋪滿上方,文字壓在圖的下緣(跟戰鬥畫面一樣)
   const top = node.art
-    ? el("div", { class: "child-scene", style: `background-image:url("${node.art}")` }, [el("div", { class: "scene-text" }, body)])
+    ? el("div", { class: "child-scene" }, [sceneStage(node), node.petals ? scenePetals() : null, el("div", { class: "scene-text" }, body)])
     : panel(body);
   // 開場剛播完:全螢幕的雪梅花蓋在上面慢慢淡掉,淡完就拿掉
   let unveil = null;
   if (state.awaken === "out") {
     state.awaken = null;
-    unveil = el("div", { class: "awaken out" }, [el("i", { class: "aw-wake", style: `background-image:url("${node.art}")` })]);
+    unveil = el("div", { class: "awaken out" }, [el("i", { class: "aw-wake" }, [sceneStage(node)])]);
     setTimeout(() => unveil.remove(), AWAKEN_OUT_MS);
   }
   return screen([top, actions, unveil], unveil ? null : "fade-in");
