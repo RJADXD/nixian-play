@@ -208,7 +208,7 @@ const CONTENT = {
            petals: true = 畫面上飄花瓣
      文字裡的 {name} 會換成玩家取的名字
      opening = 第一次進遊戲的開場(全螢幕,約 12 秒,可以略過):主角在做惡夢,眨了幾次眼才醒來。
-               第一次睜眼:白煙、模糊的 dreamArt、金色花瓣,浮出 question;第二次:字消失,火光和字幕 dreamLine;
+               第一次睜眼:白煙、模糊的 dreamArts(好幾張輪流)、金色花瓣,浮出 question;第二次:字消失,火光和字幕 dreamLine;
                第三次:金光亮起、夢散了;閉眼時聽到 wakeLine;最後睜眼看到 start 那一段的圖,從模糊對焦。
                字幕的說話者顯示 speaker。只在從頭開始(還沒取名)時播放
      ============================================================ */
@@ -216,7 +216,13 @@ const CONTENT = {
     start: "name",
     opening: {
       question: "是夢醒，還是入夢？",
-      dreamArt: "assets/boss/prologue-1-gold.webp", // 夢裡模糊的金色人影:之後會發生的事
+      // 夢裡輪流出現的模糊畫面(每張約 2.2 秒,交叉淡入淡出):美好的早上和之後會發生的事交錯。
+      // 之後序章有新的畫面,把路徑加進來就會排進輪替
+      dreamArts: [
+        "assets/scene/awaken.webp",
+        "assets/boss/prologue-1-gold.webp",
+        "assets/boss/prologue-2-blood.webp"
+      ],
       speaker: "？？？",
       dreamLine: "……閉上眼睛。", // 第二次睜眼時的字幕:她之後吞下囈花前說的話
       wakeLine: "……喂，醒醒。"   // 夢散了、閉著眼時聽到的聲音

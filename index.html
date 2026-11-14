@@ -2141,13 +2141,21 @@
     background: #000;
   }
   .awaken > i { position: absolute; pointer-events: none; }
-  /* 夢:模糊的金色人影(醉花仙的圖),慢慢推近 */
+  /* 夢:好幾張模糊的畫面輪流出現(content.js 的 dreamArts),整層慢慢推近。
+     只用兩層圖輪流換(.on 的那張淡入、另一張淡出),模糊只套在外層一次,圖再多手機也吃得消 */
   .aw-dream {
     inset: -8%;
-    background: center 30% / cover no-repeat;
     filter: blur(12px) brightness(.5) saturate(1.2);
     animation: aw-dream 12s linear both;
   }
+  .aw-dream-img {
+    position: absolute;
+    inset: 0;
+    background: center 30% / cover no-repeat;
+    opacity: 0;
+    transition: opacity .9s ease-in-out;
+  }
+  .aw-dream-img.on { opacity: 1; }
   @keyframes aw-dream {
     0%, 6.7% { opacity: 0; transform: scale(1.12); }
     14% { opacity: .9; }
@@ -3697,10 +3705,11 @@ function startChildhood() {
 }
 
 // 第一次進遊戲的開場(全螢幕,content.js 的 childhood.opening):主角在做惡夢,眨了幾次眼才醒過來。
-// 夢裡:白煙、模糊的金色人影(醉花仙的圖)、飄落的金色花瓣、一句問話;火光和字幕「……閉上眼睛。」;
+// 夢裡:白煙、好幾張模糊的畫面輪流出現(dreamArts)、飄落的金色花瓣、一句問話;火光和字幕「……閉上眼睛。」;
 // 金光亮起、夢散了;黑暗裡有人叫你醒醒;最後睜眼看到的是第一段的圖(雪梅花),從模糊對焦。可以略過
 const AWAKEN_MS = 12000;    // 跟 CSS 的 .awaken 動畫長度一樣
 const AWAKEN_OUT_MS = 1200; // 播完後全螢幕的圖淡掉要多久
+const DREAM_SLIDE_MS = 2200; // 夢裡每張畫面停多久(換圖時淡入淡出 0.9 秒,見 CSS 的 .aw-dream-img)
 // 花瓣的位置每次都一樣(固定亂數種子)
 const AW_PETALS = (() => {
   let s = 11;
@@ -3719,8 +3728,29 @@ function awakenIntro() {
   const C = CONTENT.childhood;
   const O = C.opening;
   const sub = (cls, line) => el("div", { class: `aw-sub ${cls}` }, [el("b", null, [O.speaker]), line]);
+  // 夢裡的畫面:兩層輪流換,每 DREAM_SLIDE_MS 換下一張;開場拿掉後就停
+  const arts = O.dreamArts;
+  arts.forEach(src => { new Image().src = src; }); // 先載好,換圖時才不會閃一下
+  const layers = [el("i", { class: "aw-dream-img on" }), el("i", { class: "aw-dream-img" })];
+  layers[0].style.backgroundImage = `url("${arts[0]}")`;
+  const dream = el("i", { class: "aw-dream" }, layers);
+  let shown = 0;
+  const slide = () => {
+    if (!dream.isConnected) return false;
+    shown += 1;
+    const next = layers[shown % 2];
+    next.style.backgroundImage = `url("${arts[shown % arts.length]}")`;
+    next.classList.add("on");
+    layers[(shown + 1) % 2].classList.remove("on");
+    return true;
+  };
+  // 第一次睜眼(0.8 秒)起算,每 DREAM_SLIDE_MS 換一張
+  if (arts.length > 1) setTimeout(() => {
+    if (!slide()) return;
+    const timer = setInterval(() => { if (!slide()) clearInterval(timer); }, DREAM_SLIDE_MS);
+  }, 800 + DREAM_SLIDE_MS);
   return el("div", { class: "awaken" }, [
-    el("i", { class: "aw-dream", style: `background-image:url("${O.dreamArt}")` }),
+    dream,
     el("i", { class: "awaken-smoke" }),
     el("i", { class: "aw-fire" }),
     el("i", { class: "aw-petals" }, AW_PETALS.map(p => el("b", {
