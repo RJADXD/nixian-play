@@ -203,9 +203,8 @@ const CONTENT = {
      一段一個節點:title 標題、text 劇情(一句一句打出來)、choices 選項。
      選項的 to = 接哪個節點;"battle:childBattle" = 開打;"prologue" = 進序章戰鬥。
      input: "name" = 這一段要玩家取名字(存在本機,另外產生一組隱藏的 ID)
-     art = 這一段的圖:圖鋪滿上方,文字壓在圖的下緣。artSize = 圖的寬高(px);artPos = 圖的哪一點對齊畫面(百分比,
-           跟 background-position 一樣,裁切時保住這一點);wave = 疊在圖上會動的手:src 切出來的手、
-           box = 手在原圖上的位置 [左, 上, 寬](百分比)、pivot = 手腕在手那張圖上的位置(擺動的軸,百分比);
+     art = 這一段的圖:圖鋪滿上方,文字壓在圖的下緣(會慢慢呼吸)。artSize = 圖的寬高(px);
+           artPos = 圖的哪一點對齊畫面(百分比,跟 background-position 一樣,裁切時保住這一點);
            petals: true = 畫面上飄花瓣
      文字裡的 {name} 會換成玩家取的名字
      opening = 第一次進遊戲的開場(全螢幕,約 12 秒,可以略過):主角在做惡夢,眨了幾次眼才醒來。
@@ -225,12 +224,10 @@ const CONTENT = {
     nodes: {
       name: {
         title: "",
-        // 雪梅花把做惡夢的你叫醒,伸手在你眼前晃(使用者提供的圖,原圖在 assets/src/awaken-wave.webp)。
-        // awaken.webp 是手的地方先模糊過的底圖,會動的手另外切成 awaken-hand.webp 疊上去
+        // 雪梅花把做惡夢的你叫醒,伸手在你眼前晃(使用者提供的圖,原圖在 assets/src/awaken-wave.webp)
         art: "assets/scene/awaken.webp",
         artSize: [1199, 1312],
         artPos: [55, 30],
-        wave: { src: "assets/scene/awaken-hand.webp", box: [14.68, 32.77, 34.7], pivot: [17.8, 90] },
         petals: true,
         text: "「你醒啦。」\n她伸手在你眼前晃了晃：「又做惡夢了？……睡糊塗了吧，還記得自己叫什麼嗎？」",
         input: "name", next: "morning"
