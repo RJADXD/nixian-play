@@ -295,60 +295,147 @@
     gap: 10px;
     margin-top: 14px;
   }
+  /* 卡框(參考陰陽師、天涯明月刀這類古風卡框):雙層框(外金線、暗槽、內細金線)、四角雲紋、牌匾式名牌、銅圓章徽記 */
   .id-card {
     position: relative;
     display: flex;
     flex-direction: column;
-    padding: 6px 6px 8px;
+    padding: 8px 8px 7px;
     font: inherit;
     color: var(--text);
-    background: linear-gradient(180deg, #2c2118, #17110c);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    box-shadow: inset 0 1px 0 rgba(255,230,190,.12), 0 3px 0 #0a0705;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,164,92,.16), transparent 60%), linear-gradient(180deg, #2b2016, #120d09);
+    border: 1px solid #8a6a34;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px #0a0705, inset 0 0 0 3px #2a1e12, inset 0 0 0 4px rgba(214,178,106,.45), 0 4px 12px rgba(0,0,0,.6);
     cursor: pointer;
-    transition: transform .12s, border-color .15s, box-shadow .15s;
+    transition: transform .15s, border-color .15s, box-shadow .15s;
   }
-  .id-card:hover:not(.locked), .id-card:focus-visible { transform: translateY(-2px); border-color: var(--gold); box-shadow: inset 0 0 14px rgba(201,164,92,.2), 0 0 12px rgba(201,164,92,.35), 0 3px 0 #0a0705; outline: none; }
-  /* 頭像:身份的圖還沒有,先用剪影 */
+  .id-card::after, .id-art::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg transform='translate%280 0%29'%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23000' stroke-opacity='.6' stroke-width='2.6'/%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23e2c27c' stroke-width='1.2'/%3E%3Cpath d='M5 12.5V5.5Q5 5 5.5 5H12.5' fill='none' stroke='%23e2c27c' stroke-width='.9' stroke-opacity='.8'/%3E%3Cpath d='M8.2 10.2V8.6Q8.2 8.2 8.6 8.2H10.2' fill='none' stroke='%23e2c27c' stroke-width='.9'/%3E%3Ccircle cx='12.8' cy='12.8' r='1' fill='%23e2c27c'/%3E%3C/g%3E%3C/svg%3E") left top / 16px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg transform='translate%2816 0%29 scale%28-1 1%29'%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23000' stroke-opacity='.6' stroke-width='2.6'/%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23e2c27c' stroke-width='1.2'/%3E%3Cpath d='M5 12.5V5.5Q5 5 5.5 5H12.5' fill='none' stroke='%23e2c27c' stroke-width='.9' stroke-opacity='.8'/%3E%3Cpath d='M8.2 10.2V8.6Q8.2 8.2 8.6 8.2H10.2' fill='none' stroke='%23e2c27c' stroke-width='.9'/%3E%3Ccircle cx='12.8' cy='12.8' r='1' fill='%23e2c27c'/%3E%3C/g%3E%3C/svg%3E") right top / 16px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg transform='translate%280 16%29 scale%281 -1%29'%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23000' stroke-opacity='.6' stroke-width='2.6'/%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23e2c27c' stroke-width='1.2'/%3E%3Cpath d='M5 12.5V5.5Q5 5 5.5 5H12.5' fill='none' stroke='%23e2c27c' stroke-width='.9' stroke-opacity='.8'/%3E%3Cpath d='M8.2 10.2V8.6Q8.2 8.2 8.6 8.2H10.2' fill='none' stroke='%23e2c27c' stroke-width='.9'/%3E%3Ccircle cx='12.8' cy='12.8' r='1' fill='%23e2c27c'/%3E%3C/g%3E%3C/svg%3E") left bottom / 16px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg transform='translate%2816 16%29 scale%28-1 -1%29'%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23000' stroke-opacity='.6' stroke-width='2.6'/%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23e2c27c' stroke-width='1.2'/%3E%3Cpath d='M5 12.5V5.5Q5 5 5.5 5H12.5' fill='none' stroke='%23e2c27c' stroke-width='.9' stroke-opacity='.8'/%3E%3Cpath d='M8.2 10.2V8.6Q8.2 8.2 8.6 8.2H10.2' fill='none' stroke='%23e2c27c' stroke-width='.9'/%3E%3Ccircle cx='12.8' cy='12.8' r='1' fill='%23e2c27c'/%3E%3C/g%3E%3C/svg%3E") right bottom / 16px no-repeat;
+  }
+  .id-card:hover, .id-card:focus-visible {
+    transform: translateY(-3px);
+    border-color: #e2c27c;
+    box-shadow: inset 0 0 0 1px #0a0705, inset 0 0 0 3px #3a2a16, inset 0 0 0 4px rgba(240,208,138,.75), 0 0 14px rgba(233,199,123,.45), 0 6px 14px rgba(0,0,0,.6);
+    outline: none;
+  }
+  /* 頭像:身份的圖還沒有,先用剪影;內圈一道細金線 */
   .id-face, .id-art-img {
     position: relative;
     display: block;
     width: 100%;
     aspect-ratio: 3 / 4;
-    border: 1px solid #4a3620;
+    overflow: hidden;
+    border: 1px solid rgba(214,178,106,.55);
     background: radial-gradient(circle at 50% 36%, #3d2e21 0 17%, transparent 18%), radial-gradient(ellipse at 50% 105%, #3d2e21 0 44%, transparent 45%), #120d0a;
     background-size: cover;
     background-position: center top;
-    box-shadow: inset 0 0 12px rgba(0,0,0,.8);
+    box-shadow: inset 0 0 0 1px #000, inset 0 0 16px rgba(0,0,0,.85);
   }
-  /* 右上角的分類徽記(菱形) */
+  /* 滑過去:一道光從頭像上掃過 */
+  .id-face::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    background: linear-gradient(100deg, transparent, rgba(255,236,190,.28), transparent);
+    transform: translateX(-130%) skewX(-15deg);
+    pointer-events: none;
+  }
+  .id-card:hover:not(.locked) .id-face::before { animation: id-sheen .7s ease-out; }
+  @keyframes id-sheen { to { transform: translateX(260%) skewX(-15deg); } }
+  /* 右上角的分類徽記:一枚銅圓章,釘在卡角上 */
   .id-cat {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 2px;
+    right: 2px;
     z-index: 1;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     display: grid;
     place-items: center;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: #1a1209;
-    background: linear-gradient(180deg, #f0d08a, #a9803a);
-    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    color: #2a1606;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f6dc9a, #b98a3e 55%, #6e4a1c);
+    box-shadow: 0 0 0 1px #2a1b0a, 0 0 0 2px #d9b56a, 0 2px 4px rgba(0,0,0,.7);
   }
-  .id-card b { margin-top: 6px; font-size: 14px; letter-spacing: .1em; text-align: center; color: var(--gold); }
-  /* 鎖住的:變灰、蓋上鎖頭 */
-  .id-card.locked { filter: grayscale(.9) brightness(.62); }
-  .id-card.locked.picked-hint { filter: grayscale(.6) brightness(.8); border-color: #8a6a34; }
-  .id-lock { position: absolute; left: 50%; top: 50%; width: 30%; transform: translate(-50%, -50%); fill: #d9c08a; opacity: .85; }
-  .id-card.locked b { color: var(--dim); }
+  /* 名牌:兩道金線夾住的牌匾,字是漸層金 */
+  .id-card b {
+    position: relative;
+    margin: 7px 0 0;
+    padding: 3px 0 2px;
+    text-align: center;
+    background: linear-gradient(90deg, transparent, rgba(201,164,92,.16) 20%, rgba(201,164,92,.16) 80%, transparent);
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-image: linear-gradient(90deg, transparent, #c9a45c 22%, #c9a45c 78%, transparent) 1;
+  }
+  .id-card b span {
+    font-size: 14px;
+    letter-spacing: .12em;
+    background: linear-gradient(180deg, #fff4d6, #e9c77e 55%, #b5873b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* 鎖住的:整張壓黑、鐵灰色的框,蓋一枚紅色的「封」字印 */
+  .id-card.locked {
+    border-color: #3a3530;
+    background: linear-gradient(180deg, #141210, #0a0908);
+    box-shadow: inset 0 0 0 1px #000, inset 0 0 0 3px #1a1714, inset 0 0 0 4px rgba(150,140,130,.22), 0 4px 12px rgba(0,0,0,.6);
+  }
+  .id-card.locked::after, .id-card.locked .id-cat { filter: grayscale(1) brightness(.5); }
+  .id-card.locked .id-face, .id-art.locked .id-art-img {
+    border-color: #2a2622;
+    background: radial-gradient(circle at 50% 36%, #100d0b 0 17%, transparent 18%), radial-gradient(ellipse at 50% 105%, #100d0b 0 44%, transparent 45%), #040303;
+  }
+  .id-card.locked b span { background: none; color: #5e5750; }
+  .id-seal {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: 34%;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: #c8443a;
+    border: 2px solid #a8322d;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(168,50,45,.5);
+    transform: translate(-50%, -50%) rotate(-8deg);
+    opacity: .9;
+  }
+  .id-art .id-seal { width: 28%; font-size: 26px; border-width: 3px; }
   .id-hint { margin: 0; padding: 4px 4px 2px; font-size: 14px; line-height: 1.7; color: var(--text); }
-  .id-hint .b-k { margin-right: 6px; }
   /* 點了之後:左邊大圖、右邊介紹(數值都在這裡看,碰撞劇情裡不再列) */
   .screen > .panel.id-detail { flex: 1; display: flex; gap: 16px; overflow: hidden; padding: 16px; }
-  .id-art { flex: 0 0 42%; min-width: 0; }
+  /* 左邊大圖:跟卡片同一種框 */
+  .id-art {
+    position: relative;
+    flex: 0 0 42%;
+    align-self: flex-start;
+    min-width: 0;
+    padding: 9px;
+    background: linear-gradient(180deg, #2b2016, #120d09);
+    border: 1px solid #8a6a34;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px #0a0705, inset 0 0 0 3px #2a1e12, inset 0 0 0 4px rgba(214,178,106,.45), 0 4px 12px rgba(0,0,0,.6);
+  }
+  .id-art::after { inset: 3px; background-size: 22px; }
+  .id-art.locked { border-color: #3a3530; background: linear-gradient(180deg, #141210, #0a0908); }
+  .id-art.locked::after { filter: grayscale(1) brightness(.5); }
+  .id-unlock { margin: 10px 0 0; padding: 8px 10px; line-height: 1.7; color: var(--text); background: rgba(168,50,45,.12); border: 1px solid rgba(168,50,45,.55); border-radius: 3px; }
+  .id-unlock b { color: #e8907f; margin-right: 6px; }
   .id-info { flex: 1; min-width: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
   .id-info h1 { margin-bottom: 6px; }
   .id-info h2 { margin: 14px 0 6px; }
@@ -2678,8 +2765,7 @@ const state = {
   soulEcho: "record", // 測試用:前世殘念 record 照紀錄(上一輪選錯的回合才出現) / force 每回合都出現 / off 關
   hint: "on",       // 測試用:亮光提示 on = 每回合正解的指令和抽屜裡那一項外框亮起 / off 關
   awaken: null,     // 第一次進遊戲的開場:"intro" 播放中、"out" 播完正在淡出、null 沒有
-  selectId: null,   // 選身份:正在看介紹的身份(null = 卡片牆)
-  selectHint: null  // 選身份:點了哪張鎖住的卡(底部顯示它的解鎖條件)
+  selectId: null    // 選身份:正在看介紹的身份(null = 卡片牆)
 };
 
 function pickWeighted(list) {
@@ -4452,13 +4538,12 @@ function renderStatus() {
 }
 
 // ---- 選身份(資料在 content.js 的 identitySelect):玩家自己選,但有條件 ----
-// 卡片牆:能選的點了看介紹;鎖住的點了在底部顯示解鎖條件。state.selectId = 正在看介紹的身份,null = 卡片牆
+// 卡片牆:點了看介紹;鎖住的整張壓黑、蓋「封」字印,介紹也是黑的,只看得到解鎖條件,不能奪舍。
+// state.selectId = 正在看介紹的身份,null = 卡片牆
 const ATTR_ORDER = ["體質", "根骨", "體魄", "悟性", "氣運", "靈根", "身法"];
-const LOCK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v9A1.5 1.5 0 0 1 18.5 22h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z"/></svg>';
 
 function goSelect() {
   state.selectId = null;
-  state.selectHint = null;
   state.phase = "select";
   render();
 }
@@ -4470,7 +4555,9 @@ function identityUnlocked(entry) {
   return !!(u.achievement && player && (player.achievements || []).includes(u.achievement));
 }
 
-function identityFace(idt, cls) {
+// 頭像;鎖住的不給看圖,蓋一枚「封」字印
+function identityFace(idt, cls, open) {
+  if (!open) return el("span", { class: cls }, [el("span", { class: "id-seal" }, ["封"])]);
   return el("span", { class: cls, style: idt.portrait ? `background-image:url("${idt.portrait}")` : "" });
 }
 
@@ -4481,53 +4568,45 @@ function renderSelect() {
   const cards = S.pool.map(e => {
     const idt = getIdentity(e.id);
     const open = identityUnlocked(e);
-    const face = identityFace(idt, "id-face");
-    if (!open) face.innerHTML = LOCK_SVG.replace("<svg", '<svg class="id-lock"');
-    const card = el("button", { class: ["id-card", open ? "" : "locked", state.selectHint === e.id ? "picked-hint" : ""].join(" ").trim(), "data-id": e.id, "aria-label": open ? idt.name : `${idt.name}（未解鎖）` }, [
+    const card = el("button", { class: open ? "id-card" : "id-card locked", "data-id": e.id, "aria-label": open ? idt.name : `${idt.name}（未解鎖）` }, [
       el("span", { class: "id-cat" }, [idt.category[0]]),
-      face,
-      el("b", null, [idt.name])
+      identityFace(idt, "id-face", open),
+      el("b", null, [el("span", null, [idt.name])])
     ]);
-    card.addEventListener("click", () => {
-      if (open) { state.selectId = e.id; state.selectHint = null; }
-      else state.selectHint = e.id;
-      render();
-    });
+    card.addEventListener("click", () => { state.selectId = e.id; render(); });
     return card;
   });
-  // 底部選項框:平常是一句提示;點了鎖住的卡,顯示它的解鎖條件
-  const locked = S.pool.find(e => e.id === state.selectHint);
-  const hint = locked
-    ? el("p", { class: "id-hint" }, [el("b", { class: "b-k" }, [getIdentity(locked.id).name]), `尚未解鎖。條件：${locked.unlock.hint}`])
-    : el("p", { class: "id-hint" }, ["點一副軀殼，看看它的來歷。"]);
   return screen([
     panel([el("h1", null, [S.title]), el("div", { class: "meta" }, [S.intro]), el("div", { class: "id-grid" }, cards)]),
-    consoleFrame([hint])
+    consoleFrame([el("p", { class: "id-hint" }, ["點一副軀殼，看看它的來歷。"])])
   ]);
 }
 
-// 點了能選的身份:卡片牆收起來,左邊大圖、右邊介紹(含開局屬性);心魔要奪舍之後才知道
+// 點了身份:卡片牆收起來,左邊大圖、右邊介紹(含開局屬性);心魔要奪舍之後才知道。
+// 鎖住的:圖是黑的、資料都是「？？？」,只看得到解鎖條件,奪舍的按鈕是灰的
 function renderIdentityDetail(entry) {
   const idt = getIdentity(entry.id);
+  const open = identityUnlocked(entry);
   const attrs = buildAttributes(idt.category);
   const bonus = CATEGORY_ATTR_BONUS[idt.category] || {};
-  const stats = ATTR_ORDER.map(k => el("div", { class: bonus[k] ? "id-stat up" : "id-stat" }, [
+  const stats = ATTR_ORDER.map(k => el("div", { class: open && bonus[k] ? "id-stat up" : "id-stat" }, [
     el("span", null, [k]),
-    el("b", null, [String(attrs[k])]),
-    bonus[k] ? el("em", null, [`+${bonus[k]}`]) : el("em"),
+    el("b", null, [open ? String(attrs[k]) : "？？？"]),
+    open && bonus[k] ? el("em", null, [`+${bonus[k]}`]) : el("em"),
     el("small", null, [ATTR_EFFECTS[k]])
   ]));
   const actions = dock([
-    choiceButton("奪舍這副軀殼", () => { state.selectId = null; startRun(entry.id); }),
+    open ? choiceButton("奪舍這副軀殼", () => { state.selectId = null; startRun(entry.id); }) : disabledButton("無法奪舍"),
     choiceButton("再看看別的", () => { state.selectId = null; render(); })
   ]);
   return screen([
     el("div", { class: "panel id-detail" }, [
-      el("div", { class: "id-art" }, [identityFace(idt, "id-art-img")]),
+      el("div", { class: open ? "id-art" : "id-art locked" }, [identityFace(idt, "id-art-img", open)]),
       el("div", { class: "id-info" }, [
         el("span", { class: "tag" }, [idt.category + "類"]),
         el("h1", null, [idt.name]),
-        el("p", { class: "id-intro" }, [idt.intro]),
+        open ? null : el("p", { class: "id-unlock" }, [el("b", null, ["尚未解鎖"]), `條件：${entry.unlock.hint}`]),
+        el("p", { class: "id-intro" }, [open ? idt.intro : "？？？"]),
         el("h2", null, ["開局屬性"]),
         el("div", { class: "id-stats" }, stats),
         el("h2", null, ["心魔"]),
