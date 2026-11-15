@@ -288,45 +288,58 @@
     font-size: 13px;
     margin-bottom: 12px;
   }
-  /* ---- 選身份(仿仙境傳說的選角畫面):卡片牆 → 點了換成左邊大圖、右邊介紹 ---- */
-  .id-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-    gap: 10px;
-    margin-top: 18px;
-  }
-  /* 卡片牆的底:標題後面一面慢慢轉的命盤,底下一點一點往上飄的魂火(都在內容後面,只有空隙看得到) */
-  .screen > .panel.id-wall {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
+  /* ---- 選身份(改命):沒有外框和底部選項框,只留選的東西;字和按鈕都在最上方 ----
+     背景是自己的:一條條垂下來的命線(各掛一顆命結),其中兩條斷了、斷口發光(逆天改命),加上往上飄的魂火 */
+  .screen.id-screen > :not(.fate-bg) { position: relative; z-index: 1; }
+  .fate-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
     overflow: hidden;
-    background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(201,161,90,.14), transparent 70%), var(--panel);
-  }
-  .id-wall-in {
-    position: relative;
-    z-index: 1;
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    padding: 24px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-  .id-wheel {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    width: min(460px, 120%);
-    aspect-ratio: 1;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='none' stroke='%23e9c77b'%3E%3Ccircle cx='100' cy='100' r='98' stroke-width='0.8' stroke-opacity='1'/%3E%3Ccircle cx='100' cy='100' r='93' stroke-width='0.5' stroke-opacity='0.8'/%3E%3Ccircle cx='100' cy='100' r='74' stroke-width='0.6' stroke-opacity='0.9'/%3E%3Ccircle cx='100' cy='100' r='70' stroke-width='0.4' stroke-opacity='0.6'/%3E%3Ccircle cx='100' cy='100' r='44' stroke-width='0.6' stroke-opacity='0.8'/%3E%3Ccircle cx='100' cy='100' r='40' stroke-width='0.4' stroke-opacity='0.5'/%3E%3Ccircle cx='100' cy='100' r='12' stroke-width='0.6' stroke-opacity='0.8'/%3E%3Cline x1='193.00' y1='100.00' x2='198.00' y2='100.00' stroke-width='.5'/%3E%3Cline x1='192.65' y1='108.11' x2='195.14' y2='108.32' stroke-width='.5'/%3E%3Cline x1='191.59' y1='116.15' x2='194.05' y2='116.58' stroke-width='.5'/%3E%3Cline x1='189.83' y1='124.07' x2='192.25' y2='124.72' stroke-width='.5'/%3E%3Cline x1='187.39' y1='131.81' x2='189.74' y2='132.66' stroke-width='.5'/%3E%3Cline x1='184.29' y1='139.30' x2='186.55' y2='140.36' stroke-width='.5'/%3E%3Cline x1='180.54' y1='146.50' x2='184.87' y2='149.00' stroke-width='.5'/%3E%3Cline x1='176.18' y1='153.34' x2='178.23' y2='154.78' stroke-width='.5'/%3E%3Cline x1='171.24' y1='159.78' x2='173.16' y2='161.39' stroke-width='.5'/%3E%3Cline x1='165.76' y1='165.76' x2='167.53' y2='167.53' stroke-width='.5'/%3E%3Cline x1='159.78' y1='171.24' x2='161.39' y2='173.16' stroke-width='.5'/%3E%3Cline x1='153.34' y1='176.18' x2='154.78' y2='178.23' stroke-width='.5'/%3E%3Cline x1='146.50' y1='180.54' x2='149.00' y2='184.87' stroke-width='.5'/%3E%3Cline x1='139.30' y1='184.29' x2='140.36' y2='186.55' stroke-width='.5'/%3E%3Cline x1='131.81' y1='187.39' x2='132.66' y2='189.74' stroke-width='.5'/%3E%3Cline x1='124.07' y1='189.83' x2='124.72' y2='192.25' stroke-width='.5'/%3E%3Cline x1='116.15' y1='191.59' x2='116.58' y2='194.05' stroke-width='.5'/%3E%3Cline x1='108.11' y1='192.65' x2='108.32' y2='195.14' stroke-width='.5'/%3E%3Cline x1='100.00' y1='193.00' x2='100.00' y2='198.00' stroke-width='.5'/%3E%3Cline x1='91.89' y1='192.65' x2='91.68' y2='195.14' stroke-width='.5'/%3E%3Cline x1='83.85' y1='191.59' x2='83.42' y2='194.05' stroke-width='.5'/%3E%3Cline x1='75.93' y1='189.83' x2='75.28' y2='192.25' stroke-width='.5'/%3E%3Cline x1='68.19' y1='187.39' x2='67.34' y2='189.74' stroke-width='.5'/%3E%3Cline x1='60.70' y1='184.29' x2='59.64' y2='186.55' stroke-width='.5'/%3E%3Cline x1='53.50' y1='180.54' x2='51.00' y2='184.87' stroke-width='.5'/%3E%3Cline x1='46.66' y1='176.18' x2='45.22' y2='178.23' stroke-width='.5'/%3E%3Cline x1='40.22' y1='171.24' x2='38.61' y2='173.16' stroke-width='.5'/%3E%3Cline x1='34.24' y1='165.76' x2='32.47' y2='167.53' stroke-width='.5'/%3E%3Cline x1='28.76' y1='159.78' x2='26.84' y2='161.39' stroke-width='.5'/%3E%3Cline x1='23.82' y1='153.34' x2='21.77' y2='154.78' stroke-width='.5'/%3E%3Cline x1='19.46' y1='146.50' x2='15.13' y2='149.00' stroke-width='.5'/%3E%3Cline x1='15.71' y1='139.30' x2='13.45' y2='140.36' stroke-width='.5'/%3E%3Cline x1='12.61' y1='131.81' x2='10.26' y2='132.66' stroke-width='.5'/%3E%3Cline x1='10.17' y1='124.07' x2='7.75' y2='124.72' stroke-width='.5'/%3E%3Cline x1='8.41' y1='116.15' x2='5.95' y2='116.58' stroke-width='.5'/%3E%3Cline x1='7.35' y1='108.11' x2='4.86' y2='108.32' stroke-width='.5'/%3E%3Cline x1='7.00' y1='100.00' x2='2.00' y2='100.00' stroke-width='.5'/%3E%3Cline x1='7.35' y1='91.89' x2='4.86' y2='91.68' stroke-width='.5'/%3E%3Cline x1='8.41' y1='83.85' x2='5.95' y2='83.42' stroke-width='.5'/%3E%3Cline x1='10.17' y1='75.93' x2='7.75' y2='75.28' stroke-width='.5'/%3E%3Cline x1='12.61' y1='68.19' x2='10.26' y2='67.34' stroke-width='.5'/%3E%3Cline x1='15.71' y1='60.70' x2='13.45' y2='59.64' stroke-width='.5'/%3E%3Cline x1='19.46' y1='53.50' x2='15.13' y2='51.00' stroke-width='.5'/%3E%3Cline x1='23.82' y1='46.66' x2='21.77' y2='45.22' stroke-width='.5'/%3E%3Cline x1='28.76' y1='40.22' x2='26.84' y2='38.61' stroke-width='.5'/%3E%3Cline x1='34.24' y1='34.24' x2='32.47' y2='32.47' stroke-width='.5'/%3E%3Cline x1='40.22' y1='28.76' x2='38.61' y2='26.84' stroke-width='.5'/%3E%3Cline x1='46.66' y1='23.82' x2='45.22' y2='21.77' stroke-width='.5'/%3E%3Cline x1='53.50' y1='19.46' x2='51.00' y2='15.13' stroke-width='.5'/%3E%3Cline x1='60.70' y1='15.71' x2='59.64' y2='13.45' stroke-width='.5'/%3E%3Cline x1='68.19' y1='12.61' x2='67.34' y2='10.26' stroke-width='.5'/%3E%3Cline x1='75.93' y1='10.17' x2='75.28' y2='7.75' stroke-width='.5'/%3E%3Cline x1='83.85' y1='8.41' x2='83.42' y2='5.95' stroke-width='.5'/%3E%3Cline x1='91.89' y1='7.35' x2='91.68' y2='4.86' stroke-width='.5'/%3E%3Cline x1='100.00' y1='7.00' x2='100.00' y2='2.00' stroke-width='.5'/%3E%3Cline x1='108.11' y1='7.35' x2='108.32' y2='4.86' stroke-width='.5'/%3E%3Cline x1='116.15' y1='8.41' x2='116.58' y2='5.95' stroke-width='.5'/%3E%3Cline x1='124.07' y1='10.17' x2='124.72' y2='7.75' stroke-width='.5'/%3E%3Cline x1='131.81' y1='12.61' x2='132.66' y2='10.26' stroke-width='.5'/%3E%3Cline x1='139.30' y1='15.71' x2='140.36' y2='13.45' stroke-width='.5'/%3E%3Cline x1='146.50' y1='19.46' x2='149.00' y2='15.13' stroke-width='.5'/%3E%3Cline x1='153.34' y1='23.82' x2='154.78' y2='21.77' stroke-width='.5'/%3E%3Cline x1='159.78' y1='28.76' x2='161.39' y2='26.84' stroke-width='.5'/%3E%3Cline x1='165.76' y1='34.24' x2='167.53' y2='32.47' stroke-width='.5'/%3E%3Cline x1='171.24' y1='40.22' x2='173.16' y2='38.61' stroke-width='.5'/%3E%3Cline x1='176.18' y1='46.66' x2='178.23' y2='45.22' stroke-width='.5'/%3E%3Cline x1='180.54' y1='53.50' x2='184.87' y2='51.00' stroke-width='.5'/%3E%3Cline x1='184.29' y1='60.70' x2='186.55' y2='59.64' stroke-width='.5'/%3E%3Cline x1='187.39' y1='68.19' x2='189.74' y2='67.34' stroke-width='.5'/%3E%3Cline x1='189.83' y1='75.93' x2='192.25' y2='75.28' stroke-width='.5'/%3E%3Cline x1='191.59' y1='83.85' x2='194.05' y2='83.42' stroke-width='.5'/%3E%3Cline x1='192.65' y1='91.89' x2='195.14' y2='91.68' stroke-width='.5'/%3E%3Cpath d='M179.21 118.22L181.41 121.22L179.21 124.22L177.01 121.22Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M157.98 154.98L160.18 157.98L157.98 160.98L155.78 157.98Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M121.22 176.21L123.42 179.21L121.22 182.21L119.02 179.21Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M78.78 176.21L80.98 179.21L78.78 182.21L76.58 179.21Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M42.02 154.98L44.22 157.98L42.02 160.98L39.82 157.98Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M20.79 118.22L22.99 121.22L20.79 124.22L18.59 121.22Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M20.79 75.78L22.99 78.78L20.79 81.78L18.59 78.78Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M42.02 39.02L44.22 42.02L42.02 45.02L39.82 42.02Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M78.78 17.79L80.98 20.79L78.78 23.79L76.58 20.79Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M121.22 17.79L123.42 20.79L121.22 23.79L119.02 20.79Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M157.98 39.02L160.18 42.02L157.98 45.02L155.78 42.02Z' fill='%23e9c77b' stroke='none'/%3E%3Cpath d='M179.21 75.78L181.41 78.78L179.21 81.78L177.01 78.78Z' fill='%23e9c77b' stroke='none'/%3E%3Cline x1='174.00' y1='100.00' x2='193.00' y2='100.00' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='164.09' y1='137.00' x2='180.54' y2='146.50' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='137.00' y1='164.09' x2='146.50' y2='180.54' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='100.00' y1='174.00' x2='100.00' y2='193.00' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='63.00' y1='164.09' x2='53.50' y2='180.54' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='35.91' y1='137.00' x2='19.46' y2='146.50' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='26.00' y1='100.00' x2='7.00' y2='100.00' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='35.91' y1='63.00' x2='19.46' y2='53.50' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='63.00' y1='35.91' x2='53.50' y2='19.46' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='100.00' y1='26.00' x2='100.00' y2='7.00' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='137.00' y1='35.91' x2='146.50' y2='19.46' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='164.09' y1='63.00' x2='180.54' y2='53.50' stroke-width='.4' stroke-opacity='.6'/%3E%3Cline x1='154.00' y1='95.00' x2='154.00' y2='105.00' stroke-width='1.6'/%3E%3Cline x1='159.00' y1='95.00' x2='159.00' y2='105.00' stroke-width='1.6'/%3E%3Cline x1='141.72' y1='134.65' x2='134.65' y2='141.72' stroke-width='1.6'/%3E%3Cline x1='145.25' y1='138.18' x2='138.18' y2='145.25' stroke-width='1.6'/%3E%3Cline x1='105.00' y1='154.00' x2='95.00' y2='154.00' stroke-width='1.6'/%3E%3Cline x1='105.00' y1='159.00' x2='95.00' y2='159.00' stroke-width='1.6'/%3E%3Cline x1='65.35' y1='141.72' x2='58.28' y2='134.65' stroke-width='1.6'/%3E%3Cline x1='61.82' y1='145.25' x2='54.75' y2='138.18' stroke-width='1.6'/%3E%3Cline x1='46.00' y1='105.00' x2='46.00' y2='95.00' stroke-width='1.6'/%3E%3Cline x1='41.00' y1='105.00' x2='41.00' y2='95.00' stroke-width='1.6'/%3E%3Cline x1='58.28' y1='65.35' x2='65.35' y2='58.28' stroke-width='1.6'/%3E%3Cline x1='54.75' y1='61.82' x2='61.82' y2='54.75' stroke-width='1.6'/%3E%3Cline x1='95.00' y1='46.00' x2='105.00' y2='46.00' stroke-width='1.6'/%3E%3Cline x1='95.00' y1='41.00' x2='105.00' y2='41.00' stroke-width='1.6'/%3E%3Cline x1='134.65' y1='58.28' x2='141.72' y2='65.35' stroke-width='1.6'/%3E%3Cline x1='138.18' y1='54.75' x2='145.25' y2='61.82' stroke-width='1.6'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
-    opacity: .13;
     pointer-events: none;
-    transform: translate(-50%, -38%);
-    animation: id-wheel 160s linear infinite;
+    background: radial-gradient(ellipse 70% 45% at 50% 0%, rgba(201,161,90,.12), transparent 70%), radial-gradient(ellipse 120% 50% at 50% 110%, rgba(130,45,20,.2), transparent 70%);
   }
-  @keyframes id-wheel { to { transform: translate(-50%, -38%) rotate(360deg); } }
+  .fate-thread {
+    position: absolute;
+    top: -2%;
+    bottom: -2%;
+    left: var(--x);
+    width: 1px;
+    opacity: var(--o);
+    background: linear-gradient(180deg, transparent, #e9c77b 14%, #e9c77b 86%, transparent);
+    transform-origin: 50% 0;
+    animation: fate-sway var(--d) ease-in-out var(--delay) infinite alternate;
+  }
+  .fate-thread::before {
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: var(--knot);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #f3d48c;
+    box-shadow: 0 0 6px 2px rgba(243,212,140,.6);
+  }
+  @keyframes fate-sway { from { transform: rotate(-.6deg); } to { transform: rotate(.6deg); } }
+  .fate-thread.broken {
+    opacity: .55;
+    background: linear-gradient(180deg, transparent, #e9c77b 14%, #ffb36b var(--cut), transparent calc(var(--cut) + .1%), transparent calc(var(--cut) + 9%), #ffb36b calc(var(--cut) + 9.1%), #e9c77b 90%, transparent);
+  }
+  .fate-thread.broken::before, .fate-thread.broken::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    top: var(--cut);
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ffd59a;
+    box-shadow: 0 0 10px 4px rgba(255,150,70,.7);
+    animation: fate-ember 1.6s ease-in-out infinite alternate;
+  }
+  .fate-thread.broken::after { top: calc(var(--cut) + 9%); animation-delay: .8s; }
+  @keyframes fate-ember { from { opacity: .45; } to { opacity: 1; } }
   .id-motes { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
   .id-motes b {
     position: absolute;
@@ -346,29 +359,113 @@
     75% { opacity: .45; }
     100% { opacity: 0; transform: translate(var(--dx), -95vh); }
   }
-  /* 標題:大字漸層金,底下一道帶菱形的金線,再一句題詞 */
-  .id-head { text-align: center; animation: fade-in .8s ease-out both; }
-  .id-head h1 {
+  /* 最上方:標題、題詞、說明、提示 */
+  .id-top { flex: none; text-align: center; animation: fade-in .8s ease-out both; }
+  .id-top h1 {
     display: inline-block;
-    margin: 4px 0 0;
-    font-size: 30px;
+    margin: 0;
+    font-size: 34px;
     letter-spacing: .6em;
     margin-right: -.6em;
     background: linear-gradient(180deg, #fff4d6, #e9c77e 55%, #b5873b);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    filter: drop-shadow(0 0 12px rgba(233,199,123,.35));
+    filter: drop-shadow(0 0 14px rgba(233,199,123,.4));
   }
   .id-rule {
     display: block;
     width: min(300px, 76%);
     height: 10px;
-    margin: 8px auto 10px;
+    margin: 6px auto 8px;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 0L10 5L5 10L0 5Z' fill='%23e9c77b'/%3E%3Cpath d='M5 2.6L7.4 5L5 7.4L2.6 5Z' fill='%231f1712'/%3E%3C/svg%3E") center / 10px no-repeat, linear-gradient(90deg, transparent, rgba(233,199,123,.8) 30%, rgba(233,199,123,.8) 70%, transparent) center / 100% 1px no-repeat;
   }
-  .id-epigraph { margin: 0; font-size: 15px; line-height: 1.9; letter-spacing: .2em; white-space: pre-line; color: #e9c77b; text-shadow: 0 0 10px rgba(233,199,123,.3); }
-  .id-head .meta { margin: 10px 0 0; line-height: 1.8; white-space: pre-line; }
+  .id-epigraph { margin: 0; font-size: 15px; line-height: 1.8; letter-spacing: .2em; white-space: pre-line; color: #e9c77b; text-shadow: 0 0 10px rgba(233,199,123,.3); }
+  .id-top .meta { margin: 8px 0 0; line-height: 1.7; white-space: pre-line; }
+  .id-tip {
+    display: inline-block;
+    margin: 10px 0 0;
+    padding: 3px 16px;
+    font-size: 13px;
+    letter-spacing: .2em;
+    color: #f0dca8;
+    background: rgba(20,14,10,.7);
+    border: 1px solid rgba(201,161,90,.45);
+    border-radius: 999px;
+  }
+  /* 捲動的地方不顯示捲軸,改成底下一個上下輕輕跳的箭頭(還有東西才出現) */
+  .id-scroll-wrap, .id-info-wrap { position: relative; flex: 1; min-height: 0; min-width: 0; }
+  .id-scroll, .id-info { height: 100%; overflow-y: auto; scrollbar-width: none; }
+  .id-scroll::-webkit-scrollbar, .id-info::-webkit-scrollbar { display: none; }
+  .id-scroll { padding: 6px 2px 36px; }
+  .id-info { padding-bottom: 36px; }
+  .scroll-cue {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 46px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .3s;
+    background: linear-gradient(180deg, transparent, var(--bg) 85%);
+  }
+  .scroll-cue::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 4px;
+    width: 26px;
+    height: 26px;
+    margin-left: -13px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 6l7 6 7-6M5 12l7 6 7-6' fill='none' stroke='%23e9c77b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    filter: drop-shadow(0 0 6px rgba(233,199,123,.6));
+    animation: cue-bob 1.4s ease-in-out infinite;
+  }
+  .scroll-cue.show { opacity: 1; }
+  @keyframes cue-bob { 50% { transform: translateY(5px); } }
+  .id-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 10px;
+  }
+  /* 介紹頁最上方:左邊回去、中間一句問話、右邊「逆天改命」 */
+  .id-bar { flex: none; display: flex; align-items: center; gap: 10px; }
+  .id-ask { flex: 1; min-width: 0; margin: 0; text-align: center; font-size: 13px; letter-spacing: .15em; color: #e9c77b; white-space: nowrap; }
+  @media (max-width: 480px) {
+    .id-bar { flex-wrap: wrap; justify-content: space-between; row-gap: 6px; }
+    .id-ask { order: 3; flex-basis: 100%; }
+  }
+  .id-back {
+    flex: none;
+    padding: 6px 14px;
+    font: inherit;
+    font-size: 14px;
+    letter-spacing: .12em;
+    color: #e9c77b;
+    background: rgba(20,14,10,.7);
+    border: 1px solid rgba(201,161,90,.45);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .id-back:hover, .id-back:focus-visible { border-color: #e9c77b; outline: none; }
+  .id-go {
+    flex: none;
+    padding: 8px 14px 8px 20px;
+    font: inherit;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: .3em;
+    color: #2a1606;
+    background: linear-gradient(180deg, #ffe9b0, #e2b866 50%, #b5873b);
+    border: 1px solid #fff0c8;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px #5a3d14, 0 0 16px rgba(233,199,123,.45);
+    cursor: pointer;
+    animation: go-glow 1.8s ease-in-out infinite alternate;
+  }
+  @keyframes go-glow { to { box-shadow: 0 0 0 1px #5a3d14, 0 0 28px rgba(255,214,130,.85); } }
+  .id-go:disabled { color: #6f665c; background: #1b1714; border-color: #3a3530; box-shadow: none; animation: none; cursor: not-allowed; }
   /* 卡框(參考陰陽師、天涯明月刀這類古風卡框):雙層框(外金線、暗槽、內細金線)、四角雲紋、牌匾式名牌 */
   .id-card {
     position: relative;
@@ -446,7 +543,7 @@
     background-clip: text;
     color: transparent;
   }
-  /* 鎖住的:整張壓黑、鐵灰色的框,蓋一枚紅色的「封」字印 */
+  /* 鎖住的(未知):整張壓黑、鐵灰色的框,蓋一枚紅色的「未知」字印 */
   .id-card.locked {
     border-color: #3a3530;
     background: linear-gradient(180deg, #141210, #0a0908);
@@ -462,23 +559,21 @@
     position: absolute;
     left: 50%;
     top: 46%;
-    width: 34%;
-    aspect-ratio: 1;
-    display: grid;
-    place-items: center;
-    font-size: 15px;
+    padding: 6px 4px 5px;
+    writing-mode: vertical-rl;
+    font-size: 13px;
     font-weight: 700;
+    line-height: 1.1;
     color: #c8443a;
     border: 2px solid #a8322d;
     border-radius: 3px;
     box-shadow: inset 0 0 0 1px rgba(168,50,45,.5);
-    transform: translate(-50%, -50%) rotate(-8deg);
+    transform: translate(-50%, -50%) rotate(-6deg);
     opacity: .9;
   }
-  .id-art .id-seal { width: 28%; font-size: 26px; border-width: 3px; }
-  .id-hint { margin: 0; padding: 4px 4px 2px; font-size: 14px; line-height: 1.7; color: var(--text); }
-  /* 點了之後:左邊大圖、右邊介紹(數值都在這裡看,碰撞劇情裡不再列) */
-  .screen > .panel.id-detail { flex: 1; display: flex; gap: 16px; overflow: hidden; padding: 16px; }
+  .id-art .id-seal { padding: 12px 8px 10px; font-size: 26px; border-width: 3px; }
+  /* 點了之後:左邊大圖和判詞、右邊介紹(數值都在這裡看,碰撞劇情裡不再列) */
+  .id-detail { flex: 1; min-height: 0; display: flex; gap: 16px; }
   /* 左欄:大圖(跟卡片同一種框),底下是直排的判詞,像一副對聯 */
   .id-side { flex: 0 0 42%; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 18px; }
   /* 寬螢幕:左欄夠寬,判詞改放在大圖右邊 */
@@ -504,7 +599,6 @@
   .id-art.locked::after { filter: grayscale(1) brightness(.5); }
   .id-unlock { margin: 10px 0 0; padding: 8px 10px; line-height: 1.7; color: var(--text); background: rgba(168,50,45,.12); border: 1px solid rgba(168,50,45,.55); border-radius: 3px; }
   .id-unlock b { color: #e8907f; margin-right: 6px; }
-  .id-info { flex: 1; min-width: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
   .id-info h1 { margin: 6px 0 4px; font-size: 28px; letter-spacing: .3em; }
   .id-verse {
     margin: 0;
@@ -539,6 +633,62 @@
   .id-stat small { grid-column: 1 / -1; font-size: 11px; color: var(--dim); }
   .id-stat.up { border-color: #c9a45c; background: linear-gradient(90deg, #3a2a16, #241b12); }
   .id-demon { margin: 0; color: var(--dim); }
+  /* ---- 逆天改命(按下確認後,約 3.3 秒,點一下可跳過):
+     金色的「命」字浮現 → 裂痕從中間爬出去、字在抖 → 閃白、碎片炸開飛散 → 另一批碎片飛回來拼成新身份的名字 → 判詞浮現 ---- */
+  .fate-break { position: fixed; inset: 0; z-index: 70; overflow: hidden; cursor: pointer; background: #060403; animation: fb-bg 3.8s linear both; }
+  @keyframes fb-bg { 0% { opacity: 0; } 8%, 88% { opacity: 1; } 100% { opacity: 0; } }
+  .fb-stage { position: absolute; left: 50%; top: 42%; width: min(86vw, 520px); height: min(56vw, 300px); transform: translate(-50%, -50%); }
+  .fb-shard { position: absolute; inset: 0; display: grid; place-items: center; clip-path: var(--clip); }
+  .fb-shard span {
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    background: linear-gradient(180deg, #fff4d6, #e9c77e 55%, #b5873b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .fb-old { animation: fb-old-in .5s ease-out .2s both, fb-shake .45s linear .9s; }
+  @keyframes fb-old-in { from { opacity: 0; transform: translate(-50%, -50%) scale(1.15); filter: blur(8px); } to { transform: translate(-50%, -50%); } }
+  @keyframes fb-shake {
+    0%, 100% { transform: translate(-50%, -50%); }
+    20% { transform: translate(calc(-50% - 3px), calc(-50% + 2px)); }
+    40% { transform: translate(calc(-50% + 3px), calc(-50% - 2px)); }
+    60% { transform: translate(calc(-50% - 2px), calc(-50% - 3px)); }
+    80% { transform: translate(calc(-50% + 2px), calc(-50% + 3px)); }
+  }
+  .fb-old .fb-shard span { font-size: min(44vw, 230px); filter: drop-shadow(0 0 18px rgba(255,214,130,.55)); }
+  .fb-old .fb-shard { animation: fb-burst .8s cubic-bezier(.2,.7,.3,1) 1.35s both; }
+  @keyframes fb-burst { to { transform: translate(var(--tx), var(--ty)) rotate(var(--r)) scale(.85); opacity: 0; } }
+  .fb-cracks { position: absolute; inset: 0; overflow: visible; animation: fb-gone .15s linear 1.35s both; }
+  .fb-cracks svg { width: 100%; height: 100%; overflow: visible; }
+  .fb-cracks path {
+    fill: none;
+    stroke: #fff6dc;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    filter: drop-shadow(0 0 3px #ffd27a);
+    animation: fb-crack .4s ease-out both;
+    animation-delay: calc(.85s + var(--k) * 30ms);
+  }
+  @keyframes fb-crack { to { stroke-dashoffset: 0; } }
+  @keyframes fb-gone { to { opacity: 0; } }
+  .fb-flash { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle at 50% 42%, #fff 0, rgba(255,240,200,.85) 22%, rgba(255,214,130,0) 70%); animation: fb-flash .6s ease-out 1.3s both; }
+  @keyframes fb-flash { 15% { opacity: 1; } 100% { opacity: 0; } }
+  .fb-new .fb-shard span { font-size: min(88px, calc(62vw / var(--n, 2))); letter-spacing: .25em; margin-right: -.25em; filter: drop-shadow(0 0 14px rgba(255,214,130,.6)); }
+  .fb-new .fb-shard { opacity: 0; animation: fb-gather .9s cubic-bezier(.15,.8,.25,1) both; animation-delay: calc(1.7s + var(--k) * 25ms); }
+  @keyframes fb-gather { from { transform: translate(var(--tx), var(--ty)) rotate(var(--r)) scale(1.2); opacity: 0; } 40% { opacity: 1; } to { transform: none; opacity: 1; } }
+  .fb-new { animation: fb-settle .7s ease-out 2.6s both; }
+  @keyframes fb-settle { 0% { filter: brightness(1); } 40% { filter: brightness(1.9); } 100% { filter: brightness(1); } }
+  .fb-cap, .fb-verse { position: absolute; left: 0; right: 0; margin: 0; text-align: center; letter-spacing: .3em; opacity: 0; }
+  .fb-cap { top: calc(42% - min(15vw, 88px)); font-size: 14px; color: #c9a15a; }
+  .fb-verse { top: calc(42% + min(11vw, 64px)); font-size: 15px; line-height: 2; white-space: pre-line; color: #f0dca8; text-shadow: 0 0 10px rgba(233,199,123,.35); }
+  .fb-cap, .fb-verse { animation: fb-text .7s ease-out both; }
+  .fb-cap { animation-delay: 2.45s; }
+  .fb-verse { animation-delay: 2.7s; }
+  @keyframes fb-text { from { opacity: 0; transform: translateY(6px); filter: blur(4px); } to { opacity: 1; } }
 
   /* ---- 劇情文字:一句一句打出來,點一下繼續(參考視覺小說、活俠傳的對話框) ---- */
   .story { cursor: pointer; }
@@ -2642,7 +2792,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .scene-stage, .scene-petals b { animation: none !important; }
-    .id-wheel, .id-head, .id-card, .id-detail .id-art, .id-info > *, .id-verse { animation: none !important; }
+    .id-top, .id-card, .id-detail .id-art, .id-info > *, .id-verse, .fate-thread, .fate-thread::before, .fate-thread::after, .scroll-cue::after, .id-go { animation: none !important; }
     .id-motes { display: none; }
     .battle, .battle *, .fade-in { animation: none !important; transition: none !important; }
     .b-float, .b-fx, .b-intro, .pick-fx, .pick-ghost { display: none; }
@@ -4622,7 +4772,8 @@ function renderStatus() {
 }
 
 // ---- 選身份(資料在 content.js 的 identitySelect):玩家自己選,但有條件 ----
-// 卡片牆:點了看介紹;鎖住的整張壓黑、蓋「封」字印,介紹也是黑的,只看得到解鎖條件,不能奪舍。
+// 卡片牆:點了看介紹;「未知」的整張壓黑、蓋「未知」字印,介紹也全是未知,不能選。
+// 沒有外框和底部選項框:字和按鈕都在最上方。按下「逆天改命」播 fateBreak,播完才開始這一輪。
 // state.selectId = 正在看介紹的身份,null = 卡片牆
 const ATTR_ORDER = ["體質", "根骨", "體魄", "悟性", "氣運", "靈根", "身法"];
 
@@ -4639,13 +4790,13 @@ function identityUnlocked(entry) {
   return !!(u.achievement && player && (player.achievements || []).includes(u.achievement));
 }
 
-// 頭像;鎖住的不給看圖,蓋一枚「封」字印
+// 頭像;未知的不給看圖,蓋一枚「未知」字印
 function identityFace(idt, cls, open) {
-  if (!open) return el("span", { class: cls }, [el("span", { class: "id-seal" }, ["封"])]);
+  if (!open) return el("span", { class: cls }, [el("span", { class: "id-seal" }, ["未知"])]);
   return el("span", { class: cls, style: idt.portrait ? `background-image:url("${idt.portrait}")` : "" });
 }
 
-// 卡片牆背景:慢慢往上飄的魂火
+// 背景:往上飄的魂火
 const SELECT_MOTES = (() => {
   let s = 11;
   const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
@@ -4657,6 +4808,35 @@ function selectMotes() {
   })));
 }
 
+// 背景:一條條垂下來的命線,各掛一顆命結;其中兩條斷了(逆天改命)
+const FATE_THREADS = (() => {
+  let s = 23;
+  const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  return Array.from({ length: 16 }, (_, i) => ({
+    x: (i + .2 + rnd() * .6) * 100 / 16, o: .07 + rnd() * .18, d: 6 + rnd() * 6, delay: rnd() * 8,
+    knot: 15 + rnd() * 65, broken: i === 3 || i === 12, cut: 35 + rnd() * 25
+  }));
+})();
+function fateBg() {
+  return el("div", { class: "fate-bg", "aria-hidden": "true" }, [
+    ...FATE_THREADS.map(t => el("i", {
+      class: t.broken ? "fate-thread broken" : "fate-thread",
+      style: `--x:${t.x.toFixed(1)}%;--o:${t.o.toFixed(2)};--d:${t.d.toFixed(1)}s;--delay:-${t.delay.toFixed(1)}s;--knot:${t.knot.toFixed(0)}%;--cut:${t.cut.toFixed(0)}%`
+    })),
+    selectMotes()
+  ]);
+}
+
+// 捲動的地方不顯示捲軸,改成底下一個箭頭:下面還有東西才出現,捲到底就消失
+function scrollCue(scroller) {
+  const cue = el("i", { class: "scroll-cue", "aria-hidden": "true" });
+  const update = () => cue.classList.toggle("show", scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight > 6);
+  scroller.addEventListener("scroll", update, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(update).observe(scroller);
+  else requestAnimationFrame(update);
+  return cue;
+}
+
 function renderSelect() {
   const S = CONTENT.identitySelect;
   const entry = state.selectId && S.pool.find(e => e.id === state.selectId);
@@ -4664,33 +4844,29 @@ function renderSelect() {
   const cards = S.pool.map((e, i) => {
     const idt = getIdentity(e.id);
     const open = identityUnlocked(e);
-    const card = el("button", { class: open ? "id-card" : "id-card locked", style: `--i:${i}`, "data-id": e.id, "aria-label": open ? idt.name : `${idt.name}（未解鎖）` }, [
+    const card = el("button", { class: open ? "id-card" : "id-card locked", style: `--i:${i}`, "data-id": e.id, "aria-label": open ? idt.name : "未知" }, [
       identityFace(idt, "id-face", open),
-      el("b", null, [el("span", null, [idt.name])])
+      el("b", null, [el("span", null, [open ? idt.name : "？？？"])])
     ]);
     card.addEventListener("click", () => { state.selectId = e.id; render(); });
     return card;
   });
+  const scroller = el("div", { class: "id-scroll" }, [el("div", { class: "id-grid" }, cards)]);
   return screen([
-    el("div", { class: "panel id-wall" }, [
-      el("i", { class: "id-wheel" }),
-      selectMotes(),
-      el("div", { class: "id-wall-in" }, [
-        el("div", { class: "id-head" }, [
-          el("h1", null, [S.title]),
-          el("i", { class: "id-rule" }),
-          el("p", { class: "id-epigraph" }, [S.epigraph]),
-          el("p", { class: "meta" }, [S.intro])
-        ]),
-        el("div", { class: "id-grid" }, cards)
-      ])
+    fateBg(),
+    el("div", { class: "id-top" }, [
+      el("h1", null, [S.title]),
+      el("i", { class: "id-rule" }),
+      el("p", { class: "id-epigraph" }, [S.epigraph]),
+      el("p", { class: "meta" }, [S.intro]),
+      el("p", { class: "id-tip" }, [S.hint])
     ]),
-    consoleFrame([el("p", { class: "id-hint" }, [S.hint])])
-  ]);
+    el("div", { class: "id-scroll-wrap" }, [scroller, scrollCue(scroller)])
+  ], "id-screen");
 }
 
-// 點了身份:卡片牆收起來,左邊大圖、右邊介紹(判詞、簡介、開局屬性);心魔要奪舍之後才知道。
-// 鎖住的:圖是黑的、資料都是「？？？」,只看得到解鎖條件(機緣),奪舍的按鈕是灰的「緣分未至」
+// 點了身份:卡片牆收起來,左邊大圖和判詞、右邊介紹(開局屬性在「根基」);心魔要改命之後才知道。
+// 最上方:左「另擇他命」、中間一句問話、右「逆天改命」。未知的:全是未知,按鈕是灰的「命數未明」
 function renderIdentityDetail(entry) {
   const idt = getIdentity(entry.id);
   const open = identityUnlocked(entry);
@@ -4698,37 +4874,102 @@ function renderIdentityDetail(entry) {
   const bonus = CATEGORY_ATTR_BONUS[idt.category] || {};
   const stats = ATTR_ORDER.map(k => el("div", { class: open && bonus[k] ? "id-stat up" : "id-stat" }, [
     el("span", null, [k]),
-    el("b", null, [open ? String(attrs[k]) : "？？？"]),
+    el("b", null, [open ? String(attrs[k]) : "未知"]),
     open && bonus[k] ? el("em", null, [`+${bonus[k]}`]) : el("em"),
     el("small", null, [ATTR_EFFECTS[k]])
   ]));
-  const actions = dock([
-    open ? choiceButton("奪舍此身", () => { state.selectId = null; startRun(entry.id); }) : disabledButton("緣分未至"),
-    choiceButton("另擇他殼", () => { state.selectId = null; render(); })
-  ]);
+  const back = el("button", { class: "id-back" }, ["‹ 另擇他命"]);
+  back.addEventListener("click", () => { state.selectId = null; render(); });
+  const go = el("button", { class: "id-go" }, [open ? "逆天改命" : "命數未明"]);
+  if (open) go.addEventListener("click", () => fateBreak(idt, () => { state.selectId = null; startRun(entry.id); }));
+  else go.disabled = true;
   // 判詞直排,像對聯:逗號換成空格、句尾的標點拿掉
-  const verse = open ? idt.verse : "？？？";
+  const verse = open ? idt.verse : "未知";
   const info = [
-    el("span", { class: "tag" }, [idt.category + "類"]),
-    el("h1", null, [idt.name]),
-    open ? null : el("p", { class: "id-unlock" }, [el("b", null, ["此殼未啟"]), `機緣：${entry.unlock.hint}`]),
+    open ? el("span", { class: "tag" }, [idt.category + "類"]) : null,
+    el("h1", null, [open ? idt.name : "未知"]),
+    open ? null : el("p", { class: "id-unlock" }, [el("b", null, ["此命未明"]), `機緣：${entry.unlock.hint || "未知"}`]),
     el("p", { class: "id-intro" }, [open ? idt.intro : "此人之命，尚未向你展開。"]),
     el("h2", null, ["根基"]),
     el("div", { class: "id-stats" }, stats),
     el("h2", null, ["心魔"]),
-    el("p", { class: "id-demon" }, ["？？？　入殼之後，自會浮現。"])
+    el("p", { class: "id-demon" }, [open ? "？？？　改命之後，自會浮現。" : "未知"])
   ].filter(Boolean);
   info.forEach((c, i) => c.style.setProperty("--i", i));
+  const scroller = el("div", { class: "id-info" }, info);
   return screen([
-    el("div", { class: "panel id-detail" }, [
+    fateBg(),
+    el("div", { class: "id-bar" }, [back, el("p", { class: "id-ask" }, [open ? "借此身，改此命？" : "此命未明。"]), go]),
+    el("div", { class: "id-detail" }, [
       el("div", { class: "id-side" }, [
         el("div", { class: open ? "id-art" : "id-art locked" }, [identityFace(idt, "id-art-img", open)]),
         verse ? el("p", { class: "id-verse" }, [verse.replace(/，/g, "　").replace(/[；。]/g, "")]) : null
       ]),
-      el("div", { class: "id-info" }, info)
-    ]),
-    actions
-  ], "fade-in");
+      el("div", { class: "id-info-wrap" }, [scroller, scrollCue(scroller)])
+    ])
+  ], "id-screen fade-in");
+}
+
+// 逆天改命的碎片:從中間附近放射出去的裂痕,切成內圈三角形和外圈四邊形(座標是舞台的 %)
+const FATE_SHARDS = (() => {
+  let s = 7;
+  const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const K = 7, c = [50 + (rnd() - .5) * 6, 48 + (rnd() - .5) * 6];
+  const ang = Array.from({ length: K }, (_, i) => (i + rnd() * .6) / K * Math.PI * 2);
+  const pt = (a, r) => [c[0] + Math.cos(a) * r, c[1] + Math.sin(a) * r * 1.7];
+  const inner = ang.map(a => pt(a, 12 + rnd() * 10)), outer = ang.map(a => pt(a, 90));
+  const polys = [];
+  for (let i = 0; i < K; i++) {
+    const j = (i + 1) % K;
+    polys.push([c, inner[i], inner[j]]);
+    polys.push([inner[i], outer[i], outer[j], inner[j]]);
+  }
+  const shards = polys.map(poly => {
+    const g = [poly.reduce((t, p) => t + p[0], 0) / poly.length, poly.reduce((t, p) => t + p[1], 0) / poly.length];
+    const dx = (g[0] - c[0]) * 5.2, dy = (g[1] - c[1]) * 3, len = Math.hypot(dx, dy) || 1;
+    const dist = (poly.length === 3 ? 140 : 280) + rnd() * 140;
+    return {
+      clip: "polygon(" + poly.map(p => `${p[0].toFixed(1)}% ${p[1].toFixed(1)}%`).join(",") + ")",
+      tx: (dx / len * dist).toFixed(0), ty: (dy / len * dist).toFixed(0), r: ((rnd() - .5) * 90).toFixed(0)
+    };
+  });
+  // 裂痕:每一段中間折兩下,才像玻璃裂開
+  const f = p => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+  const jag = (a, b) => {
+    const nx = -(b[1] - a[1]), ny = b[0] - a[0], n = Math.hypot(nx, ny) || 1;
+    const mid = [1 / 3, 2 / 3].map(t => {
+      const o = (rnd() - .5) * 8;
+      return [a[0] + (b[0] - a[0]) * t + nx / n * o, a[1] + (b[1] - a[1]) * t + ny / n * o];
+    });
+    return `M${f(a)}L${f(mid[0])}L${f(mid[1])}L${f(b)}`;
+  };
+  const cracks = [];
+  for (let i = 0; i < K; i++) cracks.push(jag(c, inner[i]), jag(inner[i], inner[(i + 1) % K]), jag(inner[i], pt(ang[i] + (rnd() - .5) * .3, 55 + rnd() * 20)));
+  return { shards, cracks };
+})();
+
+function fateBreak(idt, done) {
+  let finished = false;
+  const finish = () => { if (!finished) { finished = true; done(); } };
+  if (REDUCE_MOTION) return finish();
+  const layer = (cls, text, extra, n) => el("div", { class: "fb-stage " + cls, style: n ? `--n:${n}` : "" }, [
+    ...FATE_SHARDS.shards.map((p, k) => el("div", { class: "fb-shard", style: `--clip:${p.clip};--tx:${p.tx}px;--ty:${p.ty}px;--r:${p.r}deg;--k:${k}` }, [el("span", null, [text])])),
+    extra
+  ]);
+  const cracks = el("div", { class: "fb-cracks" });
+  cracks.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="none">' +
+    FATE_SHARDS.cracks.map((d, k) => `<path d="${d}" pathLength="1" style="--k:${k}"/>`).join("") + "</svg>";
+  const box = el("div", { class: "fate-break", "aria-hidden": "true" }, [
+    layer("fb-old", "命", cracks),
+    el("i", { class: "fb-flash" }),
+    el("p", { class: "fb-cap" }, ["此後，你便是"]),
+    layer("fb-new", idt.name, null, idt.name.length),
+    idt.verse ? el("p", { class: "fb-verse" }, [idt.verse]) : null
+  ]);
+  document.body.appendChild(box);
+  const t1 = setTimeout(finish, 3300);
+  const t2 = setTimeout(() => box.remove(), 3800);
+  box.addEventListener("click", () => { clearTimeout(t1); clearTimeout(t2); box.remove(); finish(); });
 }
 
 function renderOpening() {
