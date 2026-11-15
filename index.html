@@ -288,29 +288,88 @@
     font-size: 13px;
     margin-bottom: 12px;
   }
-  /* 屬性:一行一項,直直往下排(跟術法抽屜的清單一樣) */
-  .attrs {
+  /* ---- 選身份(仿仙境傳說的選角畫面):卡片牆 → 點了換成左邊大圖、右邊介紹 ---- */
+  .id-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .id-card {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin: 16px 0;
-    font-size: 14px;
-  }
-  .attrs div {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 6px;
-    background: linear-gradient(180deg, #2c2118, #1c150f);
+    padding: 6px 6px 8px;
+    font: inherit;
+    color: var(--text);
+    background: linear-gradient(180deg, #2c2118, #17110c);
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 8px 14px;
+    box-shadow: inset 0 1px 0 rgba(255,230,190,.12), 0 3px 0 #0a0705;
+    cursor: pointer;
+    transition: transform .12s, border-color .15s, box-shadow .15s;
   }
-  .attrs span {
-    color: var(--gold);
-    font-size: 15px;
-    font-variant-numeric: tabular-nums;
+  .id-card:hover:not(.locked), .id-card:focus-visible { transform: translateY(-2px); border-color: var(--gold); box-shadow: inset 0 0 14px rgba(201,164,92,.2), 0 0 12px rgba(201,164,92,.35), 0 3px 0 #0a0705; outline: none; }
+  /* 頭像:身份的圖還沒有,先用剪影 */
+  .id-face, .id-art-img {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border: 1px solid #4a3620;
+    background: radial-gradient(circle at 50% 36%, #3d2e21 0 17%, transparent 18%), radial-gradient(ellipse at 50% 105%, #3d2e21 0 44%, transparent 45%), #120d0a;
+    background-size: cover;
+    background-position: center top;
+    box-shadow: inset 0 0 12px rgba(0,0,0,.8);
   }
+  /* 右上角的分類徽記(菱形) */
+  .id-cat {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #1a1209;
+    background: linear-gradient(180deg, #f0d08a, #a9803a);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  }
+  .id-card b { margin-top: 6px; font-size: 14px; letter-spacing: .1em; text-align: center; color: var(--gold); }
+  /* 鎖住的:變灰、蓋上鎖頭 */
+  .id-card.locked { filter: grayscale(.9) brightness(.62); }
+  .id-card.locked.picked-hint { filter: grayscale(.6) brightness(.8); border-color: #8a6a34; }
+  .id-lock { position: absolute; left: 50%; top: 50%; width: 30%; transform: translate(-50%, -50%); fill: #d9c08a; opacity: .85; }
+  .id-card.locked b { color: var(--dim); }
+  .id-hint { margin: 0; padding: 4px 4px 2px; font-size: 14px; line-height: 1.7; color: var(--text); }
+  .id-hint .b-k { margin-right: 6px; }
+  /* 點了之後:左邊大圖、右邊介紹(數值都在這裡看,碰撞劇情裡不再列) */
+  .screen > .panel.id-detail { flex: 1; display: flex; gap: 16px; overflow: hidden; padding: 16px; }
+  .id-art { flex: 0 0 42%; min-width: 0; }
+  .id-info { flex: 1; min-width: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .id-info h1 { margin-bottom: 6px; }
+  .id-info h2 { margin: 14px 0 6px; }
+  .id-intro { margin: 8px 0 0; line-height: 1.8; }
+  .id-stats { display: flex; flex-direction: column; gap: 4px; }
+  .id-stat {
+    display: grid;
+    grid-template-columns: 2.6em auto 1fr;
+    align-items: baseline;
+    column-gap: 6px;
+    padding: 4px 8px;
+    font-size: 14px;
+    background: #241b12;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  .id-stat b { color: var(--gold); font-variant-numeric: tabular-nums; }
+  .id-stat em { font-style: normal; font-size: 12px; color: #86d68f; }
+  .id-stat small { grid-column: 1 / -1; font-size: 11px; color: var(--dim); }
+  .id-stat.up { border-color: #c9a45c; background: linear-gradient(90deg, #3a2a16, #241b12); }
+  .id-demon { margin: 0; color: var(--dim); }
 
   /* ---- 劇情文字:一句一句打出來,點一下繼續(參考視覺小說、活俠傳的對話框) ---- */
   .story { cursor: pointer; }
@@ -2556,9 +2615,6 @@
    之後的場景流/戰鬥/道具系統尚未接上,先驗證這條管線走得通
    ============================================================ */
 
-// beta 階段先開放這 5 個身份(都已有完整 collision/innerDemon)
-const BETA_IDENTITY_IDS = ["farmer", "wrestler", "miner", "boatman", "blacksmith"];
-
 // 分類 -> 屬性加成表(數字為暫定預設值,之後可直接調整)
 const CATEGORY_ATTR_BONUS = {
   "體質": { "體質": 5 },
@@ -2621,7 +2677,9 @@ const state = {
   barStyle: "hex",  // 測試用(新版介面):氣血、靈力條的樣子 hex 六角刀形 / plain 純細框
   soulEcho: "record", // 測試用:前世殘念 record 照紀錄(上一輪選錯的回合才出現) / force 每回合都出現 / off 關
   hint: "on",       // 測試用:亮光提示 on = 每回合正解的指令和抽屜裡那一項外框亮起 / off 關
-  awaken: null      // 第一次進遊戲的開場:"intro" 播放中、"out" 播完正在淡出、null 沒有
+  awaken: null,     // 第一次進遊戲的開場:"intro" 播放中、"out" 播完正在淡出、null 沒有
+  selectId: null,   // 選身份:正在看介紹的身份(null = 卡片牆)
+  selectHint: null  // 選身份:點了哪張鎖住的卡(底部顯示它的解鎖條件)
 };
 
 function pickWeighted(list) {
@@ -2958,8 +3016,12 @@ function finishPrologue() {
   if (P.soulEcho === false) { /* 這場不記 */ }
   else if (b.result === "win") saveEcho([]);
   else if (b.wrongTurns.length) saveEcho([...new Set([...loadEcho(), ...b.wrongTurns])]);
-  // 序章戰鬥只打一次:打完(不管輸贏)之後的輪迴從選身份開始
-  if (player) { player.prologueDone = true; savePlayer(); }
+  // 序章戰鬥只打一次:打完(不管輸贏)之後的輪迴從選身份開始;打贏記下成就(可以解鎖身份,見 identitySelect)
+  if (player) {
+    player.prologueDone = true;
+    if (b.result === "win" && P.achievement) player.achievements = [...new Set([...(player.achievements || []), P.achievement])];
+    savePlayer();
+  }
   state.phase = "prologueEnd";
   render();
 }
@@ -3005,13 +3067,6 @@ function pick(btn, then, ms = PICK_MS) {
 
 function disabledButton(label) {
   return el("button", { class: "choice", disabled: "disabled" }, [el("span", { class: "cl" }, [label])]);
-}
-
-function renderAttrs(attrs) {
-  const order = ["體質", "根骨", "體魄", "悟性", "氣運", "靈根", "身法"];
-  return el("div", { class: "attrs" }, order.map(k =>
-    el("div", null, [k, el("span", null, [String(attrs[k])])])
-  ));
 }
 
 /* ---------- 劇情文字:一句一句打出來,點一下繼續 ----------
@@ -3658,7 +3713,8 @@ const EMBLEMS = {
 
 // ---- 玩家:名字 + 一組隱藏的 ID,存在本機(這台裝置的這個瀏覽器)----
 // 名字只是顯示用,兩個玩家可以取一樣的名字;id 才是真正的玩家編號,之後做雲端存檔時拿它綁帳號。
-// childhoodDone = 桃花村玩過了(只有第一次進遊戲會玩);prologueDone = 序章戰鬥打過了(也只打一次)
+// childhoodDone = 桃花村玩過了(只有第一次進遊戲會玩);prologueDone = 序章戰鬥打過了(也只打一次);
+// achievements = 拿到的成就(例如「一聲雪梅」),用來解鎖身份
 const PLAYER_KEY = "nixian.player";
 let player = (() => {
   try { return JSON.parse(localStorage.getItem(PLAYER_KEY)); } catch (e) { return null; }
@@ -3689,7 +3745,7 @@ function newCycle() {
   if (SKIP_CHILD) startPrologue();
   else if (!(player && player.childhoodDone)) startChildhood();
   else if (!player.prologueDone) startPrologue();
-  else { state.phase = "select"; render(); }
+  else goSelect();
 }
 
 // ---- 序章前段:桃花村(資料在 content.js 的 childhood)----
@@ -4313,7 +4369,7 @@ function backlogSheet() {
 function renderPrologueEnd() {
   const P = CONTENT.prologueBattle;
   const won = state.battle.result === "win";
-  const actions = dock([choiceButton("墜落", () => { state.phase = "select"; render(); })]);
+  const actions = dock([choiceButton("墜落", goSelect)]);
   // 從黑暗中慢慢浮現
   return screen([
     panel([
@@ -4395,14 +4451,91 @@ function renderStatus() {
   ])])]);
 }
 
+// ---- 選身份(資料在 content.js 的 identitySelect):玩家自己選,但有條件 ----
+// 卡片牆:能選的點了看介紹;鎖住的點了在底部顯示解鎖條件。state.selectId = 正在看介紹的身份,null = 卡片牆
+const ATTR_ORDER = ["體質", "根骨", "體魄", "悟性", "氣運", "靈根", "身法"];
+const LOCK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v9A1.5 1.5 0 0 1 18.5 22h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z"/></svg>';
+
+function goSelect() {
+  state.selectId = null;
+  state.selectHint = null;
+  state.phase = "select";
+  render();
+}
+
+// 這個身份現在能不能選:沒寫 unlock 就能選;寫了的話,要拿到它的成就
+function identityUnlocked(entry) {
+  const u = entry.unlock;
+  if (!u) return true;
+  return !!(u.achievement && player && (player.achievements || []).includes(u.achievement));
+}
+
+function identityFace(idt, cls) {
+  return el("span", { class: cls, style: idt.portrait ? `background-image:url("${idt.portrait}")` : "" });
+}
+
 function renderSelect() {
+  const S = CONTENT.identitySelect;
+  const entry = state.selectId && S.pool.find(e => e.id === state.selectId);
+  if (entry) return renderIdentityDetail(entry);
+  const cards = S.pool.map(e => {
+    const idt = getIdentity(e.id);
+    const open = identityUnlocked(e);
+    const face = identityFace(idt, "id-face");
+    if (!open) face.innerHTML = LOCK_SVG.replace("<svg", '<svg class="id-lock"');
+    const card = el("button", { class: ["id-card", open ? "" : "locked", state.selectHint === e.id ? "picked-hint" : ""].join(" ").trim(), "data-id": e.id, "aria-label": open ? idt.name : `${idt.name}（未解鎖）` }, [
+      el("span", { class: "id-cat" }, [idt.category[0]]),
+      face,
+      el("b", null, [idt.name])
+    ]);
+    card.addEventListener("click", () => {
+      if (open) { state.selectId = e.id; state.selectHint = null; }
+      else state.selectHint = e.id;
+      render();
+    });
+    return card;
+  });
+  // 底部選項框:平常是一句提示;點了鎖住的卡,顯示它的解鎖條件
+  const locked = S.pool.find(e => e.id === state.selectHint);
+  const hint = locked
+    ? el("p", { class: "id-hint" }, [el("b", { class: "b-k" }, [getIdentity(locked.id).name]), `尚未解鎖。條件：${locked.unlock.hint}`])
+    : el("p", { class: "id-hint" }, ["點一副軀殼，看看它的來歷。"]);
   return screen([
-    panel([el("h1", null, ["選擇身份"])]),
-    dock(BETA_IDENTITY_IDS.map(id => {
-      const idt = getIdentity(id);
-      return choiceButton(`${idt.name} —— ${idt.intro}`, () => startRun(id));
-    }))
+    panel([el("h1", null, [S.title]), el("div", { class: "meta" }, [S.intro]), el("div", { class: "id-grid" }, cards)]),
+    consoleFrame([hint])
   ]);
+}
+
+// 點了能選的身份:卡片牆收起來,左邊大圖、右邊介紹(含開局屬性);心魔要奪舍之後才知道
+function renderIdentityDetail(entry) {
+  const idt = getIdentity(entry.id);
+  const attrs = buildAttributes(idt.category);
+  const bonus = CATEGORY_ATTR_BONUS[idt.category] || {};
+  const stats = ATTR_ORDER.map(k => el("div", { class: bonus[k] ? "id-stat up" : "id-stat" }, [
+    el("span", null, [k]),
+    el("b", null, [String(attrs[k])]),
+    bonus[k] ? el("em", null, [`+${bonus[k]}`]) : el("em"),
+    el("small", null, [ATTR_EFFECTS[k]])
+  ]));
+  const actions = dock([
+    choiceButton("奪舍這副軀殼", () => { state.selectId = null; startRun(entry.id); }),
+    choiceButton("再看看別的", () => { state.selectId = null; render(); })
+  ]);
+  return screen([
+    el("div", { class: "panel id-detail" }, [
+      el("div", { class: "id-art" }, [identityFace(idt, "id-art-img")]),
+      el("div", { class: "id-info" }, [
+        el("span", { class: "tag" }, [idt.category + "類"]),
+        el("h1", null, [idt.name]),
+        el("p", { class: "id-intro" }, [idt.intro]),
+        el("h2", null, ["開局屬性"]),
+        el("div", { class: "id-stats" }, stats),
+        el("h2", null, ["心魔"]),
+        el("p", { class: "id-demon" }, ["？？？　奪舍之後才會浮現。"])
+      ])
+    ]),
+    actions
+  ], "fade-in");
 }
 
 function renderOpening() {
@@ -4418,7 +4551,7 @@ function renderCollision() {
     panel([
       el("span", { class: "tag" }, [idt.category + "類"]),
       el("h1", null, [idt.name]),
-      storyText(idt.collision || idt.intro, [renderAttrs(state.attributes)], actions)
+      storyText(idt.collision || idt.intro, [], actions)
     ]),
     actions
   ]);
