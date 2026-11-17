@@ -290,14 +290,21 @@
   }
   /* ---- 選身份(改命):沒有外框和底部選項框,只留選的東西;字和按鈕都在最上方 ----
      背景是自己的:一條條垂下來的命線(各掛一顆命結),其中兩條斷了、斷口發光(逆天改命),加上往上飄的魂火 */
-  .screen.id-screen > :not(.fate-bg) { position: relative; z-index: 1; }
+  .screen.id-screen > * { position: relative; z-index: 1; }
+  .id-detail-screen > * { animation: fade-in .6s ease-out both; }
   .fate-bg {
     position: fixed;
     inset: 0;
     z-index: 0;
     overflow: hidden;
     pointer-events: none;
-    background: radial-gradient(ellipse 70% 45% at 50% 0%, rgba(201,161,90,.12), transparent 70%), radial-gradient(ellipse 120% 50% at 50% 110%, rgba(130,45,20,.2), transparent 70%);
+    background: radial-gradient(ellipse 38% 42% at 50% 58%, rgba(6,4,3,.55), transparent 100%), radial-gradient(ellipse 70% 45% at 50% 0%, rgba(201,161,90,.12), transparent 70%), radial-gradient(ellipse 120% 50% at 50% 110%, rgba(130,45,20,.2), transparent 70%), var(--bg);
+  }
+  .fate-threads {
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: radial-gradient(ellipse 34% 46% at 50% 58%, rgba(0,0,0,.25), #000 100%);
+    mask-image: radial-gradient(ellipse 34% 46% at 50% 58%, rgba(0,0,0,.25), #000 100%);
   }
   .fate-thread {
     position: absolute;
@@ -395,10 +402,16 @@
   }
   /* 捲動的地方不顯示捲軸,改成底下一個上下輕輕跳的箭頭(還有東西才出現) */
   .id-scroll-wrap, .id-info-wrap { position: relative; flex: 1; min-height: 0; min-width: 0; }
-  .id-scroll, .id-info { height: 100%; overflow-y: auto; scrollbar-width: none; }
+  .id-scroll, .id-info {
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 20px, #000 calc(100% - 44px), transparent);
+    mask-image: linear-gradient(180deg, transparent 0, #000 20px, #000 calc(100% - 44px), transparent);
+  }
   .id-scroll::-webkit-scrollbar, .id-info::-webkit-scrollbar { display: none; }
-  .id-scroll { padding: 6px 2px 36px; }
-  .id-info { padding-bottom: 36px; }
+  .id-scroll { padding: 16px 2px 40px; }
+  .id-info { padding: 4px 0 40px; }
   .scroll-cue {
     position: absolute;
     left: 0;
@@ -408,7 +421,6 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity .3s;
-    background: linear-gradient(180deg, transparent, var(--bg) 85%);
   }
   .scroll-cue::after {
     content: "";
@@ -474,10 +486,10 @@
     padding: 8px 8px 7px;
     font: inherit;
     color: var(--text);
-    background: radial-gradient(ellipse at 50% 0%, rgba(201,164,92,.16), transparent 60%), linear-gradient(180deg, #2b2016, #120d09);
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,164,92,.16), transparent 60%), linear-gradient(180deg, rgba(43,32,22,.86), rgba(18,13,9,.9));
     border: 1px solid #8a6a34;
     border-radius: 3px;
-    box-shadow: inset 0 0 0 1px #0a0705, inset 0 0 0 3px #2a1e12, inset 0 0 0 4px rgba(214,178,106,.45), 0 4px 12px rgba(0,0,0,.6);
+    box-shadow: inset 0 0 0 1px #0a0705, inset 0 0 0 3px #2a1e12, inset 0 0 0 4px rgba(214,178,106,.45), 0 0 18px 2px rgba(201,161,90,.08), 0 10px 26px rgba(0,0,0,.55);
     cursor: pointer;
     transition: transform .15s, border-color .15s, box-shadow .15s;
     animation: id-rise .6s ease-out backwards;
@@ -546,8 +558,8 @@
   /* 鎖住的(未知):整張壓黑、鐵灰色的框,蓋一枚紅色的「未知」字印 */
   .id-card.locked {
     border-color: #3a3530;
-    background: linear-gradient(180deg, #141210, #0a0908);
-    box-shadow: inset 0 0 0 1px #000, inset 0 0 0 3px #1a1714, inset 0 0 0 4px rgba(150,140,130,.22), 0 4px 12px rgba(0,0,0,.6);
+    background: linear-gradient(180deg, rgba(20,18,16,.9), rgba(10,9,8,.92));
+    box-shadow: inset 0 0 0 1px #000, inset 0 0 0 3px #1a1714, inset 0 0 0 4px rgba(150,140,130,.22), 0 10px 26px rgba(0,0,0,.55);
   }
   .id-card.locked::after { filter: grayscale(1) brightness(.5); }
   .id-card.locked .id-face, .id-art.locked .id-art-img {
@@ -624,14 +636,14 @@
     column-gap: 6px;
     padding: 4px 8px;
     font-size: 14px;
-    background: #241b12;
+    background: rgba(36,27,18,.8);
     border: 1px solid var(--border);
     border-radius: 3px;
   }
   .id-stat b { color: var(--gold); font-variant-numeric: tabular-nums; }
   .id-stat em { font-style: normal; font-size: 12px; color: #86d68f; }
   .id-stat small { grid-column: 1 / -1; font-size: 11px; color: var(--dim); }
-  .id-stat.up { border-color: #c9a45c; background: linear-gradient(90deg, #3a2a16, #241b12); }
+  .id-stat.up { border-color: #c9a45c; background: linear-gradient(90deg, rgba(58,42,22,.9), rgba(36,27,18,.8)); }
   .id-demon { margin: 0; color: var(--dim); }
   /* ---- 逆天改命(按下確認後,約 3.3 秒,點一下可跳過):
      金色的「命」字浮現 → 裂痕從中間爬出去、字在抖 → 閃白、碎片炸開飛散 → 另一批碎片飛回來拼成新身份的名字 → 判詞浮現 ---- */
@@ -2792,7 +2804,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .scene-stage, .scene-petals b { animation: none !important; }
-    .id-top, .id-card, .id-detail .id-art, .id-info > *, .id-verse, .fate-thread, .fate-thread::before, .fate-thread::after, .scroll-cue::after, .id-go { animation: none !important; }
+    .id-top, .id-detail-screen > *, .id-card, .id-detail .id-art, .id-info > *, .id-verse, .fate-thread, .fate-thread::before, .fate-thread::after, .scroll-cue::after, .id-go { animation: none !important; }
     .id-motes { display: none; }
     .battle, .battle *, .fade-in { animation: none !important; transition: none !important; }
     .b-float, .b-fx, .b-intro, .pick-fx, .pick-ghost { display: none; }
@@ -4817,14 +4829,21 @@ const FATE_THREADS = (() => {
     knot: 15 + rnd() * 65, broken: i === 3 || i === 12, cut: 35 + rnd() * 25
   }));
 })();
-function fateBg() {
-  return el("div", { class: "fate-bg", "aria-hidden": "true" }, [
-    ...FATE_THREADS.map(t => el("i", {
-      class: t.broken ? "fate-thread broken" : "fate-thread",
-      style: `--x:${t.x.toFixed(1)}%;--o:${t.o.toFixed(2)};--d:${t.d.toFixed(1)}s;--delay:-${t.delay.toFixed(1)}s;--knot:${t.knot.toFixed(0)}%;--cut:${t.cut.toFixed(0)}%`
-    })),
-    selectMotes()
-  ]);
+// 背景只建一次,掛在 #app 外面:卡片牆和介紹頁切換時背景不動(不閃、命線和魂火不重來);離開選身份才拿掉
+let fateBgNode = null;
+function syncFateBg() {
+  if (state.phase === "select") {
+    if (!fateBgNode) fateBgNode = el("div", { class: "fate-bg", "aria-hidden": "true" }, [
+      el("div", { class: "fate-threads" }, FATE_THREADS.map(t => el("i", {
+        class: t.broken ? "fate-thread broken" : "fate-thread",
+        style: `--x:${t.x.toFixed(1)}%;--o:${t.o.toFixed(2)};--d:${t.d.toFixed(1)}s;--delay:-${t.delay.toFixed(1)}s;--knot:${t.knot.toFixed(0)}%;--cut:${t.cut.toFixed(0)}%`
+      }))),
+      selectMotes()
+    ]);
+    if (!fateBgNode.isConnected) document.body.insertBefore(fateBgNode, document.body.firstChild);
+  } else if (fateBgNode && fateBgNode.isConnected) {
+    fateBgNode.remove();
+  }
 }
 
 // 捲動的地方不顯示捲軸,改成底下一個箭頭:下面還有東西才出現,捲到底就消失
@@ -4853,7 +4872,6 @@ function renderSelect() {
   });
   const scroller = el("div", { class: "id-scroll" }, [el("div", { class: "id-grid" }, cards)]);
   return screen([
-    fateBg(),
     el("div", { class: "id-top" }, [
       el("h1", null, [S.title]),
       el("i", { class: "id-rule" }),
@@ -4898,7 +4916,6 @@ function renderIdentityDetail(entry) {
   info.forEach((c, i) => c.style.setProperty("--i", i));
   const scroller = el("div", { class: "id-info" }, info);
   return screen([
-    fateBg(),
     el("div", { class: "id-bar" }, [back, el("p", { class: "id-ask" }, [open ? "借此身，改此命？" : "此命未明。"]), go]),
     el("div", { class: "id-detail" }, [
       el("div", { class: "id-side" }, [
@@ -4907,7 +4924,7 @@ function renderIdentityDetail(entry) {
       ]),
       el("div", { class: "id-info-wrap" }, [scroller, scrollCue(scroller)])
     ])
-  ], "id-screen fade-in");
+  ], "id-screen id-detail-screen");
 }
 
 // 逆天改命的碎片:從中間附近放射出去的裂痕,切成內圈三角形和外圈四邊形(座標是舞台的 %)
@@ -5099,6 +5116,7 @@ function render() {
     summary: renderSummary
   };
   app.appendChild(renderers[state.phase]());
+  syncFateBg();
 }
 
 render();
