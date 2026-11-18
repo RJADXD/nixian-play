@@ -56,7 +56,7 @@
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
   }
-  /* ---- 底部選項框(參考魔獸爭霸的底部控制台):石框+金邊,兩端各一尊石雕 ---- */
+  /* ---- 底部選項框(參考魔獸爭霸的底部控制台):銅龍外框(使用者定案,見下面 .orn-bronze) ---- */
   .console {
     position: relative;
     margin-top: auto;
@@ -73,16 +73,6 @@
     border-radius: 6px 6px 4px 4px;
     box-shadow: inset 0 2px 0 rgba(255,240,215,.16), inset 0 -3px 6px rgba(0,0,0,.6), 0 8px 18px rgba(0,0,0,.6);
   }
-  .console.orn-none .console-frame { padding-left: 14px; padding-right: 14px; }
-  /* 龍紋浮雕:刻在框左右兩側的邊條上,用 overlay 疊上去,明暗跟著石框本身走 */
-  .console-relief {
-    position: absolute;
-    top: 0;
-    pointer-events: none;
-    mix-blend-mode: overlay;
-  }
-  .console-relief.left { left: 0; }
-  .console-relief.right { right: 0; }
   /* 銅龍外框:參考圖切成九宮格(border-image),四角是龍頭與龍尾雲紋,上下緣的回紋重複延伸。
      圖的比例固定,所以框高也固定(圖上外框 454px × --s);每個畫面的選項都落在同一個位置。
      下面的數字都是圖上的 px(素材 assets/console-frame.webp 由參考圖切出) */
@@ -104,7 +94,6 @@
       calc(97px * var(--s)) calc(37px * var(--s)) calc(17px * var(--s)) round stretch;
     box-shadow: none;
   }
-  .console.orn-bronze .console-frame::before, .console.orn-bronze .console-frame::after { content: none; }
   .console.orn-bronze .console-well {
     box-sizing: border-box;
     height: 100%;
@@ -132,39 +121,6 @@
     margin-left: calc(-75px * var(--s));
     pointer-events: none;
   }
-  /* 中央的八卦銅盤、下方兩角的銅包角 */
-  .console-crest {
-    position: absolute;
-    left: 50%;
-    top: 22px;
-    z-index: 2;
-    width: 58px;
-    height: 58px;
-    margin-left: -29px;
-    pointer-events: none;
-    filter: drop-shadow(0 3px 3px rgba(0,0,0,.75));
-  }
-  .console-cap {
-    position: absolute;
-    bottom: -4px;
-    z-index: 1;
-    width: 44px;
-    height: 44px;
-    pointer-events: none;
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,.6));
-  }
-  .console-cap.left { left: -6px; }
-  .console-cap.right { right: -6px; }
-  .console-frame::before, .console-frame::after {
-    content: "";
-    position: absolute;
-    left: 12px;
-    right: 12px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #7d6030 12%, #d6b26a 50%, #7d6030 88%, transparent);
-  }
-  .console-frame::before { top: 5px; }
-  .console-frame::after { bottom: 4px; opacity: .5; }
   .console-well {
     padding: 6px 10px 10px;
     background: rgba(10,7,5,.6);
@@ -180,41 +136,9 @@
   @keyframes choice-ready {
     35% { border-color: #f0d08a; box-shadow: inset 0 0 14px rgba(240,208,138,.35), 0 0 12px rgba(240,208,138,.55), 0 3px 0 #0a0705; }
   }
-  .console-orn {
-    position: absolute;
-    top: 0;
-    z-index: 2;
-    width: 100px;
-    height: 112px;
-    overflow: visible;
-    pointer-events: none;
-    filter: drop-shadow(0 5px 4px rgba(0,0,0,.75));
-  }
-  .console-orn.left { left: -36px; }
-  .console-orn.right { right: -36px; }
-  /* 眼窩裡的餘燼,慢慢一明一暗 */
-  .orn-eye { animation: orn-ember 2.8s ease-in-out infinite; }
-  @keyframes orn-ember {
-    50% { opacity: .55; }
-  }
-  .defs {
-    position: absolute;
-    width: 0;
-    height: 0;
-  }
   @media (max-width: 480px) {
     .console { padding-top: 40px; }
     .console-frame { padding: 22px 42px 12px; }
-    .console-cap { width: 34px; height: 34px; }
-    .console-crest {
-      top: 17px;
-      width: 46px;
-      height: 46px;
-      margin-left: -23px;
-    }
-    .console-orn { width: 70px; height: 78px; }
-    .console-orn.left { left: -14px; }
-    .console-orn.right { right: -14px; }
     /* 手機:銅龍外框貼齊螢幕左右邊,兩側的龍才不會擠到選項 */
     .console.orn-bronze { --pad: 40px; margin-left: -16px; margin-right: -16px; }
     .b-me-head { gap: 8px; }
@@ -1138,7 +1062,7 @@
   .b-ally-info span { font-size: 11px; color: #c9a7b3; }
   .b-ally.ready { border-color: #f4a9c2; animation: ally-ready 1.6s ease-in-out infinite; }
   .b-ally.ready .b-ally-info span { color: #ffd3e1; }
-  @keyframes ally-ready { 50% { box-shadow: 0 0 14px rgba(244,169,194,.65); } }
+  @keyframes ally-ready { 50% { box-shadow: 0 0 14px var(--al-glow, rgba(244,169,194,.65)); } }
   /* 夥伴出手的特寫:斜橫幅從左劃進來,停一下,往右淡出 */
   .ally-cut {
     position: absolute;
@@ -1204,6 +1128,9 @@
   .name-input:focus { outline: none; border-color: var(--gold); }
   .name-ok { flex: none; }
   .name-hint { min-height: 1em; font-size: 12px; color: #e8907f; }
+  /* 主選單的測試區:借用戰鬥測試切換的按鈕樣式 */
+  .title-test { --b-line: #5e4527; --b-quiet: #9a8b76; --b-icon: #c9a45c; margin-top: 14px; }
+  .title-test .test-link { display: block; }
   .test-link {
     margin-top: 10px;
     padding: 0;
@@ -2849,6 +2776,107 @@
     from { transform: translate(0, 0) rotate(0); }
     to { transform: translate(var(--dx), 110cqh) rotate(400deg); }
   }
+  /* ---- 夥伴配色(測試切換,選定後拿掉):夥伴卡、招式說明框、出手特寫、戰鬥紀錄裡的名字標籤一起換;
+     沒寫或 pink = 原本的粉色。A 墨金 ink(天涯明月刀、逆水寒的說明框)、B 宣紙 paper(陰陽師;狀態說明框也一起變紙)、
+     C 雪梅 plum(原神、鳴潮依角色換主題色)、D 霧面玻璃 glass(原神、崩壞:星穹鐵道) ---- */
+  :root[data-ally-theme="ink"] { --al-glow: rgba(233,199,123,.55); }
+  :root[data-ally-theme="ink"] .b-ally { background: linear-gradient(90deg, rgba(24,18,12,.94), rgba(24,18,12,.65)); border-color: #8a6a34; }
+  :root[data-ally-theme="ink"] .b-ally.ready, :root[data-ally-theme="ink"] .b-ally:hover, :root[data-ally-theme="ink"] .b-ally:focus-visible, :root[data-ally-theme="ink"] .b-ally.on { border-color: #e9c77b; }
+  :root[data-ally-theme="ink"] .b-ally.on { box-shadow: 0 0 10px rgba(233,199,123,.45); }
+  :root[data-ally-theme="ink"] .b-ally-ring { background: conic-gradient(#e9c77b var(--p), rgba(255,255,255,.12) 0); }
+  :root[data-ally-theme="ink"] .b-ally-info b { color: #f0dca8; }
+  :root[data-ally-theme="ink"] .b-ally-info span { color: #b8a88c; }
+  :root[data-ally-theme="ink"] .b-ally.ready .b-ally-info span { color: #f0dca8; }
+  :root[data-ally-theme="ink"] .b-ally::after { background: linear-gradient(180deg, #f6dc9a, #b98a3e); color: #2a1606; box-shadow: 0 0 0 1px #2a1b0a; }
+  :root[data-ally-theme="ink"] .b-ally-tip { padding: 11px 13px 9px; background: linear-gradient(180deg, #241b12, #120d09); border: 1px solid #8a6a34; border-radius: 3px; box-shadow: inset 0 0 0 1px #0a0705, inset 0 0 0 3px #2a1e12, inset 0 0 0 4px rgba(214,178,106,.45), 0 8px 20px rgba(0,0,0,.7); }
+  :root[data-ally-theme="ink"] .b-ally-tip::after { content: ""; position: absolute; inset: 3px; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg transform='translate%280 0%29'%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23000' stroke-opacity='.6' stroke-width='2.6'/%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23e2c27c' stroke-width='1.2'/%3E%3Cpath d='M5 12.5V5.5Q5 5 5.5 5H12.5' fill='none' stroke='%23e2c27c' stroke-width='.9' stroke-opacity='.8'/%3E%3Cpath d='M8.2 10.2V8.6Q8.2 8.2 8.6 8.2H10.2' fill='none' stroke='%23e2c27c' stroke-width='.9'/%3E%3Ccircle cx='12.8' cy='12.8' r='1' fill='%23e2c27c'/%3E%3C/g%3E%3C/svg%3E") left top / 14px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg transform='translate%2816 0%29 scale%28-1 1%29'%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23000' stroke-opacity='.6' stroke-width='2.6'/%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23e2c27c' stroke-width='1.2'/%3E%3Cpath d='M5 12.5V5.5Q5 5 5.5 5H12.5' fill='none' stroke='%23e2c27c' stroke-width='.9' stroke-opacity='.8'/%3E%3Cpath d='M8.2 10.2V8.6Q8.2 8.2 8.6 8.2H10.2' fill='none' stroke='%23e2c27c' stroke-width='.9'/%3E%3Ccircle cx='12.8' cy='12.8' r='1' fill='%23e2c27c'/%3E%3C/g%3E%3C/svg%3E") right top / 14px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg transform='translate%280 16%29 scale%281 -1%29'%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23000' stroke-opacity='.6' stroke-width='2.6'/%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23e2c27c' stroke-width='1.2'/%3E%3Cpath d='M5 12.5V5.5Q5 5 5.5 5H12.5' fill='none' stroke='%23e2c27c' stroke-width='.9' stroke-opacity='.8'/%3E%3Cpath d='M8.2 10.2V8.6Q8.2 8.2 8.6 8.2H10.2' fill='none' stroke='%23e2c27c' stroke-width='.9'/%3E%3Ccircle cx='12.8' cy='12.8' r='1' fill='%23e2c27c'/%3E%3C/g%3E%3C/svg%3E") left bottom / 14px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg transform='translate%2816 16%29 scale%28-1 -1%29'%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23000' stroke-opacity='.6' stroke-width='2.6'/%3E%3Cpath d='M1.5 15V6.5Q1.5 1.5 6.5 1.5H15' fill='none' stroke='%23e2c27c' stroke-width='1.2'/%3E%3Cpath d='M5 12.5V5.5Q5 5 5.5 5H12.5' fill='none' stroke='%23e2c27c' stroke-width='.9' stroke-opacity='.8'/%3E%3Cpath d='M8.2 10.2V8.6Q8.2 8.2 8.6 8.2H10.2' fill='none' stroke='%23e2c27c' stroke-width='.9'/%3E%3Ccircle cx='12.8' cy='12.8' r='1' fill='%23e2c27c'/%3E%3C/g%3E%3C/svg%3E") right bottom / 14px no-repeat; }
+  :root[data-ally-theme="ink"] .b-ally-tip-head b { color: #f0dca8; }
+  :root[data-ally-theme="ink"] :is(.b-ally-tip-head span, .b-ally-tip-lead, .b-ally-tip-row em) { color: #a8977a; }
+  :root[data-ally-theme="ink"] .b-ally-tip-lead { padding-bottom: 6px; border-bottom: 1px solid; border-image: linear-gradient(90deg, transparent, #c9a45c 20%, #c9a45c 80%, transparent) 1; }
+  :root[data-ally-theme="ink"] .b-ally-tip li { border-color: rgba(201,161,90,.22); background: rgba(255,255,255,.02); }
+  :root[data-ally-theme="ink"] .b-ally-tip li.now { border-color: #c9a45c; background: linear-gradient(90deg, rgba(201,161,90,.2), rgba(201,161,90,.04)); }
+  :root[data-ally-theme="ink"] .b-ally-tip-row b { color: #f3dfae; }
+  :root[data-ally-theme="ink"] .b-ally-tip-row i { background: linear-gradient(180deg, #f6dc9a, #b98a3e); color: #2a1606; }
+  :root[data-ally-theme="ink"] .ally-cut-band { background: linear-gradient(90deg, transparent, rgba(30,22,14,.94) 14%, rgba(30,22,14,.94) 86%, transparent); border-color: #c9a45c; }
+  :root[data-ally-theme="ink"] .ally-cut-face { box-shadow: 0 0 0 2px #e9c77b, 0 0 16px rgba(233,199,123,.55); }
+  :root[data-ally-theme="ink"] .ally-cut-text small { color: #c9b48a; }
+  :root[data-ally-theme="ink"] .ally-cut-text b { color: #fff4d6; text-shadow: 0 0 12px rgba(233,199,123,.8); }
+  :root[data-ally-theme="ink"] :is(.b-log, .b-backlog) p.ally .b-who b { background: #1c150e; color: #f0dca8; box-shadow: inset 0 0 0 1px #c9a45c; }
+  :root[data-ally-theme="ink"] :is(.b-log, .b-backlog) p.ally .b-text { color: #eadcbc; }
+  :root[data-ally-theme="paper"] { --al-glow: rgba(233,199,123,.5); }
+  :root[data-ally-theme="paper"] .b-ally { background: linear-gradient(90deg, rgba(24,18,12,.94), rgba(24,18,12,.65)); border-color: #8a6a34; }
+  :root[data-ally-theme="paper"] .b-ally.ready, :root[data-ally-theme="paper"] .b-ally:hover, :root[data-ally-theme="paper"] .b-ally:focus-visible, :root[data-ally-theme="paper"] .b-ally.on { border-color: #e9c77b; }
+  :root[data-ally-theme="paper"] .b-ally.on { box-shadow: 0 0 10px rgba(233,199,123,.4); }
+  :root[data-ally-theme="paper"] .b-ally-ring { background: conic-gradient(#b8382f var(--p), rgba(255,255,255,.12) 0); }
+  :root[data-ally-theme="paper"] .b-ally-info b { color: #f0dca8; }
+  :root[data-ally-theme="paper"] .b-ally-info span { color: #b8a88c; }
+  :root[data-ally-theme="paper"] .b-ally.ready .b-ally-info span { color: #f0dca8; }
+  :root[data-ally-theme="paper"] .b-ally::after { background: #a8322d; color: #fbeee0; box-shadow: 0 0 0 1px #3a0d0a; border-radius: 3px; }
+  :root[data-ally-theme="paper"] :is(.b-ally-tip, .b-tip) { color: #2e2418; border: 1px solid #6b4f2a; border-radius: 2px; background: radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.5), transparent 60%), radial-gradient(ellipse at 90% 100%, rgba(150,120,80,.18), transparent 60%), #ece0c4; box-shadow: 0 0 0 3px rgba(18,13,9,.9), 0 0 0 4px #8a6a34, 0 10px 24px rgba(0,0,0,.75); }
+  :root[data-ally-theme="paper"] .b-ally-tip { padding: 11px 13px 9px; }
+  :root[data-ally-theme="paper"] .b-tip { border-left: 3px solid var(--c); }
+  :root[data-ally-theme="paper"] .b-tip b { color: color-mix(in srgb, var(--c) 70%, #000); }
+  :root[data-ally-theme="paper"] .b-tip span { color: #74624a; }
+  :root[data-ally-theme="paper"] .b-tip p { color: #3b2f22; }
+  :root[data-ally-theme="paper"] .b-ally-tip-head b { color: #241708; }
+  :root[data-ally-theme="paper"] :is(.b-ally-tip-head span, .b-ally-tip-lead, .b-ally-tip-row em) { color: #74624a; }
+  :root[data-ally-theme="paper"] .b-ally-tip-lead { padding-bottom: 6px; border-bottom: 1px dashed rgba(107,79,42,.45); }
+  :root[data-ally-theme="paper"] .b-ally-tip li { border-color: rgba(107,79,42,.28); background: rgba(255,255,255,.35); }
+  :root[data-ally-theme="paper"] .b-ally-tip li.now { border-color: #a8322d; background: rgba(168,50,45,.07); }
+  :root[data-ally-theme="paper"] .b-ally-tip-row b { color: #3a2410; }
+  :root[data-ally-theme="paper"] .b-ally-tip li > span { color: #3b2f22; }
+  :root[data-ally-theme="paper"] .b-ally-tip-row i { background: none; color: #a8322d; border: 1.5px solid #a8322d; border-radius: 2px; font-weight: 700; transform: rotate(-5deg); }
+  :root[data-ally-theme="paper"] .ally-cut-band { background: linear-gradient(90deg, transparent, rgba(236,224,196,.96) 14%, rgba(236,224,196,.96) 86%, transparent); border-color: #6b4f2a; }
+  :root[data-ally-theme="paper"] .ally-cut-face { box-shadow: 0 0 0 2px #a8322d, 0 0 14px rgba(0,0,0,.4); }
+  :root[data-ally-theme="paper"] .ally-cut-text small { color: #74624a; }
+  :root[data-ally-theme="paper"] .ally-cut-text b { color: #241708; text-shadow: none; }
+  :root[data-ally-theme="paper"] :is(.b-log, .b-backlog) p.ally .b-who b { background: #ece0c4; color: #3a2410; box-shadow: inset 0 0 0 1px #8a6a34; }
+  :root[data-ally-theme="paper"] :is(.b-log, .b-backlog) p.ally .b-text { color: #efe4cc; }
+  :root[data-ally-theme="plum"] { --al-glow: rgba(208,86,110,.55); }
+  :root[data-ally-theme="plum"] .b-ally { background: linear-gradient(90deg, rgba(30,12,18,.94), rgba(20,10,14,.65)); border-color: rgba(196,74,98,.65); }
+  :root[data-ally-theme="plum"] .b-ally.ready, :root[data-ally-theme="plum"] .b-ally:hover, :root[data-ally-theme="plum"] .b-ally:focus-visible, :root[data-ally-theme="plum"] .b-ally.on { border-color: #e07a8e; }
+  :root[data-ally-theme="plum"] .b-ally.on { box-shadow: 0 0 10px rgba(208,86,110,.45); }
+  :root[data-ally-theme="plum"] .b-ally-ring { background: conic-gradient(#d0566e var(--p), rgba(255,255,255,.12) 0); }
+  :root[data-ally-theme="plum"] .b-ally-info b { color: #fbeff2; }
+  :root[data-ally-theme="plum"] .b-ally-info span { color: #c4a0aa; }
+  :root[data-ally-theme="plum"] .b-ally.ready .b-ally-info span { color: #f6c9d3; }
+  :root[data-ally-theme="plum"] .b-ally::after { background: #c44a62; color: #fff; box-shadow: 0 0 0 1px #3a0a14; }
+  :root[data-ally-theme="plum"] .b-ally-tip { padding: 11px 13px 9px; background: linear-gradient(180deg, rgba(30,14,20,.97), rgba(14,8,11,.97)); border: 1px solid rgba(196,74,98,.55); border-top: 2px solid #d0566e; border-radius: 3px; box-shadow: 0 8px 22px rgba(0,0,0,.7); }
+  :root[data-ally-theme="plum"] .b-ally-tip-head b { color: #fbeff2; }
+  :root[data-ally-theme="plum"] :is(.b-ally-tip-head span, .b-ally-tip-lead, .b-ally-tip-row em) { color: #b5919b; }
+  :root[data-ally-theme="plum"] .b-ally-tip li { border-color: rgba(196,74,98,.2); background: rgba(255,255,255,.025); }
+  :root[data-ally-theme="plum"] .b-ally-tip li.now { border-color: #d0566e; background: linear-gradient(90deg, rgba(208,86,110,.2), rgba(208,86,110,.04)); }
+  :root[data-ally-theme="plum"] .b-ally-tip-row b { color: #fde4ea; }
+  :root[data-ally-theme="plum"] .b-ally-tip-row i { background: #c44a62; color: #fff; }
+  :root[data-ally-theme="plum"] .ally-cut-band { background: linear-gradient(90deg, transparent, rgba(52,14,26,.94) 14%, rgba(52,14,26,.94) 86%, transparent); border-color: #d0566e; }
+  :root[data-ally-theme="plum"] .ally-cut-face { box-shadow: 0 0 0 2px #d0566e, 0 0 16px rgba(208,86,110,.6); }
+  :root[data-ally-theme="plum"] .ally-cut-text small { color: #e3a9b6; }
+  :root[data-ally-theme="plum"] .ally-cut-text b { color: #fff0f3; text-shadow: 0 0 12px rgba(208,86,110,.8); }
+  :root[data-ally-theme="plum"] :is(.b-log, .b-backlog) p.ally .b-who b { background: linear-gradient(180deg, #e0788c, #a83a52); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+  :root[data-ally-theme="plum"] :is(.b-log, .b-backlog) p.ally .b-text { color: #f6d7df; }
+  :root[data-ally-theme="glass"] { --al-glow: rgba(236,208,142,.45); }
+  :root[data-ally-theme="glass"] .b-ally { background: rgba(16,14,20,.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-color: rgba(255,255,255,.22); }
+  :root[data-ally-theme="glass"] .b-ally.ready, :root[data-ally-theme="glass"] .b-ally:hover, :root[data-ally-theme="glass"] .b-ally:focus-visible, :root[data-ally-theme="glass"] .b-ally.on { border-color: rgba(236,208,142,.85); }
+  :root[data-ally-theme="glass"] .b-ally.on { box-shadow: 0 0 12px rgba(236,208,142,.35); }
+  :root[data-ally-theme="glass"] .b-ally-ring { background: conic-gradient(#ecd08e var(--p), rgba(255,255,255,.14) 0); }
+  :root[data-ally-theme="glass"] .b-ally-info b { color: #fff; }
+  :root[data-ally-theme="glass"] .b-ally-info span { color: rgba(255,255,255,.62); }
+  :root[data-ally-theme="glass"] .b-ally.ready .b-ally-info span { color: #f6e7c4; }
+  :root[data-ally-theme="glass"] .b-ally::after { background: #ecd08e; color: #1c1508; box-shadow: none; }
+  :root[data-ally-theme="glass"] .b-ally-tip { padding: 12px 14px 10px; background: rgba(16,14,20,.7); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.12); border-top: 2px solid #ecd08e; border-radius: 8px; box-shadow: 0 12px 30px rgba(0,0,0,.55); }
+  :root[data-ally-theme="glass"] .b-ally-tip-head b { color: #fff; }
+  :root[data-ally-theme="glass"] :is(.b-ally-tip-head span, .b-ally-tip-lead, .b-ally-tip-row em) { color: rgba(255,255,255,.58); }
+  :root[data-ally-theme="glass"] .b-ally-tip li { border: none; border-left: 2px solid transparent; border-radius: 4px; background: rgba(255,255,255,.06); }
+  :root[data-ally-theme="glass"] .b-ally-tip li.now { border-left-color: #ecd08e; background: rgba(236,208,142,.14); }
+  :root[data-ally-theme="glass"] .b-ally-tip-row b { color: #f6e7c4; }
+  :root[data-ally-theme="glass"] .b-ally-tip li > span { color: rgba(255,255,255,.88); }
+  :root[data-ally-theme="glass"] .b-ally-tip-row i { background: #ecd08e; color: #1c1508; }
+  :root[data-ally-theme="glass"] .ally-cut-band { background: linear-gradient(90deg, transparent, rgba(16,14,20,.78) 14%, rgba(16,14,20,.78) 86%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-color: rgba(236,208,142,.7); }
+  :root[data-ally-theme="glass"] .ally-cut-face { box-shadow: 0 0 0 2px #ecd08e, 0 0 16px rgba(236,208,142,.5); }
+  :root[data-ally-theme="glass"] .ally-cut-text small { color: rgba(255,255,255,.7); }
+  :root[data-ally-theme="glass"] .ally-cut-text b { color: #fff; text-shadow: 0 0 12px rgba(236,208,142,.7); }
+  :root[data-ally-theme="glass"] :is(.b-log, .b-backlog) p.ally .b-who b { background: rgba(255,255,255,.16); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
+  :root[data-ally-theme="glass"] :is(.b-log, .b-backlog) p.ally .b-text { color: rgba(255,255,255,.92); }
   @media (prefers-reduced-motion: reduce) {
     .scene-stage, .scene-petals b { animation: none !important; }
     .id-top, .id-detail-screen > *, .id-card, .id-detail .id-art, .id-info > *, .id-verse, .fate-thread, .fate-thread::before, .fate-thread::after, .scroll-cue::after, .id-go { animation: none !important; }
@@ -2859,132 +2887,6 @@
 </style>
 </head>
 <body>
-<!-- 底部選項框兩端的石雕(暫代向量圖,之後換成美術素材) -->
-<svg class="defs" width="0" height="0" aria-hidden="true">
-  <defs>
-    <!-- 石雕質感:用模糊後的輪廓當高度圖、混一點雜訊,再打斜光 -->
-    <filter id="orn-carve" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
-      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" result="grain"/>
-      <feGaussianBlur in="SourceAlpha" stdDeviation="1.6" result="soft"/>
-      <feComposite in="soft" in2="grain" operator="arithmetic" k1="0" k2="1" k3="0.18" k4="0" result="height"/>
-      <feDiffuseLighting in="height" surfaceScale="5" diffuseConstant="1.15" lighting-color="#efe6d8" result="lit">
-        <feDistantLight azimuth="225" elevation="40"/>
-      </feDiffuseLighting>
-      <feComposite in="lit" in2="SourceAlpha" operator="in" result="litShape"/>
-      <feBlend in="SourceGraphic" in2="litShape" mode="multiply"/>
-    </filter>
-    <filter id="orn-glow" x="-200%" y="-200%" width="500%" height="500%">
-      <feGaussianBlur stdDeviation="1.6" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <!-- 青銅像:凸起處打金色高光,凹處偏暗 -->
-    <linearGradient id="orn-bronze-fill" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c39552"/>
-      <stop offset=".5" stop-color="#6e4a20"/>
-      <stop offset="1" stop-color="#2c1c0a"/>
-    </linearGradient>
-    <filter id="orn-bronze" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
-      <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="7" result="grain"/>
-      <feGaussianBlur in="SourceAlpha" stdDeviation="1.3" result="soft"/>
-      <feComposite in="soft" in2="grain" operator="arithmetic" k1="0" k2="1" k3="0.12" k4="0" result="h"/>
-      <feDiffuseLighting in="h" surfaceScale="3.5" diffuseConstant="1.05" lighting-color="#ffffff" result="diff">
-        <feDistantLight azimuth="235" elevation="42"/>
-      </feDiffuseLighting>
-      <feSpecularLighting in="h" surfaceScale="3.5" specularConstant="1.3" specularExponent="26" lighting-color="#ffe2a0" result="spec">
-        <feDistantLight azimuth="235" elevation="42"/>
-      </feSpecularLighting>
-      <feComposite in="diff" in2="SourceAlpha" operator="in" result="diffIn"/>
-      <feComposite in="spec" in2="SourceAlpha" operator="in" result="specIn"/>
-      <feBlend in="SourceGraphic" in2="diffIn" mode="multiply" result="shaded"/>
-      <feComposite in="shaded" in2="specIn" operator="arithmetic" k1="0" k2="1" k3="0.9" k4="0"/>
-    </filter>
-    <!-- 像的輪廓來自 game-icons.net(作者 Lorc,CC BY 3.0,需標示出處,見 CREDITS.md) -->
-    <path id="icon-skull" d="M142.026 16.89C94.242 38.888 62.71 74.257 62.71 113.927c0 26.11 13.42 50.288 36.22 70.04-11.664 25.398-18.99 53.91-20.81 84.212 17.194.562 33.53 4.205 48.192 11.7 41.566 21.25 61.083 66.944 57.787 121.093a286.662 286.662 0 0 0 23.122 4.58c.894-16.76.83-33.468-.496-50.122l18.63-1.485c1.438 18.035 1.466 36.014.458 53.938 8.022.76 16.14 1.21 24.322 1.382V353.03h18.687v56.13c7.83-.25 15.693-.755 23.565-1.514-.995-17.845-.96-35.745.47-53.7l18.63 1.485c-1.323 16.597-1.39 33.247-.504 49.95 7.307-1.07 14.6-2.355 21.863-3.843-3.467-54.395 16.04-100.333 57.748-121.656 14.66-7.497 30.998-11.142 48.19-11.702-1.843-30.716-9.343-59.594-21.284-85.252 22.08-19.56 35.044-43.346 35.044-69 0-39.67-31.532-75.04-79.316-97.035C386.283 33.46 394.32 53.31 394.32 74.27c0 42.688-31.51 79.614-77.026 97.146l-6.14-14.3c11.148-4.44 21.233-10.197 29.876-16.964 10.1-7.905 18.202-17.087 23.91-27.154-29.85-25.333-66.642-40.283-106.488-40.283-40.34 0-77.554 15.314-107.6 41.223 5.674 9.7 13.588 18.555 23.372 26.214 9.67 7.57 21.145 13.877 33.894 18.49l-6.125 14.264c-47.677-16.863-81.06-54.696-81.06-98.636 0-20.96 8.038-40.81 21.093-57.377zm10.286 183.128c.054-.004.1.004.127.037 18.414 23.35 51.93 39.697 91.086 43.162-5.892 19.698-26.99 34.53-52.67 34.53-30.21 0-55.148-20.584-55.148-45.517.002-12.465 6.205-23.997 16.11-32.173.083.094.33-.027.494-.04zm211.668.002c.053-.003.1.006.138.04 9.907 8.175 16.112 19.707 16.112 32.173 0 24.93-24.937 45.515-55.15 45.515-25.68 0-46.776-14.83-52.67-34.53 39.156-3.466 72.673-19.813 91.087-43.16.112.085.322-.03.483-.038zM258.4 244.174c5.625 27.42 13.928 54.84 32.91 82.26-20.274 5.432-44.818 5.627-65.82 0 17.968-27.42 26.834-54.84 32.91-82.26zm-76.31 175.54c-2.34 15.4-6.413 31.3-12.25 47.372a168.84 168.84 0 0 0 27.663 14.637c3.627-19.225 6.537-38.376 8.33-57.455a309.037 309.037 0 0 1-23.744-4.553zm152.802.48a409.42 409.42 0 0 1-22.526 3.888c1.777 18.972 4.655 38.015 8.248 57.13a169.154 169.154 0 0 0 26.452-14.126c-5.776-15.906-9.824-31.644-12.174-46.893zm-41.094 6.115c-8.335.8-16.668 1.323-24.975 1.58v65.694a157.874 157.874 0 0 0 33.973-6.01c-3.898-20.343-7.058-40.766-8.998-61.265zm-69.402.237c-1.953 20.54-5.13 41.002-9.043 61.385a157.903 157.903 0 0 0 34.783 5.773v-65.713a349.206 349.206 0 0 1-25.74-1.445z"/>
-    <!-- 石座 -->
-    <g id="orn-base">
-      <g filter="url(#orn-carve)"><path fill="#7d766d" d="M4,89 H96 V95 H90 V112 H10 V95 H4 Z"/></g>
-      <rect x="10" y="95" width="80" height="1.2" fill="#c9a45c" opacity=".8"/>
-    </g>
-    <!-- 眼睛的餘燼光放在像的後面,從眼窩透出來 -->
-    <g id="skull-statue">
-      <ellipse class="orn-eye" cx="35.3" cy="47.6" rx="7" ry="4.6" fill="#ff7a2e" filter="url(#orn-glow)"/>
-      <ellipse class="orn-eye" cx="60.9" cy="47.6" rx="7" ry="4.6" fill="#ff7a2e" filter="url(#orn-glow)"/>
-      <g filter="url(#orn-bronze)"><use href="#icon-skull" fill="url(#orn-bronze-fill)" transform="translate(2,3) scale(.18)"/></g>
-    </g>
-    <!-- 龍鱗:用遮罩讓鱗線的地方變薄,打光後就成了刻進去的溝 -->
-    <pattern id="orn-scales" patternUnits="userSpaceOnUse" width="6" height="7">
-      <path fill="none" stroke="#6e6e6e" stroke-width=".8" d="M0,3.5 Q3,0 6,3.5 M-3,7 Q0,3.5 3,7 M3,7 Q6,3.5 9,7"/>
-    </pattern>
-    <!-- 中央的八卦銅盤:外圈八卦、中間太極 -->
-    <symbol id="orn-crest" viewBox="-50 -50 100 100">
-      <g filter="url(#orn-bronze)">
-        <circle r="47" fill="url(#orn-bronze-fill)"/>
-      </g>
-      <circle r="44.5" fill="none" stroke="#2a1b0a" stroke-width="1" opacity=".7"/>
-      <circle r="33.5" fill="#1a1109" stroke="#c9a45c" stroke-width="1.4"/>
-      <g fill="#2a1b0a" opacity=".85"><g transform="rotate(0)"><rect x="-5" y="-37.5" width="10" height="1.6"/><rect x="-5" y="-40.1" width="10" height="1.6"/><rect x="-5" y="-42.7" width="10" height="1.6"/></g><g transform="rotate(45)"><rect x="-5" y="-37.5" width="10" height="1.6"/><rect x="-5" y="-40.1" width="10" height="1.6"/><rect x="-5" y="-42.7" width="4.2" height="1.6"/><rect x="0.8" y="-42.7" width="4.2" height="1.6"/></g><g transform="rotate(90)"><rect x="-5" y="-37.5" width="10" height="1.6"/><rect x="-5" y="-40.1" width="4.2" height="1.6"/><rect x="0.8" y="-40.1" width="4.2" height="1.6"/><rect x="-5" y="-42.7" width="4.2" height="1.6"/><rect x="0.8" y="-42.7" width="4.2" height="1.6"/></g><g transform="rotate(135)"><rect x="-5" y="-37.5" width="10" height="1.6"/><rect x="-5" y="-40.1" width="4.2" height="1.6"/><rect x="0.8" y="-40.1" width="4.2" height="1.6"/><rect x="-5" y="-42.7" width="10" height="1.6"/></g><g transform="rotate(180)"><rect x="-5" y="-37.5" width="4.2" height="1.6"/><rect x="0.8" y="-37.5" width="4.2" height="1.6"/><rect x="-5" y="-40.1" width="4.2" height="1.6"/><rect x="0.8" y="-40.1" width="4.2" height="1.6"/><rect x="-5" y="-42.7" width="4.2" height="1.6"/><rect x="0.8" y="-42.7" width="4.2" height="1.6"/></g><g transform="rotate(225)"><rect x="-5" y="-37.5" width="4.2" height="1.6"/><rect x="0.8" y="-37.5" width="4.2" height="1.6"/><rect x="-5" y="-40.1" width="4.2" height="1.6"/><rect x="0.8" y="-40.1" width="4.2" height="1.6"/><rect x="-5" y="-42.7" width="10" height="1.6"/></g><g transform="rotate(270)"><rect x="-5" y="-37.5" width="4.2" height="1.6"/><rect x="0.8" y="-37.5" width="4.2" height="1.6"/><rect x="-5" y="-40.1" width="10" height="1.6"/><rect x="-5" y="-42.7" width="10" height="1.6"/></g><g transform="rotate(315)"><rect x="-5" y="-37.5" width="4.2" height="1.6"/><rect x="0.8" y="-37.5" width="4.2" height="1.6"/><rect x="-5" y="-40.1" width="10" height="1.6"/><rect x="-5" y="-42.7" width="4.2" height="1.6"/><rect x="0.8" y="-42.7" width="4.2" height="1.6"/></g></g>
-      <g fill="#f0d08a" opacity=".55" transform="translate(-.5,-.5)"><g transform="rotate(0)"><rect x="-5" y="-37.5" width="10" height="1.6"/><rect x="-5" y="-40.1" width="10" height="1.6"/><rect x="-5" y="-42.7" width="10" height="1.6"/></g><g transform="rotate(45)"><rect x="-5" y="-37.5" width="10" height="1.6"/><rect x="-5" y="-40.1" width="10" height="1.6"/><rect x="-5" y="-42.7" width="4.2" height="1.6"/><rect x="0.8" y="-42.7" width="4.2" height="1.6"/></g><g transform="rotate(90)"><rect x="-5" y="-37.5" width="10" height="1.6"/><rect x="-5" y="-40.1" width="4.2" height="1.6"/><rect x="0.8" y="-40.1" width="4.2" height="1.6"/><rect x="-5" y="-42.7" width="4.2" height="1.6"/><rect x="0.8" y="-42.7" width="4.2" height="1.6"/></g><g transform="rotate(135)"><rect x="-5" y="-37.5" width="10" height="1.6"/><rect x="-5" y="-40.1" width="4.2" height="1.6"/><rect x="0.8" y="-40.1" width="4.2" height="1.6"/><rect x="-5" y="-42.7" width="10" height="1.6"/></g><g transform="rotate(180)"><rect x="-5" y="-37.5" width="4.2" height="1.6"/><rect x="0.8" y="-37.5" width="4.2" height="1.6"/><rect x="-5" y="-40.1" width="4.2" height="1.6"/><rect x="0.8" y="-40.1" width="4.2" height="1.6"/><rect x="-5" y="-42.7" width="4.2" height="1.6"/><rect x="0.8" y="-42.7" width="4.2" height="1.6"/></g><g transform="rotate(225)"><rect x="-5" y="-37.5" width="4.2" height="1.6"/><rect x="0.8" y="-37.5" width="4.2" height="1.6"/><rect x="-5" y="-40.1" width="4.2" height="1.6"/><rect x="0.8" y="-40.1" width="4.2" height="1.6"/><rect x="-5" y="-42.7" width="10" height="1.6"/></g><g transform="rotate(270)"><rect x="-5" y="-37.5" width="4.2" height="1.6"/><rect x="0.8" y="-37.5" width="4.2" height="1.6"/><rect x="-5" y="-40.1" width="10" height="1.6"/><rect x="-5" y="-42.7" width="10" height="1.6"/></g><g transform="rotate(315)"><rect x="-5" y="-37.5" width="4.2" height="1.6"/><rect x="0.8" y="-37.5" width="4.2" height="1.6"/><rect x="-5" y="-40.1" width="10" height="1.6"/><rect x="-5" y="-42.7" width="4.2" height="1.6"/><rect x="0.8" y="-42.7" width="4.2" height="1.6"/></g></g>
-      <g transform="scale(1.9)">
-        <circle r="12" fill="#e8c77d"/>
-        <path fill="#1a1109" d="M0,-12 A12,12 0 0,1 0,12 A6,6 0 0,1 0,0 A6,6 0 0,0 0,-12 Z"/>
-        <circle cy="-6" r="1.9" fill="#1a1109"/>
-        <circle cy="6" r="1.9" fill="#e8c77d"/>
-        <circle r="12" fill="none" stroke="#c9a45c" stroke-width=".8"/>
-      </g>
-    </symbol>
-    <!-- 下方兩角的銅包角:L 形托架加一個捲草,再一顆鉚釘 -->
-    <g id="orn-cap-shape">
-      <path fill="url(#orn-bronze-fill)" d="M0,40 V9 Q0,3 5,6 L9,10 V31 H30 L34,35 Q37,40 31,40 Z"/>
-      <path fill="none" stroke="url(#orn-bronze-fill)" stroke-width="2.4" stroke-linecap="round" d="M11,29 Q13,17 22,19 Q28,21 25,26 Q22,29 19,26"/>
-    </g>
-    <symbol id="orn-cap-left" viewBox="0 0 40 40">
-      <g filter="url(#orn-bronze)"><use href="#orn-cap-shape"/></g>
-      <circle cx="4.5" cy="35.5" r="2.2" fill="#f1d590" stroke="#3b2a12" stroke-width=".8"/>
-    </symbol>
-    <symbol id="orn-cap-right" viewBox="0 0 40 40">
-      <g filter="url(#orn-bronze)"><use href="#orn-cap-shape" transform="matrix(-1 0 0 1 40 0)"/></g>
-      <circle cx="35.5" cy="35.5" r="2.2" fill="#f1d590" stroke="#3b2a12" stroke-width=".8"/>
-    </symbol>
-    <!-- 左邊朝右、右邊朝左;打光濾鏡套在翻轉後的形狀外面,光線方向才不會反過來 -->
-    <!-- 龍紋浮雕:刻在石框左右兩側的邊條上(圖形在 drawRelief 依框的高度算出來) -->
-    <!-- 圖形只當高度用:打光後變成「亮 = 凸、暗 = 凹、50% 灰 = 平」的明暗,再用 overlay 疊回石框,看起來就是框本身刻出來的 -->
-    <mask id="orn-scale-mask-big" maskUnits="userSpaceOnUse" x="-100" y="-100" width="600" height="3000">
-      <rect x="-100" y="-100" width="600" height="3000" fill="#fff"/>
-      <rect x="-100" y="-100" width="600" height="3000" fill="url(#orn-scales)"/>
-    </mask>
-    <filter id="orn-relief" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
-      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="grain"/>
-      <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="11" result="wear"/>
-      <!-- 邊緣被磨得不平整 -->
-      <feDisplacementMap in="SourceGraphic" in2="grain" scale="1.3" xChannelSelector="R" yChannelSelector="G" result="worn"/>
-      <feGaussianBlur in="worn" stdDeviation=".6" result="fine"/>
-      <feGaussianBlur in="worn" stdDeviation="1.8" result="round"/>
-      <feComposite in="fine" in2="round" operator="arithmetic" k1="0" k2=".5" k3=".5" k4="0" result="soft"/>
-      <!-- 年代久遠:有些地方磨淺了,表面坑坑疤疤 -->
-      <feComposite in="soft" in2="wear" operator="arithmetic" k1=".8" k2=".45" k3="0" k4="0" result="faded"/>
-      <feComposite in="soft" in2="grain" operator="arithmetic" k1=".1" k2="0" k3="0" k4="0" result="pits"/>
-      <feComposite in="faded" in2="pits" operator="arithmetic" k1="0" k2="1" k3="-1" k4="0" result="h"/>
-      <!-- 光從左上來,仰角 30° 時平面剛好是 50% 灰(overlay 不變色) -->
-      <feDiffuseLighting in="h" surfaceScale="3.6" diffuseConstant="1" lighting-color="#fff" result="lit">
-        <feDistantLight azimuth="235" elevation="30"/>
-      </feDiffuseLighting>
-      <!-- 凸起處偏舊金,凹處帶一點銅綠鏽 -->
-      <feComponentTransfer in="lit">
-        <feFuncR type="table" tableValues=".14 .5 .9"/>
-        <feFuncG type="table" tableValues=".17 .5 .8"/>
-        <feFuncB type="table" tableValues=".18 .5 .6"/>
-      </feComponentTransfer>
-    </filter>
-    <symbol id="orn-skull-left" viewBox="0 0 100 112">
-      <use href="#orn-base"/>
-      <use href="#skull-statue"/>
-    </symbol>
-    <symbol id="orn-skull-right" viewBox="0 0 100 112">
-      <use href="#orn-base"/>
-      <use href="#skull-statue"/>
-    </symbol>
-  </defs>
-</svg>
 <div id="app"></div>
 
 <script src="content.js"></script>
@@ -3049,7 +2951,6 @@ const state = {
   introStyle: "4", // 測試用:序章首戰的進場演出 1~4,選定後拿掉
   attackStyle: null, // 測試用:普通攻擊改用斬擊 slash／拳擊 punch 預覽,null = 照 content.js
   testsOpen: false,  // 測試切換列是否展開
-  ornament: "bronze", // 測試用:選項框的外框 bronze/dragon/skull/none,選定後拿掉
   // 測試用:舞台特效一項一項開關(見 STAGE_FX),比對完再決定留哪些
   stageFx: { push: true, dust: true, edge: true, scene: true, rune: true },
   font: "wenkai",   // 測試用:wenkai 霞鶩文楷 / serif 思源宋體 / old 舊版(新細明體)
@@ -3057,6 +2958,7 @@ const state = {
   barStyle: "hex",  // 測試用(新版介面):氣血、靈力條的樣子 hex 六角刀形 / plain 純細框
   soulEcho: "record", // 測試用:前世殘念 record 照紀錄(上一輪選錯的回合才出現) / force 每回合都出現 / off 關
   hint: "on",       // 測試用:亮光提示 on = 每回合正解的指令和抽屜裡那一項外框亮起 / off 關
+  allyTheme: "pink", // 測試用:夥伴配色(見 ALLY_THEMES),選定後拿掉
   awaken: null,     // 第一次進遊戲的開場:"intro" 播放中、"out" 播完正在淡出、null 沒有
   selectId: null    // 選身份:正在看介紹的身份(null = 卡片牆)
 };
@@ -3609,173 +3511,12 @@ document.addEventListener("keydown", e => {
 });
 
 // 畫面 = 上面的內容框 + 貼在底部的選項框(跟戰鬥的四格按鈕同一個位置)
-const ORNAMENTS = { bronze: "銅龍外框", dragon: "龍紋浮雕", skull: "骷髏", none: "無" }; // 選項框上的裝飾(測試用,選定後只留一種)
 
 // 引用最上方 defs 裡畫好的圖(龍、石雕、八卦銅盤、銅包角)
-function artSvg(cls, id, viewBox, style) {
-  const holder = document.createElement("div");
-  holder.innerHTML = `<svg class="${cls}" viewBox="${viewBox}"${style ? ` style="${style}"` : ""}><use href="#${id}"/></svg>`;
-  return holder.firstChild;
-}
-
+// 底部選項框:銅龍外框整個是圖(四角的龍、上下緣都在 CSS 的 border-image 裡),只另外疊上中央銅盤
 function consoleFrame(children) {
-  const orn = state.ornament;
   const frame = el("div", { class: "console-frame" }, [el("div", { class: "console-well" }, children)]);
-  if (orn === "bronze") {
-    // 銅龍外框整個是圖(四角的龍、上下緣都在 CSS 的 border-image 裡),只另外疊上中央銅盤
-    return el("div", { class: "console orn-bronze" }, [frame, el("img", { class: "console-crest-img", src: "assets/console-crest.webp", alt: "" })]);
-  }
-  const parts = [
-    frame,
-    artSvg("console-cap left", "orn-cap-left", "0 0 40 40"),
-    artSvg("console-cap right", "orn-cap-right", "0 0 40 40")
-  ];
-  if (orn === "skull") {
-    parts.push(artSvg("console-orn left", "orn-skull-left", "0 0 100 112"), artSvg("console-orn right", "orn-skull-right", "0 0 100 112"));
-  }
-  parts.push(artSvg("console-crest", "orn-crest", "0 0 100 100"));
-  const box = el("div", { class: "console orn-" + orn }, parts);
-  if (orn === "dragon") {
-    reliefObserver.disconnect();
-    reliefObserver.observe(box);
-  }
-  return box;
-}
-
-// 龍紋浮雕的長度跟著選項框的高度走:框排好版、量到高度才畫,框的大小變了就重畫
-const reliefObserver = new ResizeObserver(entries => entries.forEach(e => drawRelief(e.target)));
-
-function drawRelief(box) {
-  const frame = box.querySelector(".console-frame");
-  const H = frame.offsetHeight;
-  const W = parseFloat(getComputedStyle(frame).paddingLeft); // 刻在框左右的邊條上,邊條多寬就刻多寬
-  if (!H || frame.dataset.drawn === `${W}/${H}`) return;
-  frame.dataset.drawn = `${W}/${H}`;
-  frame.querySelectorAll(".console-relief").forEach(n => n.remove());
-  frame.prepend(reliefSvg(W, H, false), reliefSvg(W, H, true));
-}
-
-// 一側的龍紋(左邊;mirror = 右邊,整個左右翻過來)。單位是畫面上的 px
-// 龍頭藏在上緣底下,只露出兩支往後彎的角;龍身蜿蜒往下,中段鑽進一朵祥雲後面,尾巴收在下角
-// 填色的深淺就是浮雕的高低:祥雲與背脊最高、角次之、龍身再低一點(鱗片刻成溝)、背鰭最淺
-function reliefSvg(W, H, mirror) {
-  const k = W / 54;
-  const f = n => n.toFixed(1);
-  const top = 24, bottom = H - 34 * k; // 上緣讓給回紋,下緣讓給銅包角
-  const xc = W * 0.52, A = W * 0.2, T = W * 0.29;
-
-  // 龍身中線:一段段 S 形接起來,每段取 16 個點
-  const n = Math.max(3, Math.round((bottom - top) / (62 * k)));
-  const d = (bottom - top) / n;
-  const spine = [];
-  let p = [xc + A * 0.5, top];
-  for (let i = 1; i <= n; i++) {
-    const q = [i === n ? xc : xc + (i % 2 ? -A : A), top + i * d];
-    const c1 = [p[0], p[1] + d * 0.55], c2 = [q[0], q[1] - d * 0.55];
-    for (let j = i === 1 ? 0 : 1; j <= 16; j++) {
-      const t = j / 16, u = 1 - t;
-      spine.push([0, 1].map(m => u * u * u * p[m] + 3 * u * u * t * c1[m] + 3 * u * t * t * c2[m] + t * t * t * q[m]));
-    }
-    p = q;
-  }
-  const len = [0];
-  for (let i = 1; i < spine.length; i++) len.push(len[i - 1] + Math.hypot(spine[i][0] - spine[i - 1][0], spine[i][1] - spine[i - 1][1]));
-  const total = len[len.length - 1];
-  const at = u => {
-    const i = Math.max(1, Math.min(spine.length - 2, len.findIndex(l => l >= u * total)));
-    const a = spine[i - 1], b = spine[i + 1], l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
-    const tan = [(b[0] - a[0]) / l, (b[1] - a[1]) / l];
-    return { pt: spine[i], tan, out: [-tan[1], tan[0]] }; // out = 龍背那一側(朝框外)
-  };
-
-  // 粗細沿著身體變化的帶狀圖形
-  const ribbon = (pts, widths) => {
-    const side = sign => pts.map(({ pt, out }, i) => `${f(pt[0] + out[0] * widths[i] / 2 * sign)},${f(pt[1] + out[1] * widths[i] / 2 * sign)}`);
-    return `M${side(1).join(" L")} L${side(-1).reverse().join(" L")} Z`;
-  };
-  // 龍身分兩段露出來,中間鑽進祥雲;沉進去的那一端收細
-  const clouds = [0.5];
-  const gap = 13 * k / total;
-  const runs = [[0, clouds[0] - gap], [clouds[0] + gap, 1]];
-  const bodyPaths = [], finPaths = [], ridges = [];
-  runs.forEach(([u0, u1], r) => {
-    const steps = Math.max(8, Math.round((u1 - u0) * total / 3));
-    const pts = [], widths = [];
-    for (let i = 0; i <= steps; i++) {
-      const u = u0 + (u1 - u0) * i / steps;
-      const dist = (r === 0 ? u1 - u : Math.min(u - u0, u1 - u)) * total; // 離沉進去的那一端多遠(第一段從上緣底下出來,上端不收)
-      const tuck = Math.min(1, 0.45 + dist / (10 * k));
-      const tail = u > 0.85 ? Math.max(0.12, 1 - (u - 0.85) / 0.15) : 1;
-      pts.push(at(u));
-      widths.push(T * (1 - 0.3 * u) * tuck * tail);
-    }
-    bodyPaths.push(ribbon(pts, widths));
-    // 背脊:沿著龍背外緣一道細細的稜
-    ridges.push("M" + pts.map(({ pt, out }, i) => `${f(pt[0] + out[0] * (widths[i] / 2 - 1.6 * k))},${f(pt[1] + out[1] * (widths[i] / 2 - 1.6 * k))}`).join(" L"));
-    // 背鰭:沿著龍背,尖端往尾巴那邊斜
-    for (let x = (u0 + 6 * k / total); x < u1 - 6 * k / total && x < 0.88; x += 8 * k / total) {
-      const { pt, tan, out } = at(x);
-      const w = T * (1 - 0.3 * x) / 2 - 1, h = 4.6 * k, half = 2.2 * k;
-      const q = (o, t) => `${f(pt[0] + out[0] * o + tan[0] * t)},${f(pt[1] + out[1] * o + tan[1] * t)}`;
-      finPaths.push(`M${q(w, -half)} L${q(w + h, half * 1.7)} L${q(w, half)} Z`);
-    }
-  });
-
-  // 兩支往後彎的角,從上緣底下伸出來
-  const horn = (p0, p1, p2, p3, w0) => {
-    const pts = [], widths = [];
-    for (let i = 0; i <= 14; i++) {
-      const t = i / 14, u = 1 - t;
-      const pt = [0, 1].map(m => u * u * u * p0[m] + 3 * u * u * t * p1[m] + 3 * u * t * t * p2[m] + t * t * t * p3[m]);
-      const dt = [0, 1].map(m => 3 * u * u * (p1[m] - p0[m]) + 6 * u * t * (p2[m] - p1[m]) + 3 * t * t * (p3[m] - p2[m]));
-      const l = Math.hypot(dt[0], dt[1]) || 1;
-      pts.push({ pt, out: [-dt[1] / l, dt[0] / l] });
-      widths.push(w0 * (1 - 0.85 * t));
-    }
-    return ribbon(pts, widths);
-  };
-  const horns = [
-    horn([xc - 3 * k, top + 7 * k], [xc - 14 * k, top], [4 * k, top + 3 * k], [6 * k, top + 40 * k], 5 * k),
-    horn([xc + 4 * k, top + 6 * k], [xc + 13 * k, top], [W - 4 * k, top + 6 * k], [W - 7 * k, top + 28 * k], 4 * k)
-  ];
-
-  // 祥雲:兩個往內捲的漩渦,底下一道弧連起來
-  const spiral = (cx, cy, R, dir) => {
-    const pts = [];
-    for (let i = 0; i <= 28; i++) {
-      const t = i / 28, a = Math.PI / 2 + dir * t * Math.PI * 2.3, r = R * (1 - 0.78 * t);
-      pts.push(`${f(cx + Math.cos(a) * r)},${f(cy + Math.sin(a) * r)}`);
-    }
-    return "M" + pts.join(" L");
-  };
-  const cloud = u => {
-    const { pt } = at(u), R = 5.6 * k, cx = W * 0.5;
-    return spiral(cx - R * 0.95, pt[1] - R * 0.15, R, 1) + " " + spiral(cx + R * 0.95, pt[1] - R * 0.15, R, -1) +
-      ` M${f(cx - R * 1.9)},${f(pt[1] + R * 0.6)} Q${f(cx)},${f(pt[1] + R * 1.8)} ${f(cx + R * 1.9)},${f(pt[1] + R * 0.6)}`;
-  };
-
-  // 幾道淺淺的刮痕,方向亂一點(固定的亂數,每次重畫都在同樣的位置)
-  let seed = mirror ? 7 : 3;
-  const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
-  const scratches = [];
-  for (let i = 0; i < Math.round(H / 40); i++) {
-    const x = W * (0.15 + rnd() * 0.7), y = top + rnd() * (bottom - top);
-    const a = (rnd() - 0.5) * 1.6, l = (6 + rnd() * 12) * k;
-    scratches.push(`M${f(x)},${f(y)} q${f(Math.cos(a) * l / 2)},${f(Math.sin(a) * l / 2 + 1)} ${f(Math.cos(a) * l)},${f(Math.sin(a) * l)}`);
-  }
-
-  const flip = mirror ? ` transform="translate(${f(W)},0) scale(-1,1)"` : "";
-  const holder = document.createElement("div");
-  holder.innerHTML = `<svg class="console-relief ${mirror ? "right" : "left"}" viewBox="0 0 ${f(W)} ${H}" style="width:${f(W)}px;height:${H}px">` +
-    `<g filter="url(#orn-relief)"><rect width="${f(W)}" height="${H}" fill="none"/><g${flip}>` + // 透明的底讓打光範圍蓋滿整條邊條
-    `<path fill="#000" fill-opacity=".62" d="${finPaths.join(" ")}"/>` +
-    `<g mask="url(#orn-scale-mask-big)"><path fill="#000" fill-opacity=".78" d="${bodyPaths.join(" ")}"/></g>` +
-    `<path fill="none" stroke="#000" stroke-width="${f(1.4 * k)}" stroke-linecap="round" d="${ridges.join(" ")}"/>` +
-    `<path fill="#000" fill-opacity=".85" d="${horns.join(" ")}"/>` +
-    `<path fill="none" stroke="#000" stroke-width="${f(2.3 * k)}" stroke-linecap="round" stroke-linejoin="round" d="${clouds.map(cloud).join(" ")}"/>` +
-    `<path fill="none" stroke="#000" stroke-opacity=".3" stroke-width=".6" d="${scratches.join(" ")}"/>` +
-    `</g></g></svg>`;
-  return holder.firstChild;
+  return el("div", { class: "console orn-bronze" }, [frame, el("img", { class: "console-crest-img", src: "assets/console-crest.webp", alt: "" })]);
 }
 
 function dock(buttons) {
@@ -3794,7 +3535,11 @@ function renderTitle() {
     panel([
       el("h1", null, ["逆仙之境 ‧ beta"]),
       player && player.name ? el("div", { class: "meta" }, [`歡迎回來，${player.name}`]) : null,
-      player ? el("button", { class: "test-link", onclick: resetPlayer }, ["（測試）清除名字，從頭重玩序章"]) : null
+      player ? el("button", { class: "test-link", onclick: resetPlayer }, ["（測試）清除名字，從頭重玩序章"]) : null,
+      el("div", { class: "title-test" }, [
+        testRow("夥伴配色（測試用）：", "allyTheme", ALLY_THEMES),
+        el("button", { class: "test-link", onclick: () => startPrologue(CONTENT.childBattle) }, ["（測試）直接到狼戰，點左下角的雪梅花看招式"])
+      ])
     ]),
     dock([
       choiceButton("新的輪迴", newCycle),
@@ -4037,18 +3782,11 @@ function renderIntroVariants() {
     render();
   };
   const box = el("details", state.testsOpen ? { class: "b-tests", open: "" } : { class: "b-tests" }, [
-    el("summary", null, ["測試切換（進場、外框、攻擊、特效）"]),
+    el("summary", null, ["測試切換（進場、攻擊、特效）"]),
     el("div", { class: "b-variant" }, [
       "進場演出（測試用）：",
       ...Object.keys(INTRO).map(k => el("button", { class: state.introStyle === k ? "on" : "", onclick: replay(k) }, [`${k} ${INTRO[k].name}`])),
       el("button", { onclick: replay(state.introStyle) }, ["重看"])
-    ]),
-    el("div", { class: "b-variant" }, [
-      "選項框外框（測試用）：",
-      ...Object.keys(ORNAMENTS).map(k => el("button", {
-        class: state.ornament === k ? "on" : "",
-        onclick: () => { state.ornament = k; render(); }
-      }, [ORNAMENTS[k]]))
     ]),
     el("div", { class: "b-variant" }, [
       "普通攻擊（測試用）：",
@@ -4069,11 +3807,15 @@ function renderIntroVariants() {
     testRow("介面（測試用）：", "uiStyle", [["new", "新版（照設計圖）"], ["old", "舊版"]]),
     testRow("條的樣子（新版介面）：", "barStyle", [["hex", "六角刀形"], ["plain", "純細框"]]),
     testRow("亮光提示（測試用）：", "hint", [["on", "開"], ["off", "關"]]),
+    testRow("夥伴配色（測試用）：", "allyTheme", ALLY_THEMES),
     testRow("前世殘念（測試用）：", "soulEcho", [["record", "照紀錄"], ["force", "每回合都出現"], ["off", "關"]], () => { state.battle.echoTurn = -1; })
   ]);
   box.addEventListener("toggle", () => { state.testsOpen = box.open; });
   return box;
 }
+
+// 夥伴配色(測試用,選定後拿掉):主選單和戰鬥的測試切換都能換
+const ALLY_THEMES = [["pink", "現在（粉）"], ["ink", "A 墨金"], ["paper", "B 宣紙"], ["plum", "C 雪梅"], ["glass", "D 霧面玻璃"]];
 
 // 測試切換的一排:點了把 state[key] 換成那個值;then = 換完、重畫前要做的事
 function testRow(label, key, options, then) {
@@ -5170,6 +4912,7 @@ function render() {
   document.documentElement.dataset.font = state.font;
   document.documentElement.dataset.bar = state.barStyle;
   document.documentElement.classList.toggle("ui-new", state.uiStyle === "new");
+  document.documentElement.dataset.allyTheme = state.allyTheme;
   app.innerHTML = "";
   storyScreen = null;
   // 換到新的畫面才清掉閱讀進度;只是打開/關掉「查看自身」不算
