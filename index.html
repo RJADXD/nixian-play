@@ -1068,8 +1068,55 @@
     background: linear-gradient(90deg, rgba(40,14,24,.85), rgba(20,10,14,.6));
     border: 1px solid rgba(240,180,200,.45);
     border-radius: 30px;
-    pointer-events: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
   }
+  .b-ally::after {
+    content: "招";
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    width: 16px;
+    height: 16px;
+    display: grid;
+    place-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #4a1426;
+    background: #f4a9c2;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.5);
+  }
+  .b-ally:hover, .b-ally:focus-visible, .b-ally.on { border-color: #f4a9c2; outline: none; }
+  .b-ally.on { box-shadow: 0 0 10px rgba(244,169,194,.5); }
+  .b-ally-tip {
+    position: absolute;
+    left: 10px;
+    bottom: 64px;
+    z-index: 6;
+    width: min(320px, calc(100% - 20px));
+    padding: 8px 10px 6px;
+    font-size: 13px;
+    line-height: 1.55;
+    background: linear-gradient(180deg, rgba(48,18,30,.96), rgba(24,10,16,.96));
+    border: 1px solid #f4a9c2;
+    border-radius: 4px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.6);
+    animation: fade-in .15s both;
+  }
+  .b-ally-tip-head b { margin-right: 8px; font-size: 14px; letter-spacing: .1em; color: #f8d9e4; }
+  .b-ally-tip-head span { font-size: 12px; color: #c9a7b3; }
+  .b-ally-tip-lead { margin: 2px 0 6px; font-size: 12px; color: #c9a7b3; }
+  .b-ally-tip ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .b-ally-tip li { padding: 4px 8px; border: 1px solid rgba(240,180,200,.22); border-radius: 3px; background: rgba(255,255,255,.03); }
+  .b-ally-tip li.now { border-color: #f4a9c2; background: rgba(244,169,194,.12); }
+  .b-ally-tip-row { display: flex; align-items: baseline; gap: 8px; }
+  .b-ally-tip-row b { color: #ffd3e1; letter-spacing: .08em; }
+  .b-ally-tip-row em { font-style: normal; font-size: 12px; color: #c9a7b3; }
+  .b-ally-tip-row i { margin-left: auto; font-style: normal; font-size: 11px; color: #4a1426; background: #f4a9c2; padding: 0 6px; border-radius: 8px; }
+  .b-ally-tip li > span { display: block; font-size: 12px; color: var(--text); }
   .b-ally-ring {
     width: 44px;
     height: 44px;
@@ -3108,6 +3155,7 @@ const DUSK_MS = 4100; // 分出勝負後,黑暗籠罩多久才切到下一個畫
 const REVEAL_MS = 1300; // 最後一劍的演出播完,金身才裂開
 const KILL_MS = 2800; // 真身露出來之後,多久出手
 const ALLY_CUT_MS = 2600; // 夥伴出手特寫的長度(CSS ally-cut 延遲 .8s + 1.7s,再留一點)
+const ALLY_STATUS_TURNS = 3; // 夥伴給的狀態持續幾回合
 
 // 目前這場戰鬥的設定:序章首戰(content.js 的 prologueBattle)或桃花村的教學戰(childBattle)
 function battleDef() {
@@ -3123,7 +3171,7 @@ function startPrologue(def = CONTENT.prologueBattle) {
     turn: 0, hp: P.hp, mp: P.mpMax, items,
     revealed: false, log: [], freshFrom: 0, menu: null, result: null,
     // 身上的狀態 [{ name, left }],left = 還會發作幾次;chipOpen = 正在看哪個狀態的說明
-    statuses: [], chipOpen: null,
+    statuses: [], chipOpen: null, allyOpen: false,
     // 演出用:上一刻的氣血/靈力(讓條往下掉)、這一回合要播的效果、演出播完前不接受操作
     prevHp: P.hp, prevMp: P.mpMax, fx: null, lockUntil: 0, introPending: true,
     // 選項回饋:picked = 剛剛選的指令(亮一下)、last = 上次用的指令(一直留著記號)、
@@ -3171,6 +3219,7 @@ function battleAct(id) {
   b.freshFrom = b.log.length;
   b.menu = null;
   b.chipOpen = null;
+  b.allyOpen = false;
   b.prevHp = b.hp;
   b.prevMp = b.mp;
   b.fx = { shield: !!tool.shield };
@@ -3248,12 +3297,16 @@ function battleAct(id) {
 
 // 夥伴(自動援戰):每回合結束集一格,集滿 every 格就出手一次,依情況挑招
 // (受了傷先補血、靈力不滿就補靈力,都滿就種花蔭替你擋一次傷害),出手時有一段橫幅特寫
+function allyPick(P, b) {
+  return P.ally.skills.find(k => k.when === "hurt" ? b.hp < P.hp : k.when === "tired" ? b.mp <= P.mpMax / 2 : true);
+}
+
 function allyTurnEnd(P, b) {
   const A = P.ally;
   b.ally.charge += 1;
   if (b.ally.charge < A.every) return;
   b.ally.charge = 0;
-  const sk = A.skills.find(k => k.when === "hurt" ? b.hp < P.hp : k.when === "tired" ? b.mp <= P.mpMax / 2 : true);
+  const sk = allyPick(P, b);
   battleLog(sk.text, "ally");
   if (sk.hp) {
     const v = Math.min(sk.hp, P.hp - b.hp);
@@ -3268,9 +3321,9 @@ function allyTurnEnd(P, b) {
     battleLog("你的靈力", "system", `+${v}`);
   }
   if (sk.status) {
-    b.statuses = b.statuses.filter(s => s.name !== sk.status).concat({ name: sk.status, left: 3 });
+    b.statuses = b.statuses.filter(s => s.name !== sk.status).concat({ name: sk.status, left: ALLY_STATUS_TURNS });
     b.fx.gained = sk.status;
-    battleLog(`你得到了${sk.status}，持續 3 回合`, "system");
+    battleLog(`你得到了${sk.status}，持續 ${ALLY_STATUS_TURNS} 回合`, "system");
   }
   b.fx.allyCut = sk.name;
   b.lockUntil = Date.now() + ALLY_CUT_MS; // 特寫播完才接受下一個動作
@@ -3793,6 +3846,7 @@ function renderBattleActions(animate, mePanel) {
     if (Date.now() < b.lockUntil) return; // 演出播完前不打開
     b.menu = menu;
     b.chipOpen = null;
+    b.allyOpen = false;
     render();
   };
   const closeMenu = () => {
@@ -4234,16 +4288,43 @@ function renderChild() {
   return screen([top, actions, unveil], unveil ? null : "fade-in");
 }
 
-// 夥伴卡:圖區左下角,頭像外圈是集氣環,寫著再幾回合出手;集滿的那回合整張卡亮起
+// 夥伴卡:圖區左下角,頭像外圈是集氣環,寫著再幾回合出手;集滿的那回合整張卡亮起。點了看她的招式(allyTip)
 function allyCard(b, A) {
   const left = A.every - b.ally.charge; // 包含這回合在內,再幾個回合結束時出手
   const pct = Math.round((b.ally.charge / A.every) * 100);
-  return el("div", { class: left <= 1 ? "b-ally ready" : "b-ally", "aria-label": `夥伴 ${A.name}，${left <= 1 ? "這回合結束時出手" : `再 ${left} 回合出手`}` }, [
+  const toggle = () => {
+    if (b.result || b.ending) return;
+    b.allyOpen = !b.allyOpen;
+    b.chipOpen = null;
+    render();
+  };
+  const cls = ["b-ally", left <= 1 ? "ready" : "", b.allyOpen ? "on" : ""].filter(Boolean).join(" ");
+  return el("button", { class: cls, onclick: toggle, "aria-expanded": String(!!b.allyOpen), "aria-label": `夥伴 ${A.name}，${left <= 1 ? "這回合結束時出手" : `再 ${left} 回合出手`}。點一下看招式` }, [
     el("div", { class: "b-ally-ring", style: `--p:${left <= 1 ? 100 : pct}%` }, [el("i", { class: "b-ally-face", style: `background-image:url("${A.portrait}")` })]),
     el("div", { class: "b-ally-info" }, [
       el("b", null, [A.name]),
       el("span", null, [left <= 1 ? "本回合出手" : `再 ${left} 回合出手`])
     ])
+  ]);
+}
+
+// 夥伴的招式說明框(點夥伴卡打開):全部從 content.js 的 ally 資料算出來,改了招式這裡會跟著變
+function allyTip(P, b) {
+  const A = P.ally;
+  const now = allyPick(P, b);
+  const when = (k, i) => k.when === "hurt" ? "你受了傷" : k.when === "tired" ? "你的靈力剩一半以下" : i === 0 ? "每次" : "前面都用不上時";
+  const effect = k => [
+    k.hp ? `氣血 +${k.hp}` : null,
+    k.mp ? `靈力 +${k.mp}` : null,
+    k.status ? `得到「${k.status}」${ALLY_STATUS_TURNS} 回合：${CONTENT.statusEffectCatalog[k.status].desc}` : null
+  ].filter(Boolean).join("，");
+  return el("div", { class: "b-ally-tip" }, [
+    el("div", { class: "b-ally-tip-head" }, [el("b", null, [A.name]), el("span", null, [`夥伴・每 ${A.every} 回合出手一次`])]),
+    el("p", { class: "b-ally-tip-lead" }, ["回合結束時集一格，集滿就出手；從上往下，挑第一招用得上的。"]),
+    el("ul", null, A.skills.map((k, i) => el("li", { class: k === now ? "now" : "" }, [
+      el("div", { class: "b-ally-tip-row" }, [el("b", null, [k.name]), el("em", null, [when(k, i)]), k === now ? el("i", null, ["照現在會用"]) : null]),
+      el("span", null, [effect(k)])
+    ])))
   ]);
 }
 
@@ -4586,6 +4667,7 @@ function renderPrologue() {
   const toggleChip = name => () => {
     if (b.result || b.ending) return;
     b.chipOpen = b.chipOpen === name ? null : name;
+    b.allyOpen = false;
     render();
   };
   const chips = b.statuses.map(s => {
@@ -4644,6 +4726,7 @@ function renderPrologue() {
         fxNode,
         rune,
         P.ally ? allyCard(b, P.ally) : null,
+        P.ally && b.allyOpen && !b.result && !b.ending ? allyTip(P, b) : null,
         atk ? (atk.hit ? el("span", { class: "b-float gold" }, ["？？？"]) : el("span", { class: "b-float miss" }, ["落空"])) : null
       ]),
       fx && fx.allyCut ? allyCutIn(P.ally, fx.allyCut) : null,
