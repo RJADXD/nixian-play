@@ -122,9 +122,9 @@ const CONTENT = {
      桃花村的戰鬥(試玩版):田邊的餓狼。雪梅花是夥伴,每幾回合自己出手一次(自動援戰)
      ------------------------------------------------------------
      跟序章首戰同一套格式,另外多了:
-     ally: 夥伴。every = 每幾回合出手一次(回合結束時);skills 由上往下挑第一個符合的:
-           when "hurt" = 你受了傷、"tired" = 你的靈力剩一半以下、沒寫 = 一定可以;
-           hp / mp = 替你補多少,status = 給你一個狀態(名稱要在 statusEffectCatalog 裡,持續 3 回合)
+     ally: 夥伴。every = 每幾回合出手一次(回合結束時集一格,集滿就出手;最後一回合不出手);
+           skill = 她的招式,每個夥伴只有一招:name 招式名、text 出手那句話,
+           效果寫 hp / mp = 替你補多少,或 status = 給你一個狀態(名稱要在 statusEffectCatalog 裡,持續 3 回合)
            finale = 打贏時夥伴的收尾(name 特寫上的招式名、text 那句話)
      cannotLose: 打不輸(氣血最少剩 1,最後一回合一定收尾)
      noFlee: 不能逃(按逃跑只會出現 fleeText);next: 打完接桃花村的哪一段
@@ -148,11 +148,7 @@ const CONTENT = {
       name: "雪梅花",
       portrait: "assets/ally/xuemeihua-face.webp", // 從 assets/src/xuemeihua.webp 裁出來的頭像
       every: 2,
-      skills: [
-        { when: "hurt", name: "梅香回春", hp: 10, text: "雪梅花把一片梅花瓣按在你的傷口上，暖暖的，一點都不痛了。" },
-        { when: "tired", name: "青梅", mp: 2, text: "雪梅花塞給你一顆青梅：「吃了就有力氣！」" },
-        { name: "花蔭", status: "花蔭", text: "雪梅花在你腳邊種下一圈梅花，花瓣繞著你轉。" }
-      ],
+      skill: { name: "花蔭", status: "花蔭", text: "雪梅花在你腳邊種下一圈梅花，花瓣繞著你轉。" },
       finale: { name: "花藤", text: "雪梅花從你身後走出來，指尖一點，花藤把狼輕輕推回後山：「去吧，別再來偷雞了。」花藤上結出一串野果，滾到牠腳邊。餓狼叼起野果，一溜煙跑回後山。" }
     },
     attack: { id: "attack", strike: true, fx: "slash", use: "揮起樹枝打過去。" },
