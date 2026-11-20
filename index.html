@@ -1038,6 +1038,94 @@
   .b-ally-tip-row { display: flex; align-items: baseline; gap: 8px; }
   .b-ally-tip-row b { color: #ffd3e1; letter-spacing: .08em; }
   .b-ally-tip li > span { display: block; font-size: 12px; color: var(--text); }
+  /* ---- 雪梅花出手的特效(花蔭;目前只有她,花瓣是她的):花瓣從她的卡片飛到你身上(allyPetals) →
+     你的頭像周圍綻開一圈梅花、狀態欄泛粉光,「蔭」字這時才跳出來 → 花蔭還在時幾片花瓣繞著頭像轉 →
+     擋下傷害時花瓣炸開散掉。時間要跟出手特寫(ALLY_CUT_MS)對得上 ---- */
+  .b-face-wrap { position: relative; flex: none; }
+  .ally-petals { position: fixed; inset: 0; z-index: 40; overflow: hidden; pointer-events: none; }
+  .ally-petals i {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--s);
+    height: calc(var(--s) * .72);
+    margin: calc(var(--s) * -.36) 0 0 calc(var(--s) * -.5);
+    border-radius: 60% 0 60% 0;
+    background: linear-gradient(135deg, #fff1f5, #f4a3bc 60%, #e0718f);
+    box-shadow: 0 0 6px rgba(255,190,210,.8);
+    opacity: 0;
+    animation: ally-petal-fly var(--d) cubic-bezier(.3,.1,.3,1) var(--delay) forwards;
+  }
+  @keyframes ally-petal-fly {
+    0% { opacity: 0; transform: translate(var(--sx), var(--sy)) rotate(0) scale(.4); }
+    12% { opacity: 1; }
+    25% { transform: translate(var(--bx), var(--by)) rotate(140deg) scale(1); }
+    65% { transform: translate(var(--mx), var(--my)) rotate(320deg) scale(.95); }
+    88% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--ex), var(--ey)) rotate(480deg) scale(.6); }
+  }
+  .b-bloom, .b-ward, .b-ward-break { position: absolute; left: 50%; top: 50%; z-index: 2; width: 0; height: 0; pointer-events: none; }
+  .b-bloom::before, .b-ward-break::before {
+    content: "";
+    position: absolute;
+    left: -30px;
+    top: -30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,205,220,.9);
+    box-shadow: 0 0 14px rgba(244,169,194,.8), inset 0 0 10px rgba(244,169,194,.6);
+    opacity: 0;
+    animation: bloom-ring .9s 2.45s ease-out both;
+  }
+  @keyframes bloom-ring { 0% { opacity: 0; transform: scale(.3); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.35); } }
+  .b-bloom i { position: absolute; left: 0; top: 0; transform: rotate(var(--a)) translateX(27px) rotate(calc(var(--a) * -1)); }
+  .b-bloom b {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='45%25' r='60%25'%3E%3Cstop offset='0' stop-color='%23fff7f9'/%3E%3Cstop offset='.6' stop-color='%23f8c3d2'/%3E%3Cstop offset='1' stop-color='%23e27996'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg fill='url%28%23g%29' stroke='%23c25a78' stroke-width='.6'%3E%3Ccircle cx='20.00' cy='11.00' r='7.6'/%3E%3Ccircle cx='28.56' cy='17.22' r='7.6'/%3E%3Ccircle cx='25.29' cy='27.28' r='7.6'/%3E%3Ccircle cx='14.71' cy='27.28' r='7.6'/%3E%3Ccircle cx='11.44' cy='17.22' r='7.6'/%3E%3C/g%3E%3Ccircle cx='20' cy='20' r='3.6' fill='%23c8384f'/%3E%3Cg fill='%23ffd98a'%3E%3Ccircle cx='23.06' cy='15.79' r='1.1'/%3E%3Ccircle cx='24.95' cy='21.61' r='1.1'/%3E%3Ccircle cx='20.00' cy='25.20' r='1.1'/%3E%3Ccircle cx='15.05' cy='21.61' r='1.1'/%3E%3Ccircle cx='16.94' cy='15.79' r='1.1'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+    filter: drop-shadow(0 0 4px rgba(255,190,210,.9));
+    opacity: 0;
+    animation: bloom-pop 1.5s ease-out both;
+    animation-delay: calc(2.45s + var(--k) * 60ms);
+  }
+  @keyframes bloom-pop {
+    0% { opacity: 0; transform: scale(0) rotate(-40deg); }
+    25% { opacity: 1; transform: scale(1.3) rotate(0); }
+    40% { transform: scale(1); }
+    75% { opacity: 1; }
+    100% { opacity: 0; transform: scale(.9) rotate(20deg); }
+  }
+  .b-me.b-blessed { animation: me-bless 1.2s 2.45s ease-out; }
+  @keyframes me-bless { 30% { border-color: #f4a9c2; box-shadow: 0 0 16px rgba(244,169,194,.6), inset 0 0 12px rgba(244,169,194,.25); } }
+  /* 花蔭還在:三片花瓣繞著頭像轉;剛種下的那一次,等梅花開完才出現 */
+  .b-ward { animation: ward-spin 6s linear infinite; }
+  .b-ward.fresh { animation: ward-spin 6s linear infinite, ward-in .6s 2.9s backwards; }
+  @keyframes ward-spin { to { transform: rotate(360deg); } }
+  @keyframes ward-in { from { opacity: 0; } to { opacity: 1; } }
+  .b-ward i, .b-ward-break i {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8px;
+    height: 6px;
+    margin: -3px 0 0 -4px;
+    border-radius: 60% 0 60% 0;
+    background: linear-gradient(135deg, #fff1f5, #f29ab4);
+    box-shadow: 0 0 6px rgba(244,169,194,.85);
+  }
+  .b-ward i { transform: rotate(var(--a)) translateX(25px) rotate(60deg); }
+  /* 花蔭擋下傷害:花瓣往外炸開散掉 */
+  .b-ward-break::before { animation: bloom-ring .6s .35s ease-out both; }
+  .b-ward-break i { opacity: 0; animation: ward-burst .8s .35s ease-out both; }
+  @keyframes ward-burst {
+    0% { opacity: 1; transform: rotate(var(--a)) translateX(24px) rotate(0); }
+    100% { opacity: 0; transform: rotate(var(--a)) translateX(58px) rotate(300deg) scale(.6); }
+  }
+  /* 夥伴給的狀態:等花瓣飛到才跳出來 */
+  .b-chip.new.ally-gift { animation-delay: 2.6s; }
   .b-ally-ring {
     width: 44px;
     height: 44px;
@@ -2979,6 +3067,8 @@
   :root[data-ally-theme="snow"] :is(.b-log, .b-backlog) p.ally .b-text { color: #f7eef0; }
   @media (prefers-reduced-motion: reduce) {
     .scene-stage, .scene-petals b { animation: none !important; }
+    .ally-petals, .b-bloom, .b-ward-break { display: none; }
+    .b-ward, .b-me.b-blessed { animation: none !important; }
     .id-top, .id-detail-screen > *, .id-card, .id-detail .id-art, .id-info > *, .id-verse, .fate-thread, .fate-thread::before, .fate-thread::after, .scroll-cue::after, .id-go { animation: none !important; }
     .id-motes { display: none; }
     .battle, .battle *, .fade-in { animation: none !important; transition: none !important; }
@@ -3248,9 +3338,10 @@ function battleAct(id) {
     // 打贏了:有真身的(序章)接著金身裂開、真身出手(revealTrueForm),沒有的直接打贏
     if (lastTurn) { if (P.reveal) b.ending = true; else b.result = "win"; }
   } else if (turn.onWrong === "hp" && b.statuses.some(s => s.name === "花蔭")) {
-    // 夥伴種下的花蔭:替你擋掉這一下,用掉就沒了
+    // 夥伴種下的花蔭:替你擋掉這一下,用掉就沒了(繞著頭像的花瓣炸開散掉)
     b.statuses = b.statuses.filter(s => s.name !== "花蔭");
     b.fx.block = true;
+    b.fx.wardBreak = true;
     battleLog(turn.fail);
     battleLog("花瓣替你擋下了這一擊", "system");
   } else if (turn.onWrong === "hp") {
@@ -3323,6 +3414,7 @@ function allyTurnEnd(P, b) {
     battleLog(`你得到了${sk.status}，持續 ${ALLY_STATUS_TURNS} 回合`, "system");
   }
   b.fx.allyCut = sk.name;
+  b.fx.allyBloom = true; // 花瓣飛到你身上、頭像周圍綻開梅花(allyPetals、renderBattle 的 b-bloom)
   b.lockUntil = Date.now() + ALLY_CUT_MS; // 特寫播完才接受下一個動作
 }
 
@@ -4165,6 +4257,30 @@ function allyTip(P) {
   ]);
 }
 
+// 雪梅花出手:一陣梅花瓣從她的卡片飛出來,往上繞一道弧,落到你的頭像上。
+// 畫面排好之後才量得到兩邊的位置,所以在 requestAnimationFrame 裡做;播完就拿掉
+function allyPetals() {
+  const from = document.querySelector(".b-ally"), to = document.querySelector(".b-me .b-face");
+  if (!from || !to) return;
+  const a = from.getBoundingClientRect(), c = to.getBoundingClientRect();
+  const sx = a.left + 26, sy = a.top + a.height / 2; // 她的頭像(卡片左邊)
+  const ex = c.left + c.width / 2, ey = c.top + c.height / 2;
+  const px = v => `${v.toFixed(0)}px`;
+  const layer = el("div", { class: "ally-petals", "aria-hidden": "true" }, Array.from({ length: 16 }, (_, k) => {
+    const ang = Math.random() * Math.PI * 2, burst = 30 + Math.random() * 40;
+    const vars = {
+      s: `${(7 + Math.random() * 6).toFixed(1)}px`, d: `${(.95 + Math.random() * .2).toFixed(2)}s`, delay: `${(1.25 + k * .02).toFixed(2)}s`,
+      sx: px(sx), sy: px(sy),
+      bx: px(sx + Math.cos(ang) * burst), by: px(sy + Math.sin(ang) * burst - 20),
+      mx: px((sx + ex) / 2 + (Math.random() - .5) * 100), my: px(Math.min(sy, ey) - 25 - Math.random() * 45),
+      ex: px(ex + (Math.random() - .5) * 24), ey: px(ey + (Math.random() - .5) * 24)
+    };
+    return el("i", { style: Object.entries(vars).map(([k2, v]) => `--${k2}:${v}`).join(";") });
+  }));
+  document.body.appendChild(layer);
+  setTimeout(() => layer.remove(), 3300);
+}
+
 // 夥伴出手的特寫:一條斜斜的橫幅帶著頭像和招式名劃過舞台;播完就拿掉
 function allyCutIn(A, skillName) {
   const node = el("div", { class: "ally-cut" }, [
@@ -4509,7 +4625,7 @@ function renderPrologue() {
   };
   const chips = b.statuses.map(s => {
     const def = CONTENT.statusEffectCatalog[s.name];
-    const cls = ["b-chip", fx && fx.gained === s.name ? "new" : "", b.chipOpen === s.name ? "on" : ""].join(" ").trim();
+    const cls = ["b-chip", fx && fx.gained === s.name ? "new" : "", fx && fx.allyBloom && fx.gained === s.name ? "ally-gift" : "", b.chipOpen === s.name ? "on" : ""].filter(Boolean).join(" ");
     return el("button", { class: cls, style: `--c:${def.color}`, onclick: toggleChip(s.name), "aria-label": `${s.name}，還剩 ${s.left} 回合` }, [
       def.mark, el("em", null, [String(s.left)])
     ]);
@@ -4526,10 +4642,20 @@ function renderPrologue() {
         el("div", { class: "b-face shadow" }), el("span", null, ["查看自身"])
       ]);
 
+  // 頭像外面一層:花蔭還在時花瓣繞著轉;夥伴剛出手時綻開一圈梅花;花蔭擋下傷害時花瓣炸開
+  const petals = (cls, angles, inner) => el("i", { class: cls }, angles.map((a, k) => el("i", { style: `--a:${a}deg` }, inner ? [el("b", { style: `--k:${k}` })] : [])));
+  const faceWrap = el("div", { class: "b-face-wrap" }, [
+    myFace,
+    b.statuses.some(s => s.name === "花蔭") ? petals(fx && fx.allyBloom ? "b-ward fresh" : "b-ward", [0, 120, 240]) : null,
+    fx && fx.allyBloom ? petals("b-bloom", [0, 60, 120, 180, 240, 300], true) : null,
+    fx && fx.wardBreak ? petals("b-ward-break", [0, 45, 90, 135, 180, 225, 270, 315]) : null
+  ]);
+  if (fx && fx.allyBloom && !REDUCE_MOTION) requestAnimationFrame(allyPetals);
+
   // 自己的狀態放進底部選項框的右半邊
-  const meCls = ["b-me", fx && fx.hurt ? "b-hit" : "", fx && fx.dot ? "b-dot" : ""].join(" ").trim();
+  const meCls = ["b-me", fx && fx.hurt ? "b-hit" : "", fx && fx.dot ? "b-dot" : "", fx && fx.allyBloom ? "b-blessed" : ""].filter(Boolean).join(" ");
   const mePanel = el("div", dotColor ? { class: meCls, style: `--c:${dotColor}` } : { class: meCls }, [
-    el("div", { class: "b-me-head" }, [myFace, el("div", { class: "b-me-id" }, [
+    el("div", { class: "b-me-head" }, [faceWrap, el("div", { class: "b-me-id" }, [
       el("div", { class: "b-name" }, [playerName(), el("span", { class: "b-realm" }, [P.playerRealm || "？？？"])]),
       el("div", { class: "b-chips" }, chips)
     ])]),
