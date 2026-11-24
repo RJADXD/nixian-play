@@ -434,12 +434,17 @@ const CONTENT = {
     ]
   },
 
+  // 沒寫碰撞劇情的身份,碰撞畫面用這段(之後每個身份寫了自己的主線就會取代)
+  collisionDefault: "你撞進了這具軀殼。他的意識像一堵牆，死死擋在你面前。\n你在黑暗裡掙扎了不知多久，那股意志才一點一點鬆開，終於歸於沉寂。\n你睜開眼，用一雙陌生的眼睛，看著這個世界。",
+
   /* ============================================================
      開局身份池 (90 個)
      - collision:完整的侵入/碰撞描述(目前僅體質類 10 個已寫)
      - innerDemon:心魔資料(theme / indulge / resist),目前僅體質類已寫
      - verse:判詞(選身份介紹頁直排的那兩句,寫這個人的命),體質類 10 個和選身份畫面上的 9 個已寫
-     - 沒有 collision 的身份,先沿用其他分類通用模板文字
+     - 沒有 collision 的身份,碰撞畫面用上面的 collisionDefault
+     - 選身份畫面上的 9 個(鐵匠、重刑犯、武將後代、算命師、逃婚少爺、雷擊倖存者、舞者、師爺、破產賭徒)
+       2026-11-24 使用者要大洗牌:故事全部清掉,只留名字和分類,之後每個身份要有自己的主線
      - 沒有 innerDemon 的身份,不會觸發心魔試煉事件
      ============================================================ */
   identities: [
@@ -469,11 +474,7 @@ const CONTENT = {
       intro:"常年風吹日曬撐船，性格硬朗，一身摸不透的水氣。",
       collision:"江面上，你如浪潮般侵入他的軀體。他沒有防備地站著——但那種對抗流水氣質的直覺，如同漩渦般把你死死沖住，幾乎把你逼退出去。你在暗流裡搏鬥，直到那行意志終於崩潰。你贏了，但對水的畏懼，如今成了你血脈深處的暗湧。",
       innerDemon:{ theme:"畏懼安穩", indulge:"隨波逐流不作為", resist:"死也不要放下肩上之責" } },
-    { id:"blacksmith", name:"鐵匠", category:"體質",
-      verse:"爐火未熄，好劍未成；\n千錘萬鍊，不肯將就。",
-      intro:"打了半輩子鐵器，骨架粗於常人，那身影都帶著鐵器味。",
-      collision:"爐火正燒旺，你侵入了他。他沒有以為過——鐵器落下的執念如附骨幻影死死地扎，「我要打一把好的劍！」這股意念幾乎將你逼出這具軀殼。你死死忍住不放，直到那行意志漸漸崩潰、沉寂。你贏了，但那句「一把好劍」，如今成了你血脈深處的暗湧。",
-      innerDemon:{ theme:"執火之心", indulge:"追求完美", resist:"甘於沉寂" } },
+    { id:"blacksmith", name:"鐵匠", category:"體質" },
     { id:"hunter", name:"獵人", category:"體質",
       verse:"深山獨行，箭不離手；\n寧信猛獸，不信人心。",
       intro:"在崇山峻嶺討生活，膽識過人，沒東西能讓正常入他。",
@@ -503,7 +504,7 @@ const CONTENT = {
     { id:"patrol", name:"捕快", category:"根骨", intro:"執掌捕鎮的巡邏鍛鍊出身，常年操練，骨頭是好人硬不了。" },
     { id:"bandit", name:"山賊", category:"根骨", intro:"盤桓在山上混，身上一不小心搞了活得好好磨，硬闖得很。" },
     { id:"carrier", name:"搬運工", category:"根骨", intro:"常年扛重物翻山越嶺，舉一舉骨頭都練出了韌性。" },
-    { id:"convict", name:"重刑犯", category:"根骨", intro:"蹲過牢，牢裡什麼都得學挨打，那委屈都能扛下去。", verse:"鐐銬十年，皮開骨硬；\n世人皆說，罪有應得。" },
+    { id:"convict", name:"重刑犯", category:"根骨" },
     { id:"tamer", name:"馴獸師", category:"根骨", intro:"常被自己養的獸相誤傷，也因此練出了抗撞體質。" },
     { id:"enforcer", name:"賭場打手", category:"根骨", intro:"專攔搶人收帳討錢，天天被打天天還揍，皮膚敲就練實了。" },
 
@@ -513,7 +514,7 @@ const CONTENT = {
     { id:"woodcutter", name:"樵夫", category:"體魄", intro:"日日砍柴賣柴，力氣過人，砍柴砍出一身蠻力。" },
     { id:"boxer", name:"拳師", category:"體魄", intro:"走鏢賣藝練出身，出拳有千鈞，靠拳頭換飯。" },
     { id:"quarryhead", name:"工頭", category:"體魄", intro:"帶人挖山鑿石，粗壯身材，一句話不合就動拳。" },
-    { id:"generalheir", name:"武將後代", category:"體魄", intro:"家裡中落但生子遺氣猶存，一身蠻力是祖上唯一遺產。", verse:"祖上封侯，門庭冷落；\n一身蠻力，守著空名。" },
+    { id:"generalheir", name:"武將後代", category:"體魄" },
     { id:"thug", name:"地痞", category:"體魄", intro:"少爺人跑腿收帳，以拳頭服人，講的也全靠拳頭。" },
     { id:"cattledealer", name:"牛販", category:"體魄", intro:"常年拉扯牛隻，力氣異於常人，舉牛是牛人間的練。" },
     { id:"outlaw", name:"亡命之徒", category:"體魄", intro:"逃亡路上什麼粗活都幹過，出手誰都果決。" },
@@ -522,7 +523,7 @@ const CONTENT = {
     // ---- 悟性類 ----
     { id:"healer", name:"大夫", category:"悟性", intro:"稍知醫術，遊走坊間湊活口飯，對「氣」這種東西別有敏感。" },
     { id:"scholar", name:"書生", category:"悟性", intro:"屢試不第窮酸書生，一肚子墨水沒地方用，倒是對古籍別有一套。" },
-    { id:"fortuneteller", name:"算命師", category:"悟性", intro:"街坊間行走賺個小賞，測字準確確實是辣。", verse:"替人算命，字字皆準；\n唯獨自己，算不出路。" },
+    { id:"fortuneteller", name:"算命師", category:"悟性" },
     { id:"chessplayer", name:"棋手", category:"悟性", intro:"一輩子都在琢磨棋局，腦子轉得很快，看人跟看棋一樣犀利。" },
     { id:"teacher", name:"教書先生", category:"悟性", intro:"教書多年，悟性過人，只是學生沒幾個能跟得他在講什麼。" },
     { id:"scribe", name:"抄書匠", category:"悟性", intro:"抄了半輩子古籍書籍，字跡潦草，腦子裡裝了不少雜學。" },
@@ -532,7 +533,7 @@ const CONTENT = {
     { id:"expelled", name:"被逐弟子", category:"悟性", intro:"曾被某宗門逐出學，根骨其實不差，只是脾氣不小。" },
 
     // ---- 氣運類 ----
-    { id:"runaway", name:"逃婚少爺", category:"氣運", intro:"被爹逼相親嚇人，連夜翻牆逃跑路，誤打誤撞踏進深山——命是真的很硬。", verse:"連夜翻牆，誤入深山；\n命硬如此，天也難收。" },
+    { id:"runaway", name:"逃婚少爺", category:"氣運" },
     { id:"gambler", name:"賭徒", category:"氣運", intro:"每賭必輸總在關鍵時刻翻盤，自己都覺得荒唐又奇怪。" },
     { id:"luckyorphan", name:"幸運孤兒", category:"氣運", intro:"打小就被說命裡帶福，沒人知道為什麼，反正每次總能逢凶化吉。" },
     { id:"scavenger", name:"拾荒者", category:"氣運", intro:"常在別人扔掉的地方撿到寶物，鄰居都說他氣運怪異。" },
@@ -552,7 +553,7 @@ const CONTENT = {
     { id:"herbpicker", name:"採藥人", category:"靈根", intro:"常年在靈氣濃郁處活動，體質漸漸起了變化，自己卻渾然不覺。" },
     { id:"furnacechild", name:"丹爐遺童", category:"靈根", intro:"自小在廢棄丹爐旁長大，吸了不少殘留靈氣長大。" },
     { id:"cultivatororphan", name:"修士遺孤", category:"靈根", intro:"血脈裡帶著一絲先天靈根，只是連自己都不知道。" },
-    { id:"lightningsurvivor", name:"雷擊倖存者", category:"靈根", intro:"遭天雷劈中卻奇蹟生還，從此體質異於常人。", verse:"天雷劈頂，竟未成灰；\n天要他死，他偏不死。" },
+    { id:"lightningsurvivor", name:"雷擊倖存者", category:"靈根" },
     { id:"omenchild", name:"異象童子", category:"靈根", intro:"出生時就異象滿天，鄰里穩婆都說這孩子命氣特殊。" },
 
     // ---- 身法類 ----
@@ -560,7 +561,7 @@ const CONTENT = {
     { id:"acrobat", name:"雜耍藝人", category:"身法", intro:"走江湖靠雜耍維生，身手矯健，翻滾跳躍是家常便飯。" },
     { id:"swiftpicker", name:"採茶人", category:"身法", intro:"小箍窄峭壁採茶維生，飛簷走壁是吃飯本事。" },
     { id:"messenger", name:"信差", category:"身法", intro:"常年快馬加鞭送信，反應敏快，晚一步就要挨罵。" },
-    { id:"dancer", name:"舞者", category:"身法", intro:"身段靈活，步法輕盈，一舉一動都帶著韻律。", verse:"一曲霓裳，滿堂喝采；\n曲終人散，誰記其名。" },
+    { id:"dancer", name:"舞者", category:"身法" },
     { id:"deserter", name:"逃兵", category:"身法", intro:"從戰場上跑得比誰都快撤活下來，實用就是他的護身符。" },
     { id:"tightrope", name:"走繩藝人", category:"身法", intro:"平衡感和反應敏異於常人，一根繩子上討生活。" },
     { id:"boatpuller", name:"縴夫之子", category:"身法", intro:"從小在江邊討生活，腳程矯健，水裡陸上都靈活。" },
@@ -576,7 +577,7 @@ const CONTENT = {
     { id:"travelinghealer", name:"遊醫", category:"全能", intro:"醫術、武術、雜學樣樣沾一點，靠的就是一身雜學。" },
     { id:"jackofall", name:"雜工", category:"全能", intro:"幹過各份工作，雜學不少，倒什麼都能撐個大概。" },
     { id:"accountant", name:"帳房先生", category:"全能", intro:"算帳跟武藝都要會，拳武帶頭疼，倒也練出一身本事。" },
-    { id:"clerk", name:"師爺", category:"全能", intro:"文書、人情世故、法律都懂，是縣太爺面前不缺的雜事眼。", verse:"筆下判人，生死一行；\n縣太爺前，自己無名。" },
+    { id:"clerk", name:"師爺", category:"全能" },
     { id:"knowitall", name:"百事通", category:"全能", intro:"什麼都知道一點，什麼都不精通，消息卻是誰都靈通。" },
 
     // ---- 無徵兆類 ----
@@ -588,7 +589,7 @@ const CONTENT = {
     { id:"blindwanderer", name:"盲人", category:"無徵兆", intro:"自幼雙目失明，旁人常因他的缺陷而小看他，反而讓他磨練出許多不必要的敏銳。", specialBonus:"探索遭遇隨機鬼魅機會的降低" },
     { id:"sickly", name:"病人", category:"無徵兆", intro:"自小體弱多病，大夫都說他活不長，倒也活到了現在。", specialBonus:"起始培元丹 +2" },
     { id:"eternalstudent", name:"老書生", category:"無徵兆", intro:"讀了半輩子書卻什麼都沒讀出個名堂，倒也不算白讀。", specialBonus:"悟性類別更易觸發的機率" },
-    { id:"desperategambler", name:"破產賭徒", category:"無徵兆", intro:"輸光了家產，只剩一條命，索性賭一把換命修仙。", verse:"家財散盡，只剩一命；\n索性押上，賭天一回。", specialBonus:"起始靈石極少，但更易觸發的機率" },
+    { id:"desperategambler", name:"破產賭徒", category:"無徵兆" },
     { id:"nobody", name:"無名氏", category:"無徵兆", intro:"那個什麼稱呼都沒有，平凡到不行——但誰知道呢。", specialBonus:"無特殊調整，純粹白紙" }
   ],
 

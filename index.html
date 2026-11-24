@@ -4953,7 +4953,7 @@ function renderIdentityDetail(entry) {
     open ? el("span", { class: "tag" }, [idt.category + "類"]) : null,
     el("h1", null, [open ? idt.name : "未知"]),
     open ? null : el("p", { class: "id-unlock" }, [el("b", null, ["此命未明"]), `機緣：${entry.unlock.hint || "未知"}`]),
-    el("p", { class: "id-intro" }, [open ? idt.intro : "此人之命，尚未向你展開。"]),
+    open ? (idt.intro ? el("p", { class: "id-intro" }, [idt.intro]) : null) : el("p", { class: "id-intro" }, ["此人之命，尚未向你展開。"]),
     el("h2", null, ["根基"]),
     el("div", { class: "id-stats" }, stats),
     el("h2", null, ["心魔"]),
@@ -5048,7 +5048,7 @@ function renderCollision() {
     panel([
       el("span", { class: "tag" }, [idt.category + "類"]),
       el("h1", null, [idt.name]),
-      storyText(idt.collision || idt.intro, [], actions)
+      storyText(idt.collision || CONTENT.collisionDefault, [], actions)
     ]),
     actions
   ]);
