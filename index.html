@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@400;700&display=swap">
+<!-- 死亡畫面的大字:思源宋體最粗(900),只載入「魂滅」兩個字;content.js 的 deathWord 改了字,這裡的 text= 也要跟著改 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&text=%E9%AD%82%E6%BB%85&display=block">
 <style>
   :root {
     --bg: #14100c;
@@ -636,6 +638,8 @@
     margin-bottom: 6px;
   }
   .story.done .story-tools { visibility: hidden; }
+  /* 劇情裡的「查看自身」(桃花村、支線):靠左,文字打完也一直在 */
+  .story-tools button.peek-in { visibility: visible; margin-right: auto; color: var(--gold); border-color: rgba(201,161,90,.6); }
   .story-tools button {
     font: inherit;
     font-size: 12px;
@@ -737,6 +741,26 @@
     scrollbar-color: var(--border) transparent;
   }
   .status-head .meta { margin-bottom: 0; }
+  /* 查看自身的三頁:狀態、術法、道具 */
+  .status-tabs { width: 100%; max-width: 672px; flex: none; display: flex; gap: 8px; padding: 12px 16px 0; }
+  .status-tabs button {
+    flex: 1;
+    font: inherit;
+    font-size: 15px;
+    letter-spacing: .3em;
+    text-indent: .3em;
+    color: var(--dim);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 0;
+    cursor: pointer;
+  }
+  .status-tabs button.on { color: var(--gold); border-color: var(--gold); background: rgba(201,161,90,.1); }
+  .kit-list { display: flex; flex-direction: column; gap: 8px; }
+  .kit-row { padding: 10px 12px; background: #241b12; border: 1px solid var(--border); border-radius: 4px; }
+  .kit-row b { display: block; color: var(--gold); font-weight: normal; letter-spacing: .1em; margin-bottom: 4px; }
+  .kit-row span { color: var(--dim); font-size: 14px; line-height: 1.7; }
   /* 頭像:身份圖片還沒到,先用剪影代替 */
   .portrait {
     width: 84px;
@@ -3072,104 +3096,252 @@
   @keyframes side-got { 0% { text-shadow: 0 0 12px rgba(255,214,140,.95); } 100% { text-shadow: none; } }
   .side-end { margin-top: 18px; color: var(--gold); letter-spacing: .15em; font-size: 14px; }
 
-  /* ---- 死亡畫面:畫面一紅、一道血墨刷過,大字一個一個暈開浮現,殘魂從字底下升起飄走;接著成就、選項 ---- */
+  /* ---- 死亡畫面(魂滅)----
+     1. 失去知覺(還在劇情畫面上):心跳兩下,畫面褪色、模糊,四周的黑一點一點往中間收
+     2. 黑暗裡浮出一塊石面,囈花像雪一樣落下
+     3. 大字一個一個刻進石頭:由上往下鑿開、迸出火星,刻痕裡燒著餘火
+     4. 刻完一震:石面龜裂、震波散開,餘火像心跳一樣再燒旺兩次(不甘心),才慢慢壓低
+     5. 一朵紅梅(放不下的那一念)逆著落花往上升,停在字的上方不散;接著一行字、成就、選項
+     時間都從 --imp(刻完那一震的時間,JS 依字數算)往後排;點畫面直接跳到最後 */
+  .screen.dying { animation: dying 1.9s ease-in forwards; transform-origin: 50% 40%; }
+  @keyframes dying {
+    0% { filter: none; transform: scale(1); }
+    8% { transform: scale(1.016); filter: brightness(.7) saturate(.8); }
+    16% { transform: scale(1); filter: brightness(.9) saturate(.8); }
+    27% { transform: scale(1.01); filter: brightness(.65) saturate(.5); }
+    36% { transform: scale(1); filter: brightness(.8) saturate(.4) blur(.5px); }
+    70% { filter: grayscale(.9) blur(2.5px) brightness(.5); transform: scale(1.025); }
+    100% { filter: grayscale(1) blur(5px) brightness(.08); transform: scale(1.04); }
+  }
+  .dying-veil { /* 四周的黑往中間收;蓋住整個畫面,這時候不能再點 */
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    box-shadow: inset 0 0 0 0 #000;
+    animation: dying-veil 1.9s linear forwards;
+  }
+  @keyframes dying-veil {
+    35% { box-shadow: inset 0 0 14vmin 2vmin rgba(0,0,0,.9); }
+    70% { box-shadow: inset 0 0 22vmin 14vmin #000; }
+    100% { box-shadow: inset 0 0 20vmin 60vmax #000; }
+  }
   .death {
     position: fixed;
     inset: 0;
     z-index: 1;
     overflow: hidden;
-    background: radial-gradient(ellipse 80% 60% at 50% 42%, #1b0b09 0%, #090605 62%, #000 100%);
-    animation: fade-in .5s ease-out both;
+    background: #000;
   }
-  .death::before { /* 挨了一掌:整個畫面紅一下 */
+  .death::after { /* 四周一直是暗的 */
     content: "";
     position: absolute;
     inset: 0;
-    background: #8a1410;
-    opacity: 0;
-    animation: death-flash .5s ease-out both;
+    pointer-events: none;
+    background: radial-gradient(ellipse 75% 60% at 50% 40%, transparent 35%, rgba(0,0,0,.85) 100%);
   }
-  @keyframes death-flash { 0% { opacity: .55; } 100% { opacity: 0; } }
-  .death .b-dust { z-index: 0; }
-  .death-band {
+  .death-glow { /* 黑暗裡慢慢亮起一點暖光 */
     position: absolute;
-    left: -4%;
-    right: -4%;
-    top: calc(42% - 70px);
-    height: 140px;
-    clip-path: inset(0 100% 0 0);
-    animation: death-sweep .6s .35s cubic-bezier(.25,.8,.3,1) forwards;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 45% at 50% 40%, #1d1410 0%, #0a0706 55%, #000 100%);
+    opacity: 0;
+    animation: death-show 1.6s .1s ease-out forwards;
   }
-  .death-band svg { width: 100%; height: 100%; display: block; }
-  @keyframes death-sweep { to { clip-path: inset(0 0 0 0); } }
+  .death-stage { position: absolute; inset: 0; animation: death-shake .5s var(--imp) linear both; }
+  @keyframes death-shake {
+    0%, 100% { transform: none; }
+    12% { transform: translate(-7px, 4px); }
+    26% { transform: translate(6px, -5px); }
+    40% { transform: translate(-4px, -3px); }
+    56% { transform: translate(3px, 3px); }
+    72% { transform: translate(-2px, 1px); }
+  }
+  .death-slab { /* 石面:雜訊紋理,邊緣融進黑暗 */
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    width: min(96vw, 620px);
+    height: min(68vw, 300px);
+    transform: translate(-50%, -50%);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .36 0 0 0 0 .31 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse at 50% 45%, #3b3029 0%, #231b16 55%, #120d0a 100%);
+    -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 45%, transparent 100%);
+    mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 45%, transparent 100%);
+    opacity: 0;
+    animation: death-show 1.4s .3s ease-out forwards;
+  }
+  .death-cracks { /* 刻完一震,石面裂開;裂縫先燒紅,再冷下去 */
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    width: min(96vw, 620px);
+    height: min(68vw, 300px);
+    transform: translate(-50%, -50%);
+    overflow: visible;
+    filter: drop-shadow(0 0 4px rgba(255,110,50,.9));
+    animation: death-crack-cool 3s calc(var(--imp) + .35s) ease-out both;
+  }
+  .death-cracks path {
+    fill: none;
+    stroke: #ffb27a;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    vector-effect: non-scaling-stroke;
+    animation: death-crack .4s var(--imp) cubic-bezier(.2,.8,.3,1) forwards;
+  }
+  @keyframes death-crack { to { stroke-dashoffset: 0; } }
+  @keyframes death-crack-cool { to { filter: drop-shadow(0 0 2px rgba(160,40,20,.6)) brightness(.45); } }
+  .death-ring { /* 震波 */
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    width: 160px;
+    height: 160px;
+    margin: -80px 0 0 -80px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,190,130,.85);
+    box-shadow: 0 0 24px rgba(255,120,60,.6), inset 0 0 18px rgba(255,120,60,.4);
+    opacity: 0;
+    animation: death-ring .9s var(--imp) cubic-bezier(.15,.7,.3,1) forwards;
+  }
+  @keyframes death-ring { 0% { opacity: 1; transform: scale(.3); } 100% { opacity: 0; transform: scale(3.6); } }
   .death-word {
     position: absolute;
     left: 0;
     right: 0;
-    top: 42%;
+    top: 40%;
     transform: translateY(-50%);
     text-align: center;
     white-space: nowrap;
-    font-family: "LXGW WenKai TC", var(--font-body);
-    font-weight: 700;
-    font-size: clamp(44px, 13vw, 80px);
-    letter-spacing: .28em;
-    text-indent: .28em; /* 字距加在每個字後面,往右補回來才會置中 */
-    color: #f1e6d2;
-    text-shadow: 0 0 22px rgba(200,40,28,.8), 0 0 3px #000, 0 2px 0 #2a0503;
+    font-family: "Noto Serif TC", serif;
+    font-weight: 900;
+    font-size: clamp(88px, 30vw, 172px);
+    line-height: 1;
+    letter-spacing: .08em;
+    text-indent: .08em;
   }
-  .death-word span {
-    display: inline-block;
-    opacity: 0;
-    animation: death-ink 1s calc(.85s + var(--i) * .24s) cubic-bezier(.2,.7,.25,1) forwards;
+  .dw-ch { position: relative; display: inline-block; }
+  .dw-ch i { /* 刻痕和餘火是同一個字疊兩層,一起由上往下鑿開;四周多留空間,光暈才不會被遮罩切成方框 */
+    display: block;
+    font-style: normal;
+    padding: .45em;
+    margin: -.45em;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0 42%, transparent 58%);
+    mask-image: linear-gradient(to bottom, #000 0 42%, transparent 58%);
+    -webkit-mask-size: 100% 240%;
+    mask-size: 100% 240%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 0 100%;
+    mask-position: 0 100%;
+    animation: dw-carve .9s calc(.7s + var(--i) * .75s) cubic-bezier(.5,.1,.4,1) forwards;
   }
-  @keyframes death-ink {
-    0% { opacity: 0; filter: blur(12px); transform: scale(1.4); }
-    55% { opacity: 1; filter: blur(1px); }
-    100% { opacity: 1; filter: blur(0); transform: scale(1); }
+  @keyframes dw-carve { to { -webkit-mask-position: 0 0; mask-position: 0 0; } }
+  .dw-groove { /* 刻進石頭的凹痕:上緣暗、下緣反光 */
+    color: #0b0605;
+    text-shadow: 0 3px 1px rgba(255,214,180,.2), 0 -2px 2px rgba(0,0,0,.95), 0 0 1px #000;
   }
-  .death-soul { /* 殘魂:一團冷白的光,從字底下升起,飄出畫面 */
+  .dw-ch .dw-fire { /* 刻痕裡的餘火 */
     position: absolute;
-    left: 50%;
-    top: calc(42% + 40px);
-    width: 14px;
-    height: 14px;
-    margin-left: -7px;
+    inset: -.45em;
+    margin: 0;
+    background-origin: content-box;
+    background: linear-gradient(to bottom, #ffe2a8 0%, #f08a3a 18%, #b8301a 46%, #6e0f08 80%, #3a0604 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(255,100,40,.75));
+    animation: dw-carve .9s calc(.7s + var(--i) * .75s) cubic-bezier(.5,.1,.4,1) forwards, dw-burn 3.4s var(--imp) ease-out forwards;
+  }
+  @keyframes dw-burn { /* 一震燒到最亮,接著像心跳一樣再旺兩次(不甘心),最後壓成暗紅 */
+    0% { filter: brightness(2.3) drop-shadow(0 0 30px rgba(255,150,70,1)); }
+    14% { filter: brightness(1) drop-shadow(0 0 10px rgba(255,100,40,.75)); }
+    28% { filter: brightness(1.7) drop-shadow(0 0 22px rgba(255,120,50,.9)); }
+    40% { filter: brightness(.85) drop-shadow(0 0 8px rgba(230,80,30,.6)); }
+    56% { filter: brightness(1.45) drop-shadow(0 0 18px rgba(255,110,45,.85)); }
+    70% { filter: brightness(.7) drop-shadow(0 0 7px rgba(210,60,25,.55)); }
+    100% { filter: brightness(.5) drop-shadow(0 0 6px rgba(170,35,15,.55)); }
+  }
+  .dw-spark { /* 鑿的時候迸出的火星 */
+    position: absolute;
+    width: 3px;
+    height: 3px;
     border-radius: 50%;
-    background: radial-gradient(circle, #fff 0%, #d9f0ff 45%, rgba(160,210,255,0) 72%);
-    box-shadow: 0 0 18px 7px rgba(170,215,255,.55);
+    background: #fff0c4;
+    box-shadow: 0 0 6px 2px rgba(255,160,70,.9);
     opacity: 0;
-    animation: death-soul 2.6s 2s ease-in forwards;
+    animation: dw-spark .55s var(--d) ease-out forwards;
   }
-  .death-soul::after { /* 拖在後面的尾巴 */
-    content: "";
+  @keyframes dw-spark { 0% { opacity: 1; transform: translate(0, 0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)); } }
+  .death-petals { position: absolute; inset: 0; pointer-events: none; opacity: 0; animation: death-show 2.4s .4s ease-out forwards; }
+  .death-petals b { /* 囈花像雪一樣落:外層往下掉,裡層左右飄、翻轉 */
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    animation: dw-fall var(--dur) var(--delay) linear infinite;
+  }
+  .death-petals i {
+    display: block;
+    width: var(--s);
+    height: calc(var(--s) * .7);
+    border-radius: 0 100% 0 100%;
+    background: radial-gradient(circle at 30% 35%, #fff7dc 0%, #f3c96e 50%, #b77b26 100%);
+    box-shadow: 0 0 8px rgba(255,205,120,.55);
+    opacity: var(--o);
+    filter: blur(var(--blur));
+    animation: dw-sway calc(var(--dur) / 3) ease-in-out infinite alternate;
+  }
+  @keyframes dw-fall { from { transform: translateY(-14vh); } to { transform: translateY(114vh); } }
+  @keyframes dw-sway { from { transform: translateX(calc(var(--sw) * -1)) rotate(-40deg); } to { transform: translateX(var(--sw)) rotate(220deg); } }
+  .death-plum { /* 放不下的那一念:一朵紅梅逆著落花升起,停在字的上方不散 */
     position: absolute;
     left: 50%;
-    top: 60%;
-    width: 4px;
-    height: 46px;
-    margin-left: -2px;
-    border-radius: 2px;
-    background: linear-gradient(rgba(200,230,255,.6), rgba(200,230,255,0));
+    top: calc(40% + 70px);
+    width: 26px;
+    height: 26px;
+    margin-left: -13px;
+    filter: drop-shadow(0 0 8px rgba(255,80,70,.9)) drop-shadow(0 0 18px rgba(255,60,50,.5));
+    opacity: 0;
+    animation: dw-plum-rise 2.8s calc(var(--imp) + 1.3s) cubic-bezier(.3,.6,.3,1) forwards, dw-plum-bob 3.2s calc(var(--imp) + 4.1s) ease-in-out infinite alternate;
   }
-  @keyframes death-soul {
-    0% { opacity: 0; transform: translate(0, 0) scale(.6); }
-    18% { opacity: 1; transform: translate(-6px, -4vh) scale(1); }
-    45% { transform: translate(8px, -16vh); }
-    75% { opacity: .8; transform: translate(-6px, -30vh) scale(.85); }
-    100% { opacity: 0; transform: translate(4px, -48vh) scale(.5); }
+  .death-plum svg { width: 100%; height: 100%; display: block; }
+  @keyframes dw-plum-rise {
+    0% { opacity: 0; transform: translateY(0) scale(.3) rotate(0); }
+    20% { opacity: 1; }
+    100% { opacity: 1; transform: translateY(calc(-1 * min(30vw, 172px) - 70px)) scale(1) rotate(160deg); }
   }
+  @keyframes dw-plum-bob {
+    from { opacity: 1; transform: translateY(calc(-1 * min(30vw, 172px) - 70px)) scale(1) rotate(160deg); }
+    to { opacity: .8; transform: translateY(calc(-1 * min(30vw, 172px) - 80px)) scale(.92) rotate(190deg); }
+  }
+  .death-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(40% + min(15vw, 86px) + 26px);
+    text-align: center;
+    color: #dccbaa;
+    font-size: 17px;
+    letter-spacing: .3em;
+    text-indent: .3em;
+    text-shadow: 0 0 10px rgba(0,0,0,.9);
+  }
+  .death-line span { display: inline-block; opacity: 0; animation: dw-line .9s calc(var(--imp) + 1s + var(--i) * .1s) ease-out forwards; }
+  @keyframes dw-line { from { opacity: 0; filter: blur(6px); transform: translateY(6px); } to { opacity: 1; filter: blur(0); transform: none; } }
   .death-achv {
     position: absolute;
     left: 0;
     right: 0;
-    top: calc(42% + 74px);
+    top: calc(40% + min(15vw, 86px) + 66px);
     text-align: center;
     color: #d8c39a;
     font-size: 15px;
     letter-spacing: .12em;
     opacity: 0;
-    animation: death-show .8s 2.9s ease-out forwards;
+    animation: death-show .8s calc(var(--imp) + 2.4s) ease-out forwards;
   }
   @keyframes death-show { to { opacity: 1; } }
   .death-achv b { /* 「成就」兩個字蓋成一顆小紅印 */
@@ -3187,9 +3359,11 @@
   .screen.death-screen > .console {
     position: relative;
     z-index: 2;
-    animation: death-dock .6s 3.3s ease-out both;
+    animation: death-dock .6s calc(var(--imp) + 3s) ease-out both;
   }
   @keyframes death-dock { from { opacity: 0; visibility: hidden; } to { opacity: 1; visibility: visible; } }
+  /* 點畫面略過:所有只播一次的動畫直接到最後(會循環的落花、紅梅照樣動) */
+  .screen.death-screen.skip *, .screen.death-screen.skip > .console { animation-delay: -40s !important; }
   @media (prefers-reduced-motion: reduce) {
     .scene-stage, .scene-petals b { animation: none !important; }
     .ally-petals, .b-bloom, .b-ward-break { display: none; }
@@ -3198,8 +3372,8 @@
     .id-motes { display: none; }
     .battle, .battle *, .fade-in { animation: none !important; transition: none !important; }
     .b-float, .b-fx, .b-intro, .pick-fx, .pick-ghost { display: none; }
-    .death, .death *, .death::before, .death-band, .death-word span, .death-achv, .screen.death-screen > .console { animation-duration: .01s !important; animation-delay: 0s !important; }
-    .death-soul { display: none; }
+    .death-petals, .death-plum { display: none; }
+    .dying-veil { display: none; }
   }
 </style>
 </head>
@@ -3240,6 +3414,7 @@ const TENDENCY_STEP = 15; // 一次心魔抉擇推動情理值的幅度(暫定)
 
 // 這些畫面上方會出現「查看自身」(序章首戰另外放在戰鬥畫面頂端)
 const STATUS_PHASES = ["collision", "trial", "trialResult", "loop", "loopResult", "summary"];
+const STORY_PEEK_PHASES = ["child", "side"]; // 這些劇情畫面的「查看自身」放在劇情框裡(見 storyText)
 
 function buildAttributes(category) {
   const attrs = { ...BASE_ATTRS };
@@ -3276,8 +3451,9 @@ const state = {
   soulEcho: "record", // 測試用:前世殘念 record 照紀錄(上一輪選錯的回合才出現) / force 每回合都出現 / off 關
   hint: "on",       // 測試用:亮光提示 on = 每回合正解的指令和抽屜裡那一項外框亮起 / off 關
   allyTheme: "pink", // 測試用:夥伴配色(見 ALLY_THEMES),選定後拿掉
-  deathWord: "身消道殞", // 測試用:死亡畫面的大字(content.js 的 deathWords),選定後拿掉
   side: null,       // 支線(試玩版):{ node 目前的段落, bag 背包裡的東西, got 剛拿到的 }
+  kit: null,        // 身上的術法和道具(桃花村一路拿到的,見 content.js 選項的 learn、gain):{ skills: [id], items: [id] }
+  statusTab: "status", // 查看自身正在看哪一頁:status 狀態 / skills 術法 / items 道具
   awaken: null,     // 第一次進遊戲的開場:"intro" 播放中、"out" 播完正在淡出、null 沒有
   selectId: null    // 選身份:正在看介紹的身份(null = 卡片牆)
 };
@@ -3306,6 +3482,7 @@ function startRun(identityId) {
   state.round = 0;
   state.qingli = 50;
   state.morality = 50;
+  state.kit = null; // 新的身體,桃花村那些東西都不在身上了
   state.phase = "opening";
   render();
 }
@@ -3700,10 +3877,12 @@ function storyText(text, after, actions, onDone) {
   const hint = el("span", { class: "story-hint" }, ["▼"]);
   const autoBtn = el("button", { class: reading.auto ? "on" : "" }, ["自動"]);
   const skipBtn = el("button", null, ["略過"]);
+  // 桃花村、支線沒有上方的工具列,「查看自身」放在這一列的最左邊
+  const peekBtn = STORY_PEEK_PHASES.includes(state.phase) ? el("button", { class: "peek-in", onclick: openStatus }, ["查看自身"]) : null;
   const tail = el("div", { class: "story-after" }, after);
   tail.hidden = true;
   if (actions) actions.classList.add("waiting");
-  const box = el("div", { class: "story" }, [el("div", { class: "story-tools" }, [autoBtn, skipBtn]), body, tail]);
+  const box = el("div", { class: "story" }, [el("div", { class: "story-tools" }, [peekBtn, autoBtn, skipBtn]), body, tail]);
 
   let shown = Math.min(storyProgress.get(text) || 0, sentences.length);
   let typing = null, waiting = null, span = null;
@@ -3856,7 +4035,6 @@ function renderTitle() {
       el("div", { class: "title-test" }, [
         testRow("夥伴配色（測試用）：", "allyTheme", ALLY_THEMES),
         el("button", { class: "test-link", onclick: () => startPrologue(CONTENT.childBattle) }, ["（測試）直接到狼戰，點左下角的雪梅花看招式"]),
-        testRow("死亡大字（測試用）：", "deathWord", CONTENT.deathWords.map(w => [w, w])),
         el("button", { class: "test-link", onclick: startTurtle }, ["（測試）支線：千年祥瑞"])
       ])
     ]),
@@ -4200,6 +4378,7 @@ function newCycle() {
 const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function startChildhood() {
   const C = CONTENT.childhood;
+  state.kit = { skills: [], items: [] };
   // 已經取過名字(例如上次玩到一半)就不再問
   state.childNode = player && player.name ? C.nodes[C.start].next : C.start;
   // 從頭開始(還沒取名)才播開場;系統開了「減少動態效果」就不播
@@ -4284,6 +4463,13 @@ function goChild(to) {
   render();
 }
 
+// 選項上寫了 learn(學會的術法)、gain(拿到的道具)就記到身上,查看自身看得到
+function takeKit(c) {
+  if (!state.kit) state.kit = { skills: [], items: [] };
+  (c.learn || []).forEach(id => { if (!state.kit.skills.includes(id)) state.kit.skills.push(id); });
+  (c.gain || []).forEach(id => { if (!state.kit.items.includes(id)) state.kit.items.push(id); });
+}
+
 // 段落的圖(content.js 的 art、artSize、artPos):用一個跟圖同比例的舞台鋪滿畫面(跟 background-size: cover 一樣)
 function sceneStage(node) {
   const [w, h] = node.artSize;
@@ -4333,7 +4519,7 @@ function renderChild() {
     });
     actions = consoleFrame([el("div", { class: "choices name-entry" }, [el("div", { class: "name-row" }, [input, ok]), hint])]);
   } else {
-    actions = dock(node.choices.map(c => choiceButton(fillName(c.label), () => goChild(c.to))));
+    actions = dock(node.choices.map(c => choiceButton(fillName(c.label), () => { takeKit(c); goChild(c.to); })));
   }
   const body = [node.title ? el("h1", null, [node.title]) : null, storyText(fillName(node.text), [], actions)];
   // 有圖的段落:圖鋪滿上方,文字壓在圖的下緣(跟戰鬥畫面一樣)
@@ -4894,6 +5080,7 @@ function renderPrologueEnd() {
 
 function openStatus() {
   state.statusOpen = true;
+  state.statusTab = "status";
   state.statusSlide = true; // 打開那一次從底部滑上來;之後重畫不再滑
   render();
 }
@@ -4917,11 +5104,36 @@ function leanBar(left, right, value) {
   ]);
 }
 
-// 序章裡一切模糊,數值全部顯示「？？？」
+// 身上的術法、道具:支線看背包;其他時候看 state.kit(名字和說明拿戰鬥裡同一個東西的寫法)
+function kitLore(id) {
+  for (const def of [CONTENT.prologueBattle, CONTENT.childBattle]) {
+    const t = [...(def.spells || []), ...(def.items || [])].find(x => x.id === id);
+    if (t) return t;
+  }
+  return { name: id, desc: "" };
+}
+function statusKit() {
+  if (state.phase === "side" && state.side) {
+    const Q = CONTENT.turtleQuest;
+    return { skills: [], items: state.side.bag.map(i => Q.items[i]) };
+  }
+  const k = state.kit || { skills: [], items: [] };
+  return { skills: k.skills.map(kitLore), items: k.items.map(kitLore) };
+}
+function kitList(list, empty) {
+  if (!list.length) return el("div", { class: "text" }, [empty]);
+  return el("div", { class: "kit-list" }, list.map(t => el("div", { class: "kit-row" }, [
+    el("b", null, [t.name]),
+    t.desc ? el("span", null, [t.desc]) : null
+  ])));
+}
+
+// 序章、桃花村、還沒入魂的時候一切模糊,數值全部顯示「？？？」
+// 上面分三頁:狀態、術法、道具
 function renderStatus() {
-  const blur = state.phase === "prologue";
-  const unknown = "？？？";
   const idt = state.identity;
+  const blur = state.phase === "prologue" || !idt;
+  const unknown = "？？？";
   const dm = idt && idt.innerDemon;
   let demonText = "尚未浮現";
   if (blur) demonText = unknown;
@@ -4937,12 +5149,22 @@ function renderStatus() {
   // 滿版的角色面板:蓋滿整個畫面,右上角 ✕ 關閉(電腦上 Esc 也能關),不用底部的選項
   const slide = state.statusSlide;
   state.statusSlide = false;
+  const tab = state.statusTab;
+  const kit = statusKit();
+  const tabs = el("div", { class: "status-tabs", role: "tablist" }, [["status", "狀態"], ["skills", "術法"], ["items", "道具"]].map(([k, label]) => el("button", {
+    class: tab === k ? "on" : "", role: "tab", "aria-selected": String(tab === k),
+    onclick: () => { state.statusTab = k; render(); }
+  }, [label])));
+  const page = tab === "skills" ? panel([kitList(kit.skills, "還沒學會任何術法。")])
+    : tab === "items" ? panel([kitList(kit.items, "身上什麼都沒有。")])
+    : null;
   return el("div", { class: slide ? "status-sheet slide-in" : "status-sheet", role: "dialog", "aria-label": "查看自身" }, [
     el("div", { class: "status-bar" }, [
       el("h2", null, ["查看自身"]),
       el("button", { class: "status-close", onclick: closeStatus, "aria-label": "關閉" }, ["✕"])
     ]),
-    el("div", { class: "status-body" }, [panel([
+    tabs,
+    el("div", { class: "status-body" }, [page || panel([
     el("div", { class: "status-head" }, [
       el("div", { class: blur ? "portrait blur" : "portrait" }),
       el("div", null, [
@@ -5295,23 +5517,23 @@ function renderSide() {
   if (node.feed) {
     const items = Q.feedOrder.filter(i => S.bag.includes(i));
     buttons = items.length
-      ? items.map(i => choiceButton(`（投餵${Q.items[i]}）`, () => sideFeed(i)))
+      ? items.map(i => choiceButton(`（投餵${Q.items[i].name}）`, () => sideFeed(i)))
       : [choiceButton(Q.emptyLabel, () => sideGo("empty"))];
   } else if (node.end === "death") {
-    buttons = [choiceButton("……", () => { state.phase = "sideDeath"; render(); })];
+    buttons = [choiceButton("……", sideDie)];
   } else if (node.end) {
     buttons = [choiceButton("再走一次", startTurtle), choiceButton("回主選單", toTitle)];
   } else {
     buttons = node.choices.map(c => choiceButton(c.label, () => sideGo(c.to, c.gain)));
   }
   const actions = dock(buttons);
-  // 死掉的段落:文字打完停一下,自己跳死亡畫面(也可以點「……」)
+  // 死掉的段落:文字打完停一下,自己開始失去知覺(也可以點「……」)
   const onDone = node.end === "death" ? () => setTimeout(() => {
-    if (state.phase === "side" && state.side && state.side.node === id) { state.phase = "sideDeath"; render(); }
-  }, 1200) : null;
+    if (state.phase === "side" && !state.statusOpen && state.side && state.side.node === id) sideDie();
+  }, 900) : null;
   const bag = id === Q.start ? null : el("div", { class: "side-bag" }, [
     "背包：",
-    ...(S.bag.length ? S.bag.flatMap((i, n) => [n ? "、" : "", el("b", { class: i === S.got ? "new" : "" }, [Q.items[i]])]) : ["空"])
+    ...(S.bag.length ? S.bag.flatMap((i, n) => [n ? "、" : "", el("b", { class: i === S.got ? "new" : "" }, [Q.items[i].name])]) : ["空"])
   ]);
   const ending = node.end === "win" ? `支線結束　千年海龜好感度等級 ${node.affection}`
     : node.end === "leave" ? "支線結束　沒有好感度" : null;
@@ -5324,25 +5546,101 @@ function renderSide() {
     actions
   ], "fade-in");
 }
-// 死亡畫面:大字是 state.deathWord(測試切換);墨帶用 SVG 的雜訊濾鏡做出刷子的毛邊
-const DEATH_BAND_SVG = `<svg viewBox="0 0 1000 140" preserveAspectRatio="none" aria-hidden="true"><defs>`
-  + `<filter id="death-brush" x="-5%" y="-40%" width="110%" height="180%"><feTurbulence type="fractalNoise" baseFrequency=".008 .32" numOctaves="3" seed="7"/><feDisplacementMap in="SourceGraphic" scale="34" xChannelSelector="R" yChannelSelector="G"/></filter>`
-  + `<linearGradient id="death-ink" x1="0" x2="1"><stop offset="0" stop-color="#3a0605" stop-opacity="0"/><stop offset=".1" stop-color="#4a0907" stop-opacity=".85"/><stop offset=".5" stop-color="#6b100c" stop-opacity=".95"/><stop offset=".9" stop-color="#4a0907" stop-opacity=".85"/><stop offset="1" stop-color="#3a0605" stop-opacity="0"/></linearGradient></defs>`
-  + `<path d="M10,44 C220,30 760,26 985,42 L995,74 C780,112 240,116 15,100 Z" fill="url(#death-ink)" filter="url(#death-brush)"/></svg>`;
+// 死亡:先在劇情畫面上失去知覺(心跳兩下、褪色模糊、四周的黑往中間收),再換到死亡畫面
+let dying = false;
+function sideDie() {
+  if (dying || state.phase !== "side") return;
+  const go = () => { dying = false; state.phase = "sideDeath"; render(); };
+  const scr = document.querySelector("#app > .screen");
+  if (REDUCE_MOTION || !scr) { go(); return; }
+  dying = true;
+  scr.classList.add("dying");
+  document.getElementById("app").appendChild(el("div", { class: "dying-veil" }));
+  setTimeout(go, 1900);
+}
+// 死亡畫面(魂滅)的固定亂數:落花、火星、裂縫每次都一樣
+const DEATH_FX = (() => {
+  let s = 23;
+  const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const petals = Array.from({ length: 42 }, () => {
+    const near = rnd() < .25; // 近的大、糊、掉得快
+    const size = near ? 13 + rnd() * 7 : 5 + rnd() * 7;
+    const dur = near ? 7 + rnd() * 3 : 11 + rnd() * 7;
+    return { x: rnd() * 100, size, dur, delay: -rnd() * dur, sway: 14 + rnd() * 30, o: near ? .55 + rnd() * .25 : .45 + rnd() * .5, blur: near ? 1.6 : rnd() < .4 ? .6 : 0 };
+  });
+  const sparks = Array.from({ length: 12 }, () => {
+    const a = rnd() * Math.PI * 2, r = 30 + rnd() * 60;
+    return { x: 10 + rnd() * 80, y: 5 + rnd() * 90, dx: Math.cos(a) * r, dy: Math.sin(a) * r - 20 };
+  });
+  // 裂縫:從字的周圍往外裂,鋸齒狀,有的分岔(viewBox 以石面中心為原點)
+  const paths = [];
+  for (let k = 0; k < 11; k++) {
+    let ang = (k / 11) * Math.PI * 2 + (rnd() - .5) * .4;
+    let x = Math.cos(ang) * (95 + rnd() * 20), y = Math.sin(ang) * (55 + rnd() * 10);
+    let d = `M${x.toFixed(1)},${y.toFixed(1)}`;
+    const steps = 3 + Math.floor(rnd() * 3);
+    for (let n = 0; n < steps; n++) {
+      ang += (rnd() - .5) * .9;
+      const len = 14 + rnd() * 22;
+      x += Math.cos(ang) * len * 1.5;
+      y += Math.sin(ang) * len * .8;
+      d += ` L${x.toFixed(1)},${y.toFixed(1)}`;
+      if (n === 1 && rnd() < .5) {
+        const b = ang + (rnd() < .5 ? .8 : -.8);
+        paths.push(`M${x.toFixed(1)},${y.toFixed(1)} L${(x + Math.cos(b) * 24).toFixed(1)},${(y + Math.sin(b) * 14).toFixed(1)} L${(x + Math.cos(b) * 40).toFixed(1)},${(y + Math.sin(b) * 26).toFixed(1)}`);
+      }
+    }
+    paths.push(d);
+  }
+  const cracks = `<svg class="death-cracks" viewBox="-310 -150 620 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${paths.map(d => `<path pathLength="1" d="${d}"/>`).join("")}</svg>`;
+  return { petals, sparks, cracks };
+})();
+// 紅梅(放不下的那一念)
+const DEATH_PLUM_SVG = (() => {
+  const pt = (r, deg) => [20 + r * Math.cos(deg * Math.PI / 180), 20 + r * Math.sin(deg * Math.PI / 180)].map(v => v.toFixed(2));
+  const petals = [0, 1, 2, 3, 4].map(k => { const [x, y] = pt(9, k * 72 - 90); return `<circle cx="${x}" cy="${y}" r="7.4"/>`; }).join("");
+  const stamens = [0, 1, 2, 3, 4].map(k => { const [x, y] = pt(5.6, k * 72 - 54); return `<circle cx="${x}" cy="${y}" r="1.1"/>`; }).join("");
+  return `<svg viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="death-plum" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#ff9a8a"/><stop offset=".6" stop-color="#d8322a"/><stop offset="1" stop-color="#7a0e0c"/></radialGradient></defs>`
+    + `<g fill="url(#death-plum)">${petals}</g><circle cx="20" cy="20" r="3.6" fill="#ffd27a"/><g fill="#fff1c0">${stamens}</g></svg>`;
+})();
 function renderSideDeath() {
   const node = CONTENT.turtleQuest.nodes[state.side.node];
-  const band = el("div", { class: "death-band" });
-  band.innerHTML = DEATH_BAND_SVG;
-  return screen([
-    el("div", { class: "death" }, [
-      dustLayer(true),
-      band,
-      el("div", { class: "death-word" }, [...state.deathWord].map((ch, i) => el("span", { style: `--i:${i}` }, [ch]))),
-      el("i", { class: "death-soul" }),
+  const word = [...CONTENT.deathWord];
+  const imp = 0.7 + (word.length - 1) * 0.75 + 0.95; // 最後一個字刻完的時間(秒),之後的演出都從這裡往後排
+  const chars = word.map((ch, i) => el("span", { class: "dw-ch", style: `--i:${i}` }, [
+    el("i", { class: "dw-groove" }, [ch]),
+    el("i", { class: "dw-fire", "aria-hidden": "true" }, [ch]),
+    ...DEATH_FX.sparks.map(p => el("b", {
+      class: "dw-spark",
+      style: `left:${p.x.toFixed(0)}%;top:${p.y.toFixed(0)}%;--dx:${p.dx.toFixed(0)}px;--dy:${p.dy.toFixed(0)}px;--d:${(0.7 + i * 0.75 + (p.y / 100) * 0.85).toFixed(2)}s`
+    }))
+  ]));
+  const stage = el("div", { class: "death-stage" }, [
+    el("div", { class: "death-slab" }),
+    el("div", { class: "death-ring" }),
+    el("div", { class: "death-word" }, chars)
+  ]);
+  stage.insertAdjacentHTML("beforeend", DEATH_FX.cracks);
+  stage.appendChild(stage.querySelector(".death-word")); // 字疊在裂縫上面
+  const plum = el("div", { class: "death-plum" });
+  plum.innerHTML = DEATH_PLUM_SVG;
+  const scr = screen([
+    el("div", { class: "death", style: `--imp:${imp.toFixed(2)}s` }, [
+      el("div", { class: "death-glow" }),
+      stage,
+      el("div", { class: "death-petals" }, DEATH_FX.petals.map(p => el("b", {
+        style: `--x:${p.x.toFixed(1)}%;--dur:${p.dur.toFixed(1)}s;--delay:${p.delay.toFixed(1)}s`
+      }, [el("i", { style: `--s:${p.size.toFixed(1)}px;--sw:${p.sway.toFixed(0)}px;--o:${p.o.toFixed(2)};--blur:${p.blur}px` })]))),
+      plum,
+      el("div", { class: "death-line" }, [...CONTENT.deathLine].map((ch, i) => el("span", { style: `--i:${i}` }, [ch]))),
       node.achievement ? el("div", { class: "death-achv" }, [el("b", null, ["成就"]), node.achievement]) : null
     ]),
     dock([choiceButton("再走一次", startTurtle), choiceButton("回主選單", toTitle)])
-  ], "death-screen");
+  ], REDUCE_MOTION ? "death-screen skip" : "death-screen");
+  scr.style.setProperty("--imp", `${imp.toFixed(2)}s`); // 選項框也要用
+  // 點畫面(選項以外)直接跳到最後
+  scr.addEventListener("click", e => { if (!e.target.closest("button")) scr.classList.add("skip"); });
+  return scr;
 }
 
 function render() {

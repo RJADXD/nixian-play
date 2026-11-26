@@ -238,12 +238,12 @@ const CONTENT = {
       dream: {
         title: "桃花村",
         text: "你想說剛才的夢，卻怎麼也想不起來。只記得白煙、一句問話，還有一片刺眼的金光。\n雪梅花沒有追問，只把一顆青梅放到你碗邊：「夢都是反的。吃顆梅子壓壓驚。」",
-        choices: [{ label: "（把梅子收進懷裡）", to: "village" }]
+        choices: [{ label: "（把梅子收進懷裡）", to: "village", gain: ["plum"] }]
       },
       breakfast: {
         title: "桃花村",
         text: "你低頭喝粥，她就坐在對面托著下巴看你，看得你都不好意思了。\n「看什麼？」\n「看你有沒有睡傻。」她把一顆青梅放到你碗邊，「喏，留著，餓了吃。」",
-        choices: [{ label: "（把梅子收進懷裡）", to: "village" }]
+        choices: [{ label: "（把梅子收進懷裡）", to: "village", gain: ["plum"] }]
       },
       village: {
         title: "桃花村",
@@ -303,12 +303,12 @@ const CONTENT = {
       teach: {
         title: "囈花田",
         text: "收完花，她坐在田埂上，教你兩句口訣。\n一句叫【護身訣】，害怕的時候唸；一句叫【定心訣】，腦子裡有聲音在吵的時候唸。\n「你老是做惡夢，學起來。」她說，「唸著唸著，就不怕了。」",
-        choices: [{ label: "（跟著唸一遍）", to: "bell" }]
+        choices: [{ label: "（跟著唸一遍）", to: "bell", learn: ["guard", "calm"] }]
       },
       bell: {
         title: "囈花田",
         text: "她從腰間解下一個小銅鈴，繫在你手腕上。\n「這個也給你。看不清楚東西的時候，搖一搖。」\n「看不清楚？」\n「就是……眼睛騙你的時候。」她自己也說不上來，低頭笑了，「反正一搖，我就找得到你。」",
-        choices: [{ label: "我會一直戴著。", to: "wolf" }]
+        choices: [{ label: "我會一直戴著。", to: "wolf", gain: ["bell"] }]
       },
       wolf: {
         title: "田邊",
@@ -328,7 +328,7 @@ const CONTENT = {
       evening: {
         title: "桃花村・傍晚",
         text: "傍晚，家家戶戶升起了炊煙。\n雪梅花在院子裡的老梅樹下攤開今天收的囈花，順手摘了一朵梅花，別在你的衣襟上。\n「聞到它的香味，就算做了惡夢，也會醒過來。」",
-        choices: [{ label: "為什麼是梅花？", to: "plum" }, { label: "（低頭聞了聞）", to: "plum" }]
+        choices: [{ label: "為什麼是梅花？", to: "plum", gain: ["blossom"] }, { label: "（低頭聞了聞）", to: "plum", gain: ["blossom"] }]
       },
       plum: {
         title: "桃花村・傍晚",
@@ -402,7 +402,13 @@ const CONTENT = {
   turtleQuest: {
     name: "千年祥瑞",
     start: "port",
-    items: { jellyfish: "水母", toast: "巧克力吐司", hotpot: "火鍋", pill: "還魂丹" },
+    // 背包裡的東西(查看自身的道具頁看得到;說明是 Claude 照前導的文字暫擬)
+    items: {
+      jellyfish: { name: "水母", desc: "漁家婆婆一簍剛撈上來的水母，還在一抽一抽地動。" },
+      toast: { name: "巧克力吐司", desc: "番邦商人賣的黑褐色方塊，香得有點怪。" },
+      hotpot: { name: "火鍋", desc: "船上廚子分你的一鍋，還冒著熱氣。" },
+      pill: { name: "還魂丹", desc: "江湖郎中送的丹藥，裝在木匣裡。" }
+    },
     feedOrder: ["jellyfish", "pill", "hotpot", "toast"], // 投餵選項的順序;選了就到同名的段落
     emptyLabel: "（翻翻背包）",                            // 沒東西可餵時唯一的選項
     nodes: {
@@ -496,9 +502,11 @@ const CONTENT = {
   },
 
   /* ============================================================
-     死亡畫面的大字(試玩版先用在支線;主選單可以切換比較,選定後只留一個)
+     死亡畫面(試玩版先用在支線):大字(2026-11-26 使用者選定「魂滅」)和底下那一行(Claude 暫擬,可以改)
+     改了大字的話,整合版 html 開頭載入字型那行的 text= 也要跟著改
      ============================================================ */
-  deathWords: ["身消道殞", "魂力盡滅", "魂滅"],
+  deathWord: "魂滅",
+  deathLine: "唯餘一念，不肯散去。",
 
   /* ============================================================
      世界觀開場(每輪固定播放)
