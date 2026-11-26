@@ -3065,6 +3065,131 @@
   :root[data-ally-theme="snow"] .ally-cut-text b { color: #8f2238; text-shadow: none; }
   :root[data-ally-theme="snow"] :is(.b-log, .b-backlog) p.ally .b-who b { background: #f4f2f0; color: #8f2238; box-shadow: inset 0 0 0 1px #b3364e; }
   :root[data-ally-theme="snow"] :is(.b-log, .b-backlog) p.ally .b-text { color: #f7eef0; }
+  /* ---- 支線(試玩版:千年祥瑞):背包一行,剛拿到的那樣亮一下;結束時的一行字 ---- */
+  .side-bag { color: var(--dim); font-size: 13px; margin: -6px 0 14px; letter-spacing: .05em; }
+  .side-bag b { color: var(--text); font-weight: normal; }
+  .side-bag b.new { color: var(--gold); animation: side-got 1.6s ease-out both; }
+  @keyframes side-got { 0% { text-shadow: 0 0 12px rgba(255,214,140,.95); } 100% { text-shadow: none; } }
+  .side-end { margin-top: 18px; color: var(--gold); letter-spacing: .15em; font-size: 14px; }
+
+  /* ---- 死亡畫面:畫面一紅、一道血墨刷過,大字一個一個暈開浮現,殘魂從字底下升起飄走;接著成就、選項 ---- */
+  .death {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    background: radial-gradient(ellipse 80% 60% at 50% 42%, #1b0b09 0%, #090605 62%, #000 100%);
+    animation: fade-in .5s ease-out both;
+  }
+  .death::before { /* 挨了一掌:整個畫面紅一下 */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #8a1410;
+    opacity: 0;
+    animation: death-flash .5s ease-out both;
+  }
+  @keyframes death-flash { 0% { opacity: .55; } 100% { opacity: 0; } }
+  .death .b-dust { z-index: 0; }
+  .death-band {
+    position: absolute;
+    left: -4%;
+    right: -4%;
+    top: calc(42% - 70px);
+    height: 140px;
+    clip-path: inset(0 100% 0 0);
+    animation: death-sweep .6s .35s cubic-bezier(.25,.8,.3,1) forwards;
+  }
+  .death-band svg { width: 100%; height: 100%; display: block; }
+  @keyframes death-sweep { to { clip-path: inset(0 0 0 0); } }
+  .death-word {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 42%;
+    transform: translateY(-50%);
+    text-align: center;
+    white-space: nowrap;
+    font-family: "LXGW WenKai TC", var(--font-body);
+    font-weight: 700;
+    font-size: clamp(44px, 13vw, 80px);
+    letter-spacing: .28em;
+    text-indent: .28em; /* 字距加在每個字後面,往右補回來才會置中 */
+    color: #f1e6d2;
+    text-shadow: 0 0 22px rgba(200,40,28,.8), 0 0 3px #000, 0 2px 0 #2a0503;
+  }
+  .death-word span {
+    display: inline-block;
+    opacity: 0;
+    animation: death-ink 1s calc(.85s + var(--i) * .24s) cubic-bezier(.2,.7,.25,1) forwards;
+  }
+  @keyframes death-ink {
+    0% { opacity: 0; filter: blur(12px); transform: scale(1.4); }
+    55% { opacity: 1; filter: blur(1px); }
+    100% { opacity: 1; filter: blur(0); transform: scale(1); }
+  }
+  .death-soul { /* 殘魂:一團冷白的光,從字底下升起,飄出畫面 */
+    position: absolute;
+    left: 50%;
+    top: calc(42% + 40px);
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #d9f0ff 45%, rgba(160,210,255,0) 72%);
+    box-shadow: 0 0 18px 7px rgba(170,215,255,.55);
+    opacity: 0;
+    animation: death-soul 2.6s 2s ease-in forwards;
+  }
+  .death-soul::after { /* 拖在後面的尾巴 */
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 60%;
+    width: 4px;
+    height: 46px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: linear-gradient(rgba(200,230,255,.6), rgba(200,230,255,0));
+  }
+  @keyframes death-soul {
+    0% { opacity: 0; transform: translate(0, 0) scale(.6); }
+    18% { opacity: 1; transform: translate(-6px, -4vh) scale(1); }
+    45% { transform: translate(8px, -16vh); }
+    75% { opacity: .8; transform: translate(-6px, -30vh) scale(.85); }
+    100% { opacity: 0; transform: translate(4px, -48vh) scale(.5); }
+  }
+  .death-achv {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(42% + 74px);
+    text-align: center;
+    color: #d8c39a;
+    font-size: 15px;
+    letter-spacing: .12em;
+    opacity: 0;
+    animation: death-show .8s 2.9s ease-out forwards;
+  }
+  @keyframes death-show { to { opacity: 1; } }
+  .death-achv b { /* 「成就」兩個字蓋成一顆小紅印 */
+    display: inline-block;
+    margin-right: .6em;
+    padding: 1px 5px;
+    border: 1px solid #b8322a;
+    border-radius: 2px;
+    color: #e8574a;
+    font-weight: normal;
+    font-size: 12px;
+    letter-spacing: .1em;
+    vertical-align: 2px;
+  }
+  .screen.death-screen > .console {
+    position: relative;
+    z-index: 2;
+    animation: death-dock .6s 3.3s ease-out both;
+  }
+  @keyframes death-dock { from { opacity: 0; visibility: hidden; } to { opacity: 1; visibility: visible; } }
   @media (prefers-reduced-motion: reduce) {
     .scene-stage, .scene-petals b { animation: none !important; }
     .ally-petals, .b-bloom, .b-ward-break { display: none; }
@@ -3073,6 +3198,8 @@
     .id-motes { display: none; }
     .battle, .battle *, .fade-in { animation: none !important; transition: none !important; }
     .b-float, .b-fx, .b-intro, .pick-fx, .pick-ghost { display: none; }
+    .death, .death *, .death::before, .death-band, .death-word span, .death-achv, .screen.death-screen > .console { animation-duration: .01s !important; animation-delay: 0s !important; }
+    .death-soul { display: none; }
   }
 </style>
 </head>
@@ -3149,6 +3276,8 @@ const state = {
   soulEcho: "record", // 測試用:前世殘念 record 照紀錄(上一輪選錯的回合才出現) / force 每回合都出現 / off 關
   hint: "on",       // 測試用:亮光提示 on = 每回合正解的指令和抽屜裡那一項外框亮起 / off 關
   allyTheme: "pink", // 測試用:夥伴配色(見 ALLY_THEMES),選定後拿掉
+  deathWord: "身消道殞", // 測試用:死亡畫面的大字(content.js 的 deathWords),選定後拿掉
+  side: null,       // 支線(試玩版):{ node 目前的段落, bag 背包裡的東西, got 剛拿到的 }
   awaken: null,     // 第一次進遊戲的開場:"intro" 播放中、"out" 播完正在淡出、null 沒有
   selectId: null    // 選身份:正在看介紹的身份(null = 卡片牆)
 };
@@ -3560,7 +3689,7 @@ function splitSentences(line) {
   return line.match(/[^。！？!?]+[。！？!?…]*[」』]*|[。！？!?…]+[」』]*/g) || [line];
 }
 
-function storyText(text, after, actions) {
+function storyText(text, after, actions, onDone) {
   const sentences = [];
   const body = el("div", { class: "story-body" });
   text.split("\n").forEach(line => {
@@ -3603,6 +3732,7 @@ function storyText(text, after, actions) {
     }
     box.classList.add("done");
     story.finished = true;
+    if (onDone) onDone();
     if (box.isConnected && tail.firstChild) tail.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
   function endSentence() {
@@ -3725,7 +3855,9 @@ function renderTitle() {
       player ? el("button", { class: "test-link", onclick: resetPlayer }, ["（測試）清除名字，從頭重玩序章"]) : null,
       el("div", { class: "title-test" }, [
         testRow("夥伴配色（測試用）：", "allyTheme", ALLY_THEMES),
-        el("button", { class: "test-link", onclick: () => startPrologue(CONTENT.childBattle) }, ["（測試）直接到狼戰，點左下角的雪梅花看招式"])
+        el("button", { class: "test-link", onclick: () => startPrologue(CONTENT.childBattle) }, ["（測試）直接到狼戰，點左下角的雪梅花看招式"]),
+        testRow("死亡大字（測試用）：", "deathWord", CONTENT.deathWords.map(w => [w, w])),
+        el("button", { class: "test-link", onclick: startTurtle }, ["（測試）支線：千年祥瑞"])
       ])
     ]),
     dock([
@@ -5128,6 +5260,91 @@ function renderSummary() {
   ]);
 }
 
+// ---- 支線(試玩版):千年祥瑞(資料在 content.js 的 turtleQuest)----
+// 前導兩站各拿一樣吃的放進背包;見到海龜後只列出背包裡還沒餵過的(feed: true);
+// 結束(end)時:win / leave 留在這頁給「再走一次」,death 跳死亡畫面
+function startTurtle() {
+  storyProgress.clear(); // 再走一次時從頭打字
+  state.side = { node: CONTENT.turtleQuest.start, bag: [], got: null };
+  state.phase = "side";
+  render();
+}
+function sideGo(to, gain) {
+  const S = state.side;
+  if (gain) S.bag.push(gain);
+  S.got = gain || null;
+  S.node = to;
+  render();
+}
+function sideFeed(item) {
+  const S = state.side;
+  S.bag = S.bag.filter(i => i !== item); // 餵過就沒了,不再出現在選項裡
+  sideGo(item);
+}
+function toTitle() {
+  state.side = null;
+  state.phase = "title";
+  render();
+}
+function renderSide() {
+  const Q = CONTENT.turtleQuest;
+  const S = state.side;
+  const id = S.node;
+  const node = Q.nodes[id];
+  let buttons;
+  if (node.feed) {
+    const items = Q.feedOrder.filter(i => S.bag.includes(i));
+    buttons = items.length
+      ? items.map(i => choiceButton(`（投餵${Q.items[i]}）`, () => sideFeed(i)))
+      : [choiceButton(Q.emptyLabel, () => sideGo("empty"))];
+  } else if (node.end === "death") {
+    buttons = [choiceButton("……", () => { state.phase = "sideDeath"; render(); })];
+  } else if (node.end) {
+    buttons = [choiceButton("再走一次", startTurtle), choiceButton("回主選單", toTitle)];
+  } else {
+    buttons = node.choices.map(c => choiceButton(c.label, () => sideGo(c.to, c.gain)));
+  }
+  const actions = dock(buttons);
+  // 死掉的段落:文字打完停一下,自己跳死亡畫面(也可以點「……」)
+  const onDone = node.end === "death" ? () => setTimeout(() => {
+    if (state.phase === "side" && state.side && state.side.node === id) { state.phase = "sideDeath"; render(); }
+  }, 1200) : null;
+  const bag = id === Q.start ? null : el("div", { class: "side-bag" }, [
+    "背包：",
+    ...(S.bag.length ? S.bag.flatMap((i, n) => [n ? "、" : "", el("b", { class: i === S.got ? "new" : "" }, [Q.items[i]])]) : ["空"])
+  ]);
+  const ending = node.end === "win" ? `支線結束　千年海龜好感度等級 ${node.affection}`
+    : node.end === "leave" ? "支線結束　沒有好感度" : null;
+  return screen([
+    panel([
+      node.title ? el("h1", null, [node.title]) : null,
+      bag,
+      storyText(node.text, [ending ? el("div", { class: "side-end" }, [ending]) : null], actions, onDone)
+    ]),
+    actions
+  ], "fade-in");
+}
+// 死亡畫面:大字是 state.deathWord(測試切換);墨帶用 SVG 的雜訊濾鏡做出刷子的毛邊
+const DEATH_BAND_SVG = `<svg viewBox="0 0 1000 140" preserveAspectRatio="none" aria-hidden="true"><defs>`
+  + `<filter id="death-brush" x="-5%" y="-40%" width="110%" height="180%"><feTurbulence type="fractalNoise" baseFrequency=".008 .32" numOctaves="3" seed="7"/><feDisplacementMap in="SourceGraphic" scale="34" xChannelSelector="R" yChannelSelector="G"/></filter>`
+  + `<linearGradient id="death-ink" x1="0" x2="1"><stop offset="0" stop-color="#3a0605" stop-opacity="0"/><stop offset=".1" stop-color="#4a0907" stop-opacity=".85"/><stop offset=".5" stop-color="#6b100c" stop-opacity=".95"/><stop offset=".9" stop-color="#4a0907" stop-opacity=".85"/><stop offset="1" stop-color="#3a0605" stop-opacity="0"/></linearGradient></defs>`
+  + `<path d="M10,44 C220,30 760,26 985,42 L995,74 C780,112 240,116 15,100 Z" fill="url(#death-ink)" filter="url(#death-brush)"/></svg>`;
+function renderSideDeath() {
+  const node = CONTENT.turtleQuest.nodes[state.side.node];
+  const band = el("div", { class: "death-band" });
+  band.innerHTML = DEATH_BAND_SVG;
+  return screen([
+    el("div", { class: "death" }, [
+      dustLayer(true),
+      band,
+      el("div", { class: "death-word" }, [...state.deathWord].map((ch, i) => el("span", { style: `--i:${i}` }, [ch]))),
+      el("i", { class: "death-soul" }),
+      node.achievement ? el("div", { class: "death-achv" }, [el("b", null, ["成就"]), node.achievement]) : null
+    ]),
+    dock([choiceButton("再走一次", startTurtle), choiceButton("回主選單", toTitle)])
+  ], "death-screen");
+}
+
 function render() {
   const app = document.getElementById("app");
   document.documentElement.dataset.font = state.font;
@@ -5160,7 +5377,9 @@ function render() {
     trialResult: renderTrialResult,
     loop: renderLoop,
     loopResult: renderLoopResult,
-    summary: renderSummary
+    summary: renderSummary,
+    side: renderSide,
+    sideDeath: renderSideDeath
   };
   app.appendChild(renderers[state.phase]());
   syncFateBg();
