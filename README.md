@@ -6,3 +6,4 @@
 
 這個專案只放試玩用的檔案,由開發用的專案同步過來,請不要直接在這裡修改。
 素材來源與授權見開發專案的 CREDITS.md;部分圖片是暫代美術。
+死亡畫面「碑拓」用到的筆畫資料源自文鼎 AR PL KaitiM 字形(經 hanzi-writer-data 整理),授權全文見 assets/licenses/ARPHICPL.TXT。

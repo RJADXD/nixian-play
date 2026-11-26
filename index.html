@@ -3329,7 +3329,7 @@
     text-indent: .3em;
     text-shadow: 0 0 10px rgba(0,0,0,.9);
   }
-  .death-line span { display: inline-block; opacity: 0; animation: dw-line .9s calc(var(--imp) + 1s + var(--i) * .1s) ease-out forwards; }
+  .death-line span { display: inline-block; opacity: 0; animation: dw-line .9s calc(var(--t-line) + var(--i) * .1s) ease-out forwards; }
   @keyframes dw-line { from { opacity: 0; filter: blur(6px); transform: translateY(6px); } to { opacity: 1; filter: blur(0); transform: none; } }
   .death-achv {
     position: absolute;
@@ -3341,7 +3341,7 @@
     font-size: 15px;
     letter-spacing: .12em;
     opacity: 0;
-    animation: death-show .8s calc(var(--imp) + 2.4s) ease-out forwards;
+    animation: death-show .8s var(--t-achv) ease-out forwards;
   }
   @keyframes death-show { to { opacity: 1; } }
   .death-achv b { /* 「成就」兩個字蓋成一顆小紅印 */
@@ -3359,9 +3359,158 @@
   .screen.death-screen > .console {
     position: relative;
     z-index: 2;
-    animation: death-dock .6s calc(var(--imp) + 3s) ease-out both;
+    animation: death-dock .6s var(--t-dock) ease-out both;
   }
   @keyframes death-dock { from { opacity: 0; visibility: hidden; } to { opacity: 1; visibility: visible; } }
+
+  /* ---- 死亡演出(測試切換:碑拓 / 闔眼 / 刻字):三種共用上面的成就、選項框;--t-line、--t-achv、--t-dock 由 JS 依演出長度給 ---- */
+  .death.dv-rubbing, .death.dv-eyes { background: var(--bg); }
+  .death-frame { /* 死掉那一刻的劇情畫面,定格當底(位置跟原本一樣) */
+    position: absolute;
+    pointer-events: none;
+    transform-origin: 50% 45%;
+  }
+  .death-frame > .screen { height: 100%; }
+
+  /* 碑拓:畫面褪成水墨 → 墨滴落下暈開吞掉畫面 → 黑底上「魂」「滅」直書,一筆一筆寫出來(碑拓那種黑底白字)
+     → 一側小字題款、蓋一顆紅印 → 囈花慢慢落 */
+  .dv-rubbing .death-frame { animation: dk-gray .9s ease-out forwards; }
+  @keyframes dk-gray { to { filter: grayscale(1) contrast(1.3) brightness(.7) sepia(.15); } }
+  .dk-ink { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .dk-ink circle {
+    fill: #060505;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0);
+    animation: dk-bloom var(--d) var(--t) cubic-bezier(.15,.6,.3,1) forwards;
+  }
+  @keyframes dk-bloom { to { transform: scale(var(--s)); } }
+  .dk-paper { /* 拓紙:墨色深淺不勻 */
+    position: absolute;
+    inset: 0;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='n' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.006' numOctaves='4' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .18 0 0 0 0 .16 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='600' height='600' filter='url(%23n)'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .46 0 0 0 0 .4 0 0 0 .12 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse 80% 60% at 50% 40%, #151210, #070606 70%, #020202);
+    opacity: 0;
+    animation: death-show .9s 1.7s ease-out forwards;
+  }
+  .dk-stage { position: absolute; inset: 0; --S: min(25vh, 46vw, 240px); --cy: 36%; }
+  .dk-stage.thump { animation: dk-thump .22s var(--t-seal) ease-out both; }
+  @keyframes dk-thump { 0%, 100% { transform: none; } 30% { transform: translateY(3px) scale(.997); } }
+  .dk-chars {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--cy) - var(--S));
+    width: var(--S);
+    height: calc(var(--S) * 2);
+    transform: translateX(-50%);
+    overflow: visible;
+    filter: drop-shadow(0 0 18px rgba(255,236,200,.12));
+  }
+  .dk-s {
+    fill: none;
+    stroke: #ece4d4;
+    stroke-width: 240;
+    stroke-linecap: butt;
+    stroke-linejoin: round;
+    stroke-dasharray: 1 2;
+    stroke-dashoffset: 1;
+    animation: dk-write .2s linear forwards;
+    animation-timing-function: cubic-bezier(.3,.05,.3,1);
+  }
+  @keyframes dk-write { to { stroke-dashoffset: 0; } }
+  .dv-rubbing .death-line { /* 題款:直書小字,在大字左邊 */
+    top: calc(var(--cy) - var(--S) + 14px);
+    left: calc(50% - var(--S) / 2 - 44px);
+    right: auto;
+    writing-mode: vertical-rl;
+    font-size: 15px;
+    letter-spacing: .32em;
+    text-indent: 0;
+    color: #cfc3ad;
+  }
+  .dk-seal {
+    position: absolute;
+    top: calc(var(--cy) + var(--S) - 96px);
+    left: calc(50% - var(--S) / 2 - 52px);
+    width: 34px;
+    height: 64px;
+    opacity: 0;
+    animation: dk-stamp .18s var(--t-seal) cubic-bezier(.6,0,.9,.4) forwards;
+  }
+  @keyframes dk-stamp { from { opacity: 0; transform: scale(1.8) rotate(-8deg); } to { opacity: .92; transform: rotate(-3deg); } }
+  .dv-rubbing .death-achv { top: calc(var(--cy) + var(--S) + 22px); }
+  .dv-rubbing .death-petals { animation-delay: 2.2s; }
+
+  /* 闔眼:畫面定格、褪色、慢慢推近 → 上下眼皮一點一點闔上(縫裡還看得到囈花在落)→ 全黑 →
+     「魂　滅」靜靜浮出 → 眼睛掙扎著想再睜開兩次,看見一點金光,又闔上(不甘心) */
+  .dv-eyes .death-frame { animation: ey-frame 4.2s ease-in forwards; }
+  @keyframes ey-frame {
+    0% { filter: none; transform: scale(1); }
+    6% { transform: scale(1.016); }
+    13% { transform: scale(1.003); filter: saturate(.8); }
+    21% { transform: scale(1.018); filter: saturate(.6); }
+    29% { transform: scale(1.008); }
+    55% { filter: saturate(.3) brightness(.95) blur(.6px); }
+    100% { filter: saturate(.12) brightness(.75) blur(2px); transform: scale(1.07); }
+  }
+  .ey-light { /* 眼睛想再睜開時看見的金光 */
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 75% 26% at 50% 50%, rgba(255,226,170,.9), rgba(235,170,80,.35) 50%, transparent 80%);
+    opacity: 0;
+    animation: ey-light 2.6s var(--t-flutter) ease-in-out forwards;
+  }
+  @keyframes ey-light { 0% { opacity: 0; } 18% { opacity: 1; } 32% { opacity: 0; } 55% { opacity: .6; } 68%, 100% { opacity: 0; } }
+  .dv-eyes .death-petals { animation-delay: 1s; }
+  .ey-lid {
+    position: absolute;
+    left: -8%;
+    right: -8%;
+    height: 82%;
+    background: linear-gradient(#000 0 84%, rgba(0,0,0,.8) 92%, transparent);
+  }
+  .ey-lid.top { top: -20%; border-radius: 0 0 50% 50% / 0 0 26% 26%; transform: translateY(-101%); animation: ey-close-top 3.4s .3s cubic-bezier(.45,.05,.55,.95) forwards, ey-flutter-top 2.6s var(--t-flutter) ease-in-out forwards; }
+  .ey-lid.bottom { bottom: -20%; transform: translateY(101%) scaleY(-1); border-radius: 0 0 50% 50% / 0 0 26% 26%; animation: ey-close-bottom 3.4s .3s cubic-bezier(.45,.05,.55,.95) forwards, ey-flutter-bottom 2.6s var(--t-flutter) ease-in-out forwards; }
+  /* 眼皮高 82vh、從 -20vh 起,不動時黑的部分到 42vh;往下 10% 剛好在中間闔上 */
+  @keyframes ey-close-top { 0% { transform: translateY(-101%); } 35% { transform: translateY(-30%); } 62% { transform: translateY(-13%); } 82% { transform: translateY(-3%); } 92% { transform: translateY(1%); } 100% { transform: translateY(11%); } }
+  @keyframes ey-close-bottom { 0% { transform: translateY(101%) scaleY(-1); } 35% { transform: translateY(30%) scaleY(-1); } 62% { transform: translateY(13%) scaleY(-1); } 82% { transform: translateY(3%) scaleY(-1); } 92% { transform: translateY(-1%) scaleY(-1); } 100% { transform: translateY(-11%) scaleY(-1); } }
+  @keyframes ey-flutter-top { 0% { transform: translateY(11%); } 18% { transform: translateY(-6%); } 32% { transform: translateY(11%); } 55% { transform: translateY(2%); } 68%, 100% { transform: translateY(11%); } }
+  @keyframes ey-flutter-bottom { 0% { transform: translateY(-11%) scaleY(-1); } 18% { transform: translateY(6%) scaleY(-1); } 32% { transform: translateY(-11%) scaleY(-1); } 55% { transform: translateY(-2%) scaleY(-1); } 68%, 100% { transform: translateY(-11%) scaleY(-1); } }
+  .ey-word {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    white-space: nowrap;
+    font-family: "Noto Serif TC", serif;
+    font-weight: 400;
+    font-size: clamp(54px, 17vw, 104px);
+    line-height: 1;
+    letter-spacing: .9em;
+    text-indent: .9em;
+    color: #e6ddcc;
+    text-shadow: 0 0 26px rgba(255,222,170,.28);
+    opacity: 0;
+    animation: ey-word 2.2s var(--t-word) cubic-bezier(.2,.6,.3,1) forwards;
+  }
+  @keyframes ey-word { from { opacity: 0; filter: blur(14px); letter-spacing: 1.2em; text-indent: 1.2em; } to { opacity: 1; filter: blur(0); letter-spacing: .9em; text-indent: .9em; } }
+  .ey-rule { /* 字兩側往外拉開的細線 */
+    position: absolute;
+    top: 50%;
+    width: 22%;
+    height: 1px;
+    opacity: 0;
+    animation: ey-rule 1.6s calc(var(--t-word) + .6s) ease-out forwards;
+  }
+  .ey-rule.l { right: calc(50% + min(28vw, 170px)); background: linear-gradient(to left, rgba(230,221,204,.55), transparent); transform-origin: right; }
+  .ey-rule.r { left: calc(50% + min(28vw, 170px)); background: linear-gradient(to right, rgba(230,221,204,.55), transparent); transform-origin: left; }
+  @keyframes ey-rule { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
+  .dv-eyes .death-line { top: calc(50% + min(10vw, 62px) + 18px); }
+  .dv-eyes .death-achv { top: calc(50% + min(10vw, 62px) + 58px); }
   /* 點畫面略過:所有只播一次的動畫直接到最後(會循環的落花、紅梅照樣動) */
   .screen.death-screen.skip *, .screen.death-screen.skip > .console { animation-delay: -40s !important; }
   @media (prefers-reduced-motion: reduce) {
@@ -3452,6 +3601,7 @@ const state = {
   hint: "on",       // 測試用:亮光提示 on = 每回合正解的指令和抽屜裡那一項外框亮起 / off 關
   allyTheme: "pink", // 測試用:夥伴配色(見 ALLY_THEMES),選定後拿掉
   side: null,       // 支線(試玩版):{ node 目前的段落, bag 背包裡的東西, got 剛拿到的 }
+  deathStyle: "rubbing", // 測試用:死亡演出 rubbing 碑拓 / eyes 闔眼 / carve 刻字(上一版),選定後拿掉
   kit: null,        // 身上的術法和道具(桃花村一路拿到的,見 content.js 選項的 learn、gain):{ skills: [id], items: [id] }
   statusTab: "status", // 查看自身正在看哪一頁:status 狀態 / skills 術法 / items 道具
   awaken: null,     // 第一次進遊戲的開場:"intro" 播放中、"out" 播完正在淡出、null 沒有
@@ -4035,6 +4185,7 @@ function renderTitle() {
       el("div", { class: "title-test" }, [
         testRow("夥伴配色（測試用）：", "allyTheme", ALLY_THEMES),
         el("button", { class: "test-link", onclick: () => startPrologue(CONTENT.childBattle) }, ["（測試）直接到狼戰，點左下角的雪梅花看招式"]),
+        testRow("死亡演出（測試用）：", "deathStyle", DEATH_STYLES),
         el("button", { class: "test-link", onclick: startTurtle }, ["（測試）支線：千年祥瑞"])
       ])
     ]),
@@ -5546,13 +5697,18 @@ function renderSide() {
     actions
   ], "fade-in");
 }
-// 死亡:先在劇情畫面上失去知覺(心跳兩下、褪色模糊、四周的黑往中間收),再換到死亡畫面
+// 死亡演出(測試切換,選定後只留一個)
+const DEATH_STYLES = [["rubbing", "碑拓"], ["eyes", "闔眼"], ["carve", "刻字（上一版）"]];
+// 死:先把這一刻的劇情畫面複製一份定格(碑拓、闔眼拿它當底),再換到死亡畫面;
+// 刻字(上一版)是先在劇情畫面上失去知覺(心跳兩下、褪色模糊、四周的黑往中間收)才換
 let dying = false;
+let deathFrame = null;
 function sideDie() {
   if (dying || state.phase !== "side") return;
   const go = () => { dying = false; state.phase = "sideDeath"; render(); };
   const scr = document.querySelector("#app > .screen");
-  if (REDUCE_MOTION || !scr) { go(); return; }
+  deathFrame = scr ? { node: scr.cloneNode(true), rect: scr.getBoundingClientRect() } : null;
+  if (state.deathStyle !== "carve" || REDUCE_MOTION || !scr) { go(); return; }
   dying = true;
   scr.classList.add("dying");
   document.getElementById("app").appendChild(el("div", { class: "dying-veil" }));
@@ -5603,8 +5759,7 @@ const DEATH_PLUM_SVG = (() => {
   return `<svg viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="death-plum" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#ff9a8a"/><stop offset=".6" stop-color="#d8322a"/><stop offset="1" stop-color="#7a0e0c"/></radialGradient></defs>`
     + `<g fill="url(#death-plum)">${petals}</g><circle cx="20" cy="20" r="3.6" fill="#ffd27a"/><g fill="#fff1c0">${stamens}</g></svg>`;
 })();
-function renderSideDeath() {
-  const node = CONTENT.turtleQuest.nodes[state.side.node];
+function deathCarve(node) {
   const word = [...CONTENT.deathWord];
   const imp = 0.7 + (word.length - 1) * 0.75 + 0.95; // 最後一個字刻完的時間(秒),之後的演出都從這裡往後排
   const chars = word.map((ch, i) => el("span", { class: "dw-ch", style: `--i:${i}` }, [
@@ -5624,20 +5779,149 @@ function renderSideDeath() {
   stage.appendChild(stage.querySelector(".death-word")); // 字疊在裂縫上面
   const plum = el("div", { class: "death-plum" });
   plum.innerHTML = DEATH_PLUM_SVG;
-  const scr = screen([
-    el("div", { class: "death", style: `--imp:${imp.toFixed(2)}s` }, [
+  return deathScreen("dv-carve", { line: imp + 1, achv: imp + 2.4, dock: imp + 3 }, [
+    el("div", { class: "death dv-carve", style: `--imp:${imp.toFixed(2)}s` }, [
       el("div", { class: "death-glow" }),
       stage,
       el("div", { class: "death-petals" }, DEATH_FX.petals.map(p => el("b", {
         style: `--x:${p.x.toFixed(1)}%;--dur:${p.dur.toFixed(1)}s;--delay:${p.delay.toFixed(1)}s`
       }, [el("i", { style: `--s:${p.size.toFixed(1)}px;--sw:${p.sway.toFixed(0)}px;--o:${p.o.toFixed(2)};--blur:${p.blur}px` })]))),
       plum,
-      el("div", { class: "death-line" }, [...CONTENT.deathLine].map((ch, i) => el("span", { style: `--i:${i}` }, [ch]))),
-      node.achievement ? el("div", { class: "death-achv" }, [el("b", null, ["成就"]), node.achievement]) : null
-    ]),
-    dock([choiceButton("再走一次", startTurtle), choiceButton("回主選單", toTitle)])
-  ], REDUCE_MOTION ? "death-screen skip" : "death-screen");
-  scr.style.setProperty("--imp", `${imp.toFixed(2)}s`); // 選項框也要用
+      deathLine(),
+      deathAchv(node)
+    ])
+  ]);
+}
+
+// ---- 三種演出共用 ----
+function deathLine() {
+  return el("div", { class: "death-line" }, [...CONTENT.deathLine].map((ch, i) => el("span", { style: `--i:${i}` }, [ch])));
+}
+function deathAchv(node) {
+  return node.achievement ? el("div", { class: "death-achv" }, [el("b", null, ["成就"]), node.achievement]) : null;
+}
+function deathPetals(n) {
+  return el("div", { class: "death-petals" }, DEATH_FX.petals.slice(0, n).map(p => el("b", {
+    style: `--x:${p.x.toFixed(1)}%;--dur:${p.dur.toFixed(1)}s;--delay:${p.delay.toFixed(1)}s`
+  }, [el("i", { style: `--s:${p.size.toFixed(1)}px;--sw:${p.sway.toFixed(0)}px;--o:${p.o.toFixed(2)};--blur:${p.blur}px` })])));
+}
+// 定格的劇情畫面:複製的節點不能再點,原本的淡入動畫拿掉
+function deathFrameLayer() {
+  if (!deathFrame) return null;
+  const n = deathFrame.node.cloneNode(true);
+  n.classList.remove("fade-in", "dying");
+  n.setAttribute("inert", "");
+  const r = deathFrame.rect;
+  return el("div", { class: "death-frame", style: `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px` }, [n]);
+}
+// times:{ line 題款/那一行字, achv 成就, dock 選項, 其他演出自己用的 } 秒
+function deathScreen(cls, times, kids) {
+  const scr = screen([...kids, dock([choiceButton("再走一次", startTurtle), choiceButton("回主選單", toTitle)])], "death-screen " + cls);
+  for (const k in times) scr.style.setProperty(`--t-${k}`, `${times[k].toFixed(2)}s`);
+  return scr;
+}
+
+// ---- 碑拓 ----
+// 「魂」「滅」的筆畫資料取自 hanzi-writer-data 2.0.1(源自文鼎 AR PL KaitiM 字形,Arphic Public License,
+// 授權全文在 assets/licenses/ARPHICPL.TXT);2026-11-26 只取這兩個字的 strokes、medians,轉成 JS 物件嵌進來,內容沒有改。
+// 改了 deathWord 的話,這裡要換成新字的資料(沒有資料的字不會畫出來)
+const DEATH_STROKES = {"魂":{"strokes":["M 174 661 Q 135 651 166 635 Q 217 614 271 636 Q 316 649 362 663 Q 383 670 386 674 Q 395 683 389 692 Q 379 704 348 708 Q 326 709 238 677 Q 208 668 174 661 Z","M 251 484 Q 258 493 396 524 Q 411 527 411 534 Q 411 547 393 553 Q 368 563 346 556 Q 136 492 70 481 Q 57 480 55 471 Q 54 461 68 451 Q 101 432 154 448 Q 182 461 210 470 L 251 484 Z","M 345 314 Q 275 295 199 263 Q 192 259 188 261 Q 187 264 191 274 Q 276 412 295 435 Q 307 445 299 457 Q 292 467 251 484 C 223 496 201 499 210 470 Q 234 419 169 314 Q 150 277 105 240 Q 92 227 97 217 Q 104 201 130 184 Q 142 174 154 186 Q 187 222 352 289 Q 353 290 357 292 C 384 305 374 322 345 314 Z","M 357 292 Q 385 229 400 224 Q 409 221 417 229 Q 426 239 429 266 Q 433 291 407 323 Q 379 351 346 378 Q 334 387 329 386 Q 323 385 320 374 Q 320 373 345 314 L 357 292 Z","M 546 639 Q 571 664 589 684 Q 635 745 668 769 Q 687 785 672 801 Q 654 816 623 825 Q 595 834 581 827 Q 568 823 576 809 Q 588 776 546 702 Q 528 668 507 629 C 493 603 525 618 546 639 Z","M 457 619 Q 447 623 422 629 Q 410 633 407 628 Q 400 622 408 606 Q 439 534 452 418 Q 453 384 473 359 Q 489 338 495 353 Q 498 363 499 377 L 499 404 Q 498 416 496 429 Q 477 547 473 586 C 470 615 470 615 457 619 Z","M 722 411 Q 723 407 725 403 Q 731 387 744 389 Q 757 392 765 406 Q 778 427 800 524 Q 815 576 850 609 Q 869 625 852 641 Q 833 657 782 682 Q 767 691 688 670 Q 664 670 546 639 L 507 629 Q 479 625 457 619 C 428 612 444 579 473 586 Q 479 587 485 588 Q 513 598 559 609 L 600 618 Q 730 648 750 637 Q 760 631 756 596 Q 737 475 726 443 L 722 411 Z","M 626 500 Q 665 510 701 516 Q 723 522 713 533 Q 703 546 678 549 Q 660 550 636 542 L 576 521 Q 543 511 514 501 Q 498 497 518 483 L 574 488 L 626 500 Z","M 608 395 Q 656 405 722 411 C 752 414 752 427 726 443 Q 725 444 722 446 Q 706 455 613 428 L 566 417 Q 530 411 499 404 C 470 398 469 374 499 377 Q 508 377 560 387 L 608 395 Z","M 603 372 Q 606 384 608 395 L 613 428 Q 619 462 626 493 Q 626 497 626 500 L 636 542 Q 640 557 647 570 Q 656 588 640 596 Q 619 611 600 618 C 573 631 548 637 559 609 Q 559 606 562 601 Q 574 577 576 521 L 574 488 Q 574 455 566 417 L 560 387 Q 509 174 334 60 Q 321 50 307 39 Q 294 30 307 28 Q 320 28 353 41 Q 417 72 466 119 Q 521 168 547 221 Q 595 339 598 348 L 603 372 Z","M 993 84 Q 981 114 968 202 Q 967 217 961 222 Q 955 225 951 209 Q 923 115 905 87 Q 869 48 756 57 Q 713 61 679 75 Q 651 91 643 109 Q 621 163 658 322 Q 664 350 619 371 Q 609 375 603 372 C 594 374 594 374 598 348 Q 605 312 603 278 Q 582 97 612 59 Q 627 37 687 15 Q 853 -34 986 45 Q 1005 58 993 84 Z","M 842 223 Q 793 217 742 205 Q 736 204 735 205 Q 734 206 736 213 Q 790 298 801 314 Q 810 321 804 331 Q 798 338 761 353 Q 748 357 741 353 Q 732 349 738 333 Q 759 285 690 208 Q 680 199 669 189 Q 659 179 663 172 Q 667 159 688 146 Q 697 139 706 148 Q 727 163 852 205 C 880 215 872 227 842 223 Z","M 852 205 Q 870 169 880 164 Q 887 163 894 169 Q 901 178 902 198 Q 905 217 885 240 Q 836 285 824 286 Q 820 285 818 276 Q 817 270 842 223 L 852 205 Z"],"medians":[[[167,649],[218,647],[341,683],[378,685]],[[66,469],[91,463],[125,467],[340,534],[368,539],[401,536]],[[218,468],[254,441],[227,373],[162,261],[158,237],[190,238],[300,285],[351,296]],[[330,376],[394,286],[405,238]],[[583,817],[608,800],[620,783],[551,669],[513,634]],[[415,620],[439,598],[447,579],[485,359]],[[464,616],[485,607],[583,633],[727,661],[770,657],[801,621],[779,557],[742,406]],[[516,492],[660,528],[705,526]],[[502,384],[521,395],[696,427],[719,438]],[[567,607],[597,588],[608,573],[583,383],[543,265],[504,194],[437,118],[367,64],[312,34]],[[608,365],[630,328],[615,196],[618,113],[630,80],[671,49],[719,34],[798,25],[884,36],[935,61],[949,79],[960,216]],[[748,342],[770,319],[769,311],[743,250],[712,203],[711,185],[739,185],[823,209],[839,204]],[[825,279],[872,219],[884,175]]]},"滅":{"strokes":["M 217 664 Q 244 642 273 614 Q 288 601 304 602 Q 316 602 321 617 Q 325 632 315 663 Q 309 682 277 697 Q 202 722 188 715 Q 182 711 185 697 Q 189 687 217 664 Z","M 136 452 Q 190 398 223 385 Q 238 382 247 397 Q 253 410 249 427 Q 237 469 147 492 Q 131 496 121 492 Q 114 491 118 478 Q 119 466 136 452 Z","M 126 123 Q 116 119 118 103 Q 131 34 165 18 Q 172 11 182 14 Q 189 15 189 39 Q 192 75 278 322 Q 284 337 283 343 Q 282 352 274 345 Q 264 339 162 163 Q 152 144 126 123 Z","M 675 555 Q 783 588 792 595 Q 801 604 796 612 Q 789 624 758 630 Q 728 634 668 608 L 623 591 Q 461 546 396 535 Q 393 535 392 533 C 363 525 383 504 413 501 Q 440 495 534 518 Q 580 531 631 543 L 675 555 Z","M 392 533 Q 352 558 334 551 Q 322 544 329 531 Q 344 504 345 454 Q 345 261 278 129 Q 265 101 249 74 Q 245 67 243 61 Q 242 51 251 53 Q 282 59 341 166 Q 345 178 351 188 Q 393 299 406 467 Q 407 492 413 501 C 419 518 418 518 392 533 Z","M 443 419 Q 415 412 437 400 Q 467 388 535 407 Q 571 417 609 430 Q 631 437 634 441 Q 640 448 636 455 Q 629 464 605 467 Q 581 468 510 437 Q 480 427 443 419 Z","M 409 301 Q 436 244 453 238 Q 463 234 471 246 Q 475 256 472 273 Q 468 286 452 297 Q 430 316 418 321 Q 411 324 408 315 Q 405 309 409 301 Z","M 543 280 Q 547 279 553 281 Q 614 321 645 335 Q 657 338 654 346 Q 650 356 638 369 Q 626 382 611 384 Q 601 384 601 371 Q 602 356 544 289 C 536 280 536 280 543 280 Z","M 535 228 Q 539 246 541 265 Q 542 272 543 280 L 544 289 Q 550 332 556 344 Q 562 359 549 365 Q 509 389 490 381 Q 480 377 486 365 Q 510 329 492 225 Q 468 141 386 72 Q 383 71 382 68 Q 373 59 383 58 Q 450 67 508 155 Q 509 161 513 166 Q 519 190 528 204 L 535 228 Z","M 528 204 Q 532 200 543 193 Q 565 178 589 159 Q 599 152 611 153 Q 618 154 622 164 Q 623 176 615 196 Q 606 215 535 228 C 506 234 506 224 528 204 Z","M 741 182 Q 789 79 876 6 Q 940 -40 971 -38 Q 990 -32 982 -3 Q 975 43 968 180 Q 967 202 958 202 Q 931 144 904 83 Q 883 83 860 104 Q 811 155 773 222 L 750 270 Q 717 349 697 449 Q 684 504 675 555 L 668 608 Q 656 713 667 775 Q 680 818 620 841 Q 583 857 561 849 Q 539 842 550 821 Q 599 778 601 741 Q 611 660 623 591 L 631 543 Q 662 357 721 225 L 741 182 Z","M 721 225 Q 655 144 588 72 Q 581 66 591 64 Q 642 73 741 182 L 773 222 Q 776 229 781 233 Q 820 290 878 400 Q 896 436 896 438 Q 887 465 845 474 Q 824 478 813 476 Q 804 473 808 461 Q 821 406 750 270 L 721 225 Z","M 757 739 Q 791 715 826 687 Q 839 677 855 678 Q 865 679 869 692 Q 872 707 861 734 Q 854 755 820 768 Q 742 792 728 783 Q 724 779 726 767 Q 730 757 757 739 Z"],"medians":[[[193,708],[269,664],[303,620]],[[128,483],[211,429],[228,406]],[[177,23],[162,62],[161,99],[255,296],[268,311],[277,339]],[[397,528],[424,520],[497,532],[733,602],[785,606]],[[339,539],[370,511],[376,494],[358,296],[318,165],[290,113],[252,62]],[[438,410],[505,416],[575,441],[626,449]],[[418,310],[446,277],[458,252]],[[611,374],[620,359],[619,349],[548,284]],[[493,372],[525,346],[511,216],[487,157],[464,128],[433,94],[389,64]],[[536,208],[562,204],[587,190],[607,168]],[[563,832],[589,823],[629,789],[648,577],[682,407],[722,278],[751,213],[798,133],[857,66],[897,42],[925,35],[939,71],[962,187],[958,194]],[[818,466],[850,431],[783,280],[719,186],[651,115],[594,70]],[[733,777],[824,730],[852,695]]]}};
+const DEATH_INK = [ // 墨滴:位置(viewBox 0~100)、開始時間、暈開多久、放多大
+  { x: 30, y: 22, t: .25, d: 1, s: 3.2 }, { x: 74, y: 40, t: .5, d: 1, s: 3.6 }, { x: 22, y: 66, t: .72, d: .95, s: 3.4 },
+  { x: 66, y: 80, t: .9, d: .9, s: 3.8 }, { x: 52, y: 12, t: 1.05, d: .85, s: 3.4 }, { x: 50, y: 48, t: 1.15, d: 1.1, s: 9 }
+];
+const DEATH_INK_SVG = `<svg class="dk-ink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>`
+  + `<filter id="dk-bleed" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="3" seed="8"/><feDisplacementMap in="SourceGraphic" scale="7" xChannelSelector="R" yChannelSelector="G"/><feGaussianBlur stdDeviation=".35"/></filter></defs>`
+  + `<g filter="url(#dk-bleed)">${DEATH_INK.map(b => `<circle cx="${b.x}" cy="${b.y}" r="10" style="--t:${b.t}s;--d:${b.d}s;--s:${b.s}"/>`).join("")}</g></svg>`;
+// 筆畫的中線往前後各延長一點,才蓋得滿筆畫頭尾
+function extendMedian(pts) {
+  if (pts.length < 2) return pts;
+  const ext = (a, b) => { const dx = a[0] - b[0], dy = a[1] - b[1], l = Math.hypot(dx, dy) || 1; return [a[0] + dx / l * 70, a[1] + dy / l * 70]; };
+  return [ext(pts[0], pts[1]), ...pts, ext(pts[pts.length - 1], pts[pts.length - 2])];
+}
+// 直書:一個字 1024×1024(字形座標 y 朝上),一筆一筆寫;回傳 SVG 和寫完的時間
+function brushColumn(chars, t0) {
+  let t = t0;
+  const defs = [], groups = [];
+  chars.forEach((ch, ci) => {
+    const d = DEATH_STROKES[ch];
+    if (!d) return;
+    const paths = d.strokes.map((outline, si) => {
+      const id = `dk-c${ci}-${si}`;
+      defs.push(`<clipPath id="${id}"><path d="${outline}"/></clipPath>`);
+      const pts = extendMedian(d.medians[si]);
+      let len = 0;
+      for (let k = 1; k < pts.length; k++) len += Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]);
+      const dur = Math.min(.2, Math.max(.06, len / 5200)); // 下筆快、短筆更快
+      const path = `<path class="dk-s" clip-path="url(#${id})" pathLength="1" d="M${pts.map(p => p.join(" ")).join(" L")}" style="animation-duration:${dur.toFixed(3)}s;animation-delay:${t.toFixed(3)}s"/>`;
+      t += dur + .018;
+      return path;
+    });
+    groups.push(`<g transform="translate(0 ${ci * 1024 + 900}) scale(1 -1)">${paths.join("")}</g>`);
+    t += .25; // 一個字寫完停一下
+  });
+  const svg = `<svg class="dk-chars" viewBox="0 0 1024 ${chars.length * 1024}" aria-hidden="true"><defs>${defs.join("")}`
+    + `<filter id="dk-rub" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="4" result="w"/>`
+    + `<feDisplacementMap in="SourceGraphic" in2="w" scale="20" xChannelSelector="R" yChannelSelector="G" result="rag"/>`
+    + `<feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="3" seed="11" result="g"/>`
+    + `<feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.2 2.55" result="holes"/>`
+    + `<feComposite in="rag" in2="holes" operator="in"/></filter></defs><g filter="url(#dk-rub)">${groups.join("")}</g></svg>`;
+  return { svg, end: t - .25 };
+}
+// 紅印(白文):字是 content.js 的 deathSeal,直排
+function sealSvg(text) {
+  const chs = [...text];
+  const h = 14 + chs.length * 40;
+  return `<svg class="dk-seal" viewBox="0 0 54 ${h}" aria-hidden="true"><defs><filter id="dk-sealtex" x="-5%" y="-5%" width="110%" height="110%">`
+    + `<feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -5 3.6" result="m"/>`
+    + `<feComposite in="SourceGraphic" in2="m" operator="in" result="worn"/><feTurbulence type="fractalNoise" baseFrequency=".2" numOctaves="2" seed="6" result="w"/>`
+    + `<feDisplacementMap in="worn" in2="w" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`
+    + `<g filter="url(#dk-sealtex)"><rect x="2" y="2" width="50" height="${h - 4}" rx="3" fill="#a9281c"/>`
+    + chs.map((c, i) => `<text x="27" y="${44 + i * 40}" text-anchor="middle" font-family="Noto Serif TC, serif" font-weight="700" font-size="34" fill="#f4e2cb">${c}</text>`).join("")
+    + `</g></svg>`;
+}
+function deathRubbing(node) {
+  const col = brushColumn([...CONTENT.deathWord], 2.3);
+  const seal = col.end + .3;
+  const stage = el("div", { class: "dk-stage thump" }, [deathLine(), deathAchv(node)]);
+  stage.insertAdjacentHTML("afterbegin", col.svg + sealSvg(CONTENT.deathSeal));
+  const ink = el("div");
+  ink.innerHTML = DEATH_INK_SVG;
+  return deathScreen("dv-rubbing", { seal, line: seal + .4, achv: seal + 1.4, dock: seal + 1.9 }, [
+    el("div", { class: "death dv-rubbing" }, [
+      deathFrameLayer(),
+      ink.firstChild,
+      el("div", { class: "dk-paper" }),
+      stage,
+      deathPetals(18)
+    ])
+  ]);
+}
+
+// ---- 闔眼 ----
+function deathEyes(node) {
+  const word = 4.1, flutter = 5.9;
+  return deathScreen("dv-eyes", { word, flutter, line: word + 1.2, achv: flutter + 2.3, dock: flutter + 2.8 }, [
+    el("div", { class: "death dv-eyes" }, [
+      deathFrameLayer(),
+      deathPetals(42),
+      el("div", { class: "ey-light" }),
+      el("div", { class: "ey-lid top" }),
+      el("div", { class: "ey-lid bottom" }),
+      el("div", { class: "ey-rule l" }),
+      el("div", { class: "ey-word" }, [[...CONTENT.deathWord].join("")]),
+      el("div", { class: "ey-rule r" }),
+      deathLine(),
+      deathAchv(node)
+    ])
+  ]);
+}
+
+function renderSideDeath() {
+  const node = CONTENT.turtleQuest.nodes[state.side.node];
+  const style = state.deathStyle;
+  const scr = style === "eyes" ? deathEyes(node) : style === "carve" ? deathCarve(node) : deathRubbing(node);
+  if (REDUCE_MOTION) scr.classList.add("skip");
   // 點畫面(選項以外)直接跳到最後
   scr.addEventListener("click", e => { if (!e.target.closest("button")) scr.classList.add("skip"); });
   return scr;
